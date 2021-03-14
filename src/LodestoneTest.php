@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace Lodestone;
+namespace Simbiat;
 
-class Test
+class LodestoneTest
 {
     private object $Lodestone;
     
@@ -15,7 +15,7 @@ class Test
                 pre {height: 5pc; max-width: 600px; overflow-y: scroll;}
             </style>
             <table><th>Type of test</th><th>Result</th><th>Page time, hh:mm:ss.ms</th><th>Parse time, hh:mm:ss.ms</th><th>Errors</th><th>Output</th>';
-        $this->Lodestone = (new \Lodestone\Api)->setLanguage($language)->setUseragent('Simbiat Software UAT')->setBenchmark(true);
+        $this->Lodestone = (new \Simbiat\Lodestone\Api)->setLanguage($language)->setUseragent('Simbiat Software UAT')->setBenchmark(true);
         
         #Checking characters
         $this->Lodestone->getCharacter('6691027');

@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace Lodestone\Modules;
+namespace Simbiat\LodestoneModules;
 
 /**
  * Class HttpRequest
- * @package src\Modules
  */
 class HttpRequest
 {

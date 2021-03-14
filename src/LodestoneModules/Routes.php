@@ -1,16 +1,11 @@
 <?php
 declare(strict_types=1);
-namespace Lodestone\Modules;
+namespace Simbiat\LodestoneModules;
 
 /**
  * URL's for Lodestone content
  *
- * The API is currently built based on the NA lodestone,
- * changing the lodestone to de/fr may work but this has
- * not been tested and can't be guaranteed.
- *
  * Class Routes
- * @package Lodestone\Modules
  */
 class Routes
 {

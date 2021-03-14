@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace Lodestone;
+namespace Simbiat;
 
 // use all the things
-use Lodestone\Modules\{
+use LodestoneModules\{
     Routes, Regex, HttpRequest, Converters
 };
 
@@ -13,10 +13,10 @@ use Lodestone\Modules\{
  * Class Api
  * @package Lodestone
  */
-class Api
+class Lodestone
 {
     #Use trait
-    use Modules\Parsers;
+    use LodestoneModules\Parsers;
     
     const langallowed = ['na', 'jp', 'ja', 'eu', 'fr', 'de'];
     #List of achievements categories' ids excluding 1
@@ -37,7 +37,7 @@ class Api
     
     public function __construct()
     {
-        $this->converters = new \Lodestone\Modules\Converters;
+        $this->converters = new \Simbiat\LodestoneModules\Converters;
     }
     
     public function __destruct()

@@ -32,7 +32,7 @@ To get last error you can use `->getLastError($close)`. For list of all errors -
 All parsers accepting `page` number support value of `0`, which will return all pages (that is run the respective parser recursively). Default value for `page` is set to `1` to limit resources used.
 
 ## Test script
-There is a `\Lodestone\Test` class to test run all of the available functions in some general scenarios. Run it to get samples of output formatting and timings for each type of test in a table format. Note, that the last 2 tests are 'error tests', so their results are purposefully reversed for the report's consistency. Additionally achievements' test is purposefully ran with `details` set to true and Free Company members in `All pages` mode, becuase of this their benchamrk results will be presented as list of timings.
+There is a `\Simbiat\LodestoneTest` class to test run all of the available functions in some general scenarios. Run it to get samples of output formatting and timings for each type of test in a table format. Note, that the last 2 tests are 'error tests', so their results are purposefully reversed for the report's consistency. Additionally achievements' test is purposefully ran with `details` set to true and Free Company members in `All pages` mode, becuase of this their benchamrk results will be presented as list of timings.
 
 ## Getting results
 To get results of parsers (listed below) you need to run `->getResult($close)`, which will return the array with the results. `$close` is an expected boolean, that, if set to `true`, will close the cURL handle. It is set to `true` by default, based on assumption, that getting results will be your last action.
