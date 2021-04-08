@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Simbiat;
 
 // use all the things
-use LodestoneModules\{
+use \Simbiat\LodestoneModules\{
     Routes, Regex, HttpRequest, Converters
 };
 
