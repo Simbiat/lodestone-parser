@@ -39,12 +39,6 @@ trait Parsers
         if ($this->benchmark) {
             $finished = hrtime(true);
             $duration = $finished - $started;
-            #echo $duration.'<br>';
-            #$micro = sprintf("%06d", ($duration / 1000));
-            #echo $micro.'<br>';
-            #echo date('H:i:s.'.$micro, intval($duration / 1000000000)).'<br>';
-            #exit;
-            #$d = new \DateTime(date('H:i:s.'.$micro, (int)$duration));
             $this->result['benchmark']['httptime'][] = date('H:i:s.'.sprintf("%06d", ($duration / 1000)), intval($duration / 1000000000));
         }
         $started = hrtime(true);
@@ -183,6 +177,9 @@ trait Parsers
                 }
                 #Decode HTML entities
                 foreach ($tempresult as $key2=>$value) {
+                    #Decode in the data inside loop
+                    $tempresult[$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
+                    #Decode in original data (for consistency)
                     $tempresults[$key][$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                 }
                 
