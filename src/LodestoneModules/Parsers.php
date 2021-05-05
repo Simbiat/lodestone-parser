@@ -175,17 +175,21 @@ trait Parsers
             }
             
             foreach ($tempresults as $key=>$tempresult) {
+                #Remove unnamed groups and empty values
                 foreach ($tempresult as $key2=>$value) {
                     if (is_numeric($key2) || empty($value)) {
                         unset($tempresults[$key][$key2]);
                     }
+                }
+                #Decode HTML entities
+                foreach ($tempresult as $key2=>$value) {
+                    $tempresults[$key][$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                 }
                 
                 #Specific processing
                 switch($this->type) {
                     case 'searchPvPTeam':
                     case 'searchFreeCompany':
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         $tempresults[$key]['crest'] = $this->crest($tempresult, 'crest'); break;
                     case 'searchCharacter':
                     case 'CharacterFriends':
@@ -193,7 +197,6 @@ trait Parsers
                     case 'FreeCompanyMembers':
                     case 'LinkshellMembers':
                     case 'PvPTeamMembers':
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         if (!empty($tempresult['linkshellcommunityid'])) {
                             $tempresults[$key]['communityid'] = $tempresult['linkshellcommunityid'];
                         }
@@ -209,11 +212,7 @@ trait Parsers
                         if (!empty($tempresult['fcid'])) {
                             $tempresults[$key]['freeCompany'] = $this->freecompany($tempresult);
                         }
-                        if (!empty($tempresult['rank'])) {
-                            $tempresults[$key]['rank'] = html_entity_decode($tempresult['rank'], ENT_QUOTES | ENT_HTML5);
-                        }
                         if (!empty($tempresult['lsrank'])) {
-                            $tempresults[$key]['rank'] = html_entity_decode($tempresult['lsrank'], ENT_QUOTES | ENT_HTML5);
                             $tempresults[$key]['rankicon'] = $tempresult['lsrankicon'];
                             #Specific for linkshell members
                             if (empty($this->result['server'])) {
@@ -226,19 +225,17 @@ trait Parsers
                         break;
                     case 'frontline':
                     case 'GrandCompanyRanking':
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         if (!empty($tempresult['gcname'])) {
                             $tempresults[$key]['grandCompany'] = $this->grandcompany($tempresult);
                         }
                         if (!empty($tempresult['fcid'])) {
                             $tempresults[$key]['freeCompany'] = $this->freecompany($tempresult);
                         }
-                        $tempresults[$key]['rank'] = ($tempresult['rank2'] ? html_entity_decode($tempresult['rank2']) : html_entity_decode($tempresult['rank1']));
+                        $tempresults[$key]['rank'] = ($tempresult['rank2'] ? $tempresult['rank2'] : $tempresult['rank1']);
                         break;
                     case 'FreeCompanyRanking':
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         $tempresults[$key]['crest'] = $this->crest($tempresult, 'crest');
-                        $tempresults[$key]['rank'] = ($tempresult['rank2'] ? html_entity_decode($tempresult['rank2']) : html_entity_decode($tempresult['rank1']));
+                        $tempresults[$key]['rank'] = ($tempresult['rank2'] ? $tempresult['rank2'] : $tempresult['rank1']);
                         break;
                     case 'topics':
                     case 'news':
@@ -258,7 +255,6 @@ trait Parsers
                         }
                         break;
                     case 'FreeCompany':
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         $tempresults[$key]['crest'] = $this->crest($tempresult, 'crest');
                         #Ranking checks for --
                         if ($tempresult['weekly_rank'] == '--') {
@@ -316,7 +312,6 @@ trait Parsers
                         }
                         break;
                     case 'Achievements':
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         $tempresults[$key]['title'] = !empty($tempresult['title']);
                         $tempresults[$key]['item'] = !empty($tempresult['item']);
                         if (empty($tempresult['time'])) {
@@ -327,19 +322,16 @@ trait Parsers
                         }
                         break;
                     case 'AchievementDetails':
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         if (empty($tempresult['title'])) {
-                            $tempresults[$key]['title'] = false;
-                        } else {
-                            $tempresults[$key]['title'] = html_entity_decode($tempresult['title'], ENT_QUOTES | ENT_HTML5);
+                            $tempresults[$key]['title'] = NULL;
                         }
                         if (empty($tempresult['item'])) {
-                            $tempresults[$key]['item'] = false;
+                            $tempresults[$key]['item'] = NULL;
                         }
                         if (!empty($tempresult['itemname'])) {
                             $tempresults[$key]['item'] = [
                                 'id'=>$tempresult['itemid'],
-                                'name'=>html_entity_decode($tempresult['itemname'], ENT_QUOTES | ENT_HTML5),
+                                'name'=>$tempresult['itemname'],
                                 'icon'=>$tempresult['itemicon'],
                             ];
                             unset($tempresults[$key]['itemid'], $tempresults[$key]['itemname'], $tempresults[$key]['itemicon']);
@@ -457,10 +449,7 @@ trait Parsers
                         }
                         break;
                     case 'Character':
-                        #Decode html entities
-                        $tempresults[$key]['name'] = html_entity_decode($tempresult['name'], ENT_QUOTES | ENT_HTML5);
                         #There are cases of characters not returning a proper race or clan (usually both). I've reported this issue to Square Enix several times and they simply update affected characters. This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
-                        $tempresults[$key]['race'] = trim(html_entity_decode($tempresult['race'], ENT_QUOTES | ENT_HTML5));
                         if ($tempresults[$key]['race'] == '----') {
                             $tempresults[$key]['race'] = match(strtolower($this->language)) {
                                 'jp', 'ja' => 'ヒューラン',
@@ -469,7 +458,6 @@ trait Parsers
                             };
                             $tempresults[$key]['comment'] = 'Defaulted race';
                         }
-                        $tempresults[$key]['clan'] = trim(html_entity_decode($tempresult['clan'], ENT_QUOTES | ENT_HTML5));
                         if ($tempresults[$key]['clan'] == '----') {
                             $tempresults[$key]['clan'] = match(strtolower($this->language)) {
                                 'jp', 'ja' => 'ミッドランダー',
@@ -485,9 +473,9 @@ trait Parsers
                         }
                         $tempresults[$key]['nameday'] = str_replace("32st", "32nd", $tempresults[$key]['nameday']);
                         if (!empty($tempresult['uppertitle'])) {
-                            $tempresults[$key]['title'] = html_entity_decode($tempresult['uppertitle'], ENT_QUOTES | ENT_HTML5);
+                            $tempresults[$key]['title'] = $tempresult['uppertitle'];
                         } elseif (!empty($tempresult['undertitle'])) {
-                            $tempresults[$key]['title'] = html_entity_decode($tempresult['undertitle'], ENT_QUOTES | ENT_HTML5);
+                            $tempresults[$key]['title'] = $tempresult['undertitle'];
                         } else {
                             $tempresults[$key]['title'] = ''; 
                         }
@@ -509,13 +497,13 @@ trait Parsers
                             }
                         } else {
                             $tempresults[$key]['guardian'] = [
-                                'name'=>html_entity_decode($tempresult['guardian'], ENT_QUOTES | ENT_HTML5),
+                                'name'=>$tempresult['guardian'],
                                 'icon'=>$tempresult['guardianicon'],
                             ];
                         }
                         #City
                         $tempresults[$key]['city'] = [
-                            'name'=>html_entity_decode($tempresult['city'], ENT_QUOTES | ENT_HTML5),
+                            'name'=>$tempresult['city'],
                             'icon'=>$tempresult['cityicon'],
                         ];
                         #Portrait
@@ -532,7 +520,7 @@ trait Parsers
                         if (!empty($tempresult['pvpid'])) {
                             $tempresults[$key]['pvp'] = [
                                 'id'=>$tempresult['pvpid'],
-                                'name'=>html_entity_decode($tempresult['pvpname'], ENT_QUOTES | ENT_HTML5),
+                                'name'=>$tempresult['pvpname'],
                             ];
                             $tempresults[$key]['pvp']['crest'] = $this->crest($tempresult, 'pvpcrest');
                         }
@@ -942,9 +930,8 @@ trait Parsers
     
     protected function grandcompany(array $tempresult): array
     {
-        $gc['name'] = html_entity_decode($tempresult['gcname'], ENT_QUOTES | ENT_HTML5);
         if (!empty($tempresult['gcrank'])) {
-            $gc['rank'] = html_entity_decode($tempresult['gcrank'], ENT_QUOTES | ENT_HTML5);
+            $gc['rank'] = $tempresult['gcrank'];
         }
         if (!empty($tempresult['gcrankicon'])) {
             $gc['icon'] = $tempresult['gcrankicon'];
@@ -956,7 +943,7 @@ trait Parsers
     {
         return [
                     'id'=>$tempresult['fcid'],
-                    'name'=>html_entity_decode($tempresult['fcname'], ENT_QUOTES | ENT_HTML5),
+                    'name'=>$tempresult['fcname'],
                     'crest'=>$this->crest($tempresult, 'fccrestimg'),
                 ];
     }
@@ -987,9 +974,9 @@ trait Parsers
         }
         foreach ($attributes as $attribute) {
             if (empty($attribute['name'])) {
-                $tempattrs[html_entity_decode($attribute['name2'], ENT_QUOTES | ENT_HTML5)] = $attribute['value2'];
+                $tempattrs[$attribute['name2']] = $attribute['value2'];
             } else {
-                $tempattrs[html_entity_decode($attribute['name'], ENT_QUOTES | ENT_HTML5)] = $attribute['value'];
+                $tempattrs[$attribute['name']] = $attribute['value'];
             }
         }
         return $tempattrs;
@@ -1006,7 +993,7 @@ trait Parsers
         if (!empty($results[0][0])) {
             preg_match_all(Regex::COLLECTIBLE, $results[0][0], $results, PREG_SET_ORDER);
             foreach ($results as $result) {
-                $colls[html_entity_decode($result[1], ENT_QUOTES | ENT_HTML5)] = $result[2];
+                $colls[$result[1]] = $result[2];
             }
         }
         return $colls;
@@ -1035,7 +1022,7 @@ trait Parsers
             #Attributes
             for ($i = 1; $i <= 15; $i++) {
                 if (!empty($tempresult['attrname'.$i])) {
-                    $tempresults[$key]['attributes'][html_entity_decode($tempresult['attrname'.$i], ENT_QUOTES | ENT_HTML5)] = $tempresult['attrvalue'.$i];
+                    $tempresults[$key]['attributes'][$tempresult['attrname'.$i]] = $tempresult['attrvalue'.$i];
                     unset($tempresults[$key]['attrname'.$i], $tempresults[$key]['attrvalue'.$i]);
                 }
             }
@@ -1043,7 +1030,7 @@ trait Parsers
             for ($i = 1; $i <= 5; $i++) {
                 if (!empty($tempresult['materianame'.$i])) {
                     $tempresults[$key]['materia'][] = [
-                        'name'=>html_entity_decode($tempresult['materianame'.$i], ENT_QUOTES | ENT_HTML5),
+                        'name'=>$tempresult['materianame'.$i],
                         'attribute'=>$tempresult['materiaattr'.$i],
                         'bonus'=>$tempresult['materiaval'.$i],
                     ];
@@ -1093,7 +1080,7 @@ trait Parsers
             if (!empty($tempresult['glamourname'])) {
                 $tempresults[$key]['customization']['glamour'] = [
                     'id'=>$tempresult['glamourid'],
-                    'name'=>html_entity_decode($tempresult['glamourname'], ENT_QUOTES | ENT_HTML5),
+                    'name'=>$tempresult['glamourname'],
                     'icon'=>$tempresult['glamouricon'],
                 ];
             }
