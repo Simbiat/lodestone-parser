@@ -447,25 +447,16 @@ trait Parsers
                         break;
                     case 'Character':
                         #There are cases of characters not returning a proper race or clan (usually both). I've reported this issue to Square Enix several times and they simply update affected characters. This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
-                        if ($tempresults[$key]['race'] == '----') {
-                            $tempresults[$key]['race'] = match(strtolower($this->language)) {
-                                'jp', 'ja' => 'ヒューラン',
-                                'de' => 'Hyuran',
-                                default => 'Hyur',
-                            };
-                            $tempresults[$key]['comment'] = 'Defaulted race';
+                        if (trim($tempresults[$key]['race']) == '----') {
+                            $tempresults[$key]['race'] = NULL;
+                            $tempresults[$key]['comment'] = 'No race';
                         }
-                        if ($tempresults[$key]['clan'] == '----') {
-                            $tempresults[$key]['clan'] = match(strtolower($this->language)) {
-                                'jp', 'ja' => 'ミッドランダー',
-                                'fr' => 'Hyurois',
-                                'de' => 'Wiesländer',
-                                default => 'Midlander',
-                            };
-                            if ($tempresults[$key]['comment'] === 'Defaulted race') {
+                        if (trim($tempresults[$key]['clan']) == '----') {
+                            $tempresults[$key]['clan'] = NULL;
+                            if ($tempresults[$key]['comment'] === 'No race') {
                                 $tempresults[$key]['comment'] .= ' and clan';
                             } else {
-                                $tempresults[$key]['comment'] = 'Defaulted clan';
+                                $tempresults[$key]['comment'] = 'No clan';
                             }
                         }
                         $tempresults[$key]['nameday'] = str_replace("32st", "32nd", $tempresults[$key]['nameday']);
