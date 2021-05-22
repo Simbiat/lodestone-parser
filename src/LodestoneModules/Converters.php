@@ -3,46 +3,48 @@
 declare(strict_types=1);
 namespace Simbiat\LodestoneModules;
 
+use Simbiat\Lodestone;
+
 class Converters {
-    
+
     public function FCRankID(string $image): string
     {
-    	if (strpos($image, 'W5a6yeRyN2eYiaV-AGU7mJKEhs') !== false) {
+    	if (str_contains($image, 'W5a6yeRyN2eYiaV-AGU7mJKEhs')) {
     		$rank = '0';
-    	} elseif (strpos($image, 'SO2DiXPE4vb5ZquxK9qZzaS2FI') !== false) {
+    	} elseif (str_contains($image, 'SO2DiXPE4vb5ZquxK9qZzaS2FI')) {
     		$rank = '12';
-    	} elseif (strpos($image, 'hOa5rExOnxaN1WNnQqZYe3Vb7c') !== false) {
+    	} elseif (str_contains($image, 'hOa5rExOnxaN1WNnQqZYe3Vb7c')) {
     		$rank = '8';
-    	} elseif (strpos($image, 'eWQ8n_shMm6W0LoRN9KodNZ8tw') !== false) {
+    	} elseif (str_contains($image, 'eWQ8n_shMm6W0LoRN9KodNZ8tw')) {
     		$rank = '14';
-    	} elseif (strpos($image, 'p94F1j-5xhM2ySM16VNrA08qjU') !== false) {
+    	} elseif (str_contains($image, 'p94F1j-5xhM2ySM16VNrA08qjU')) {
     		$rank = '1';
-    	} elseif (strpos($image, 'nw6rom1Gt5lCuBPbSsRUeFEAYo') !== false) {
+    	} elseif (str_contains($image, 'nw6rom1Gt5lCuBPbSsRUeFEAYo')) {
     		$rank = '9';
-    	} elseif (strpos($image, 'qm0y-fW7o2TvgYFH-vvcL-IH8s') !== false) {
+    	} elseif (str_contains($image, 'qm0y-fW7o2TvgYFH-vvcL-IH8s')) {
     		$rank = '10';
-    	} elseif (strpos($image, 'hU1Eoa9YXYljYZSLr_PDKlS9rA') !== false) {
+    	} elseif (str_contains($image, 'hU1Eoa9YXYljYZSLr_PDKlS9rA')) {
     		$rank = '11';
-    	} elseif (strpos($image, 'cliLaxMGlva579Q7-BGQofaHoU') !== false) {
+    	} elseif (str_contains($image, 'cliLaxMGlva579Q7-BGQofaHoU')) {
     		$rank = '3';
-    	} elseif (strpos($image, 'zXxmuKQfvR0_XbK-Q9tGafCvZQ') !== false) {
+    	} elseif (str_contains($image, 'zXxmuKQfvR0_XbK-Q9tGafCvZQ')) {
     		$rank = '4';
-    	} elseif (strpos($image, 'ZgBF9xaOv1cXJ5hpqJk775gPnU') !== false) {
+    	} elseif (str_contains($image, 'ZgBF9xaOv1cXJ5hpqJk775gPnU')) {
     		$rank = '7';
-    	} elseif (strpos($image, 'MORWKTwHdU9RwJjwTjA8Goqczg') !== false) {
+    	} elseif (str_contains($image, 'MORWKTwHdU9RwJjwTjA8Goqczg')) {
     		$rank = '13';
-    	} elseif (strpos($image, 'uIrHic2MOYHNS316SWOpAFgMKM') !== false) {
+    	} elseif (str_contains($image, 'uIrHic2MOYHNS316SWOpAFgMKM')) {
     		$rank = '6';
-    	} elseif (strpos($image, 'wy6luU_yTtJcSMjKaq-g7_uxX0') !== false) {
+    	} elseif (str_contains($image, 'wy6luU_yTtJcSMjKaq-g7_uxX0')) {
     		$rank = '2';
-    	} elseif (strpos($image, 'IjnNzh88h17r2k16noer9mUzZo') !== false) {
+    	} elseif (str_contains($image, 'IjnNzh88h17r2k16noer9mUzZo')) {
     		$rank = '5';
     	} else {
     	    $rank = '';
     	}
     	return $rank;
     }
-    
+
     public function imageToBool(string $img): bool
     {
         return in_array(strtolower($img), [
@@ -55,98 +57,7 @@ class Converters {
             'https://img.finalfantasyxiv.com/lds/h/D/_VRXR3uARNQzxAv1v16NYvS5xk.png',
         ]);
     }
-    
-    public function getAchKindId(string $kind): string
-    {
-        return match(strtolower($kind)) {
-            '1', 'battle', 'バトル', 'combats', 'kampferfolge' => '1',
-            '2', 'pvp', 'jcj' => '2',
-            '3', 'character', 'キャラクター', 'personnage', 'charakter' => '3',
-            '4', 'items', 'アイテム', 'objets', 'gegenstände' => '4',
-            '5', 'crafting', '製作', 'synthèse', 'synthese' => '5',
-            '6', 'gathering', '採集', 'récolte', 'sammeln' => '6',
-            '8', 'quests', 'クエスト', 'quêtes', 'aufträge' => '8',
-            '11', 'exploration', '探検', 'erkundungen' => '11',
-            '12', 'grand company', 'グランドカンパニー', 'grandes compagnies', 'staatliche gesellschaften' => '12',
-            '13', 'legacy', 'レガシー' => '13',
-            default => '1',
-        };
-    }
-    
-    public function getAchCatId(string $cat): string
-    {
-        return match(strtolower($cat)) {
-            '1', 'battle', '全般', 'général', 'kampferfolge' => '1',
-            '2', 'dungeons', 'ダンジョン', 'donjons' => '2',
-            '3', 'trials', '討伐・討滅戦', 'défis', 'prüfungen' => '3',
-            '4', 'raids', 'レイド' => '4',
-            '5', 'the hunt', 'モブハント', 'contrats de chasse', 'hohe jagd' => '5',
-            '6', 'treasure hunt', 'トレジャーハント', 'chasse aux trésors', 'schatzsuche' => '6',
-            #French uses duplicate name here, thus not supported
-            '7', 'general', '全般', 'allgemein' => '7',
-            '8', 'ranking', 'ランキング', 'classement', 'pvp-ranglisten' => '8',
-            '9', 'the wolve\'s den', 'コロセウム', 'l\'antre des loups', 'wolfshöhle' => '9',
-            '10', 'frontline', 'フロントライン', 'front' => '10',
-            '11', 'rival wings', 'ライバルウィングズ', 'ailes rivales', 'stahlschwingen' => '11',
-            #Japanese and French use duplicate name here, thus not supported
-            '12', 'class', 'charakter' => '12',
-            '13', 'disciples of war', 'ファイター', 'disciples de la guerre', 'krieger' => '13',
-            '14', 'disciples of magic', 'ソーサラー', 'disciples de la magie', 'magier' => '15',
-            '15', 'disciples of the hand', 'クラフター', 'disciples de la main', 'handwerker' => '15',
-            '16', 'disciples of the land', 'ギャザラー', 'disciples de la terre', 'sammler' => '16',
-            '17', 'commendation', 'mip', 'honneurs', 'ehrungen' => '17',
-            '18', 'gold saucer', 'ゴールドソーサー' => '18',
-            #Japanese and French use duplicate name here, thus not supported
-            '19', 'items', 'gegenstände' => '19',
-            '20', 'currency', '通貨', 'devises', 'vermögen' => '20',
-            '21', 'desynthesis', '分解', 'recyclage', 'verwertung' => '21',
-            '22', 'collectables', '蒐集品', 'objets collectionnables', 'sammlerstücke' => '22',
-            '23', 'materia', 'マテリア', 'matérias' => '23',
-            '24', 'carpenter', '木工師', 'menuisier', 'zimmerer' => '24',
-            '25', 'blacksmith', '鍛冶師', 'forgeron', 'grobschmied' => '25',
-            '26', 'armorer', '甲冑師', 'armurier', 'plattner' => '26',
-            '27', 'goldsmith', '彫金師', 'orfèvre', 'goldschmied' => '27',
-            '28', 'leatherworker', '革細工師', 'tanneur', 'gerber' => '28',
-            '29', 'weaver', '裁縫師', 'couturier', 'weber' => '29',
-            '30', 'alchemist', '錬金術師', 'alchimiste' => '30',
-            '31', 'culinarian', '調理師', 'cuisinier', 'gourmet' => '31',
-            '32', 'miner', '採掘師', 'mineur', 'minenarbeiter' => '32',
-            '33', 'botanist', '園芸師', 'botaniste', 'gärtner' => '33',
-            '34', 'fisher', '漁師', 'pêcheur', 'fischer' => '34',
-            #Japanese and French use duplicate name here, thus not supported
-            '35', 'quests', 'aufträge' => '35',
-            '36', 'levequests', 'リーヴ', 'mandats', 'freibriefe' => '36',
-            '37', 'beast tribe quests', '蛮族クエスト', 'quêtes tribales', 'wilde stämme' => '37',
-            '38', 'seasonal events', 'シーズナルイベント', 'événements saisonniers', 'saisonale ereignisse' => '38',
-            '39', 'sightseeing log', '探検手帳', 'carnet d\'exploration', 'eorzea incognita' => '39',
-            '40', 'la noscea', 'ラノシア', 'noscea' => '40',
-            '41', 'the black shroud', '黒衣森', 'forêt de sombrelinceul', 'finsterwald' => '41',
-            '42', 'thanalan', 'ザナラーン' => '42',
-            '43', 'coerthas', 'クルザス' => '43',
-            '44', 'mor dhona', 'モードゥナ' => '44',
-            '45', 'abalathia\'s spine', 'アバラシア', 'abalathia' => '45',
-            '46', 'dravania', 'ドラヴァニア' => '46',
-            '47', 'gyr abania', 'ギラバニア' => '47',
-            '48', 'othard', 'オサード' => '48',
-            '49', 'duty', 'コンテンツ', 'instances', 'inhalte' => '49',
-            #Japanese and French use duplicate name here, thus not supported
-            '50', 'grand company', 'staatliche gesellschaften' => '50',
-            '51', 'maelstrom', '黒渦団', 'mahlstrom' => '51',
-            '52', 'order of the twin adder', '双蛇党', 'ordre des deux vipères', 'bruderschaft' => '52',
-            '53', 'immortal flames', '不滅隊', 'immortels', 'legion' => '53',
-            #Legacy categories. Due duplicate names only IDs are supported for them
-            '54' => '54',
-            '55' => '55',
-            '56' => '56',
-            '57' => '57',
-            '58' => '58',
-            '59' => '59',
-            '60' => '60',
-            '61' => '61',
-            default => '1',
-        };
-    }
-    
+
     public function getFeastRankId(string $rank): string
     {
         return match(strtolower($rank)) {
@@ -158,7 +69,7 @@ class Converters {
             default => 'all',
         };
     }
-    
+
     public function getSearchRolesId(string $role): string
     {
         return match(strtolower($role)) {
@@ -171,7 +82,7 @@ class Converters {
             default => '',
         };
     }
-    
+
     public function getSearchActivitiesId(string $act): string
     {
         return match(strtolower($act)) {
@@ -188,7 +99,7 @@ class Converters {
             default => '',
         };
     }
-    
+
     public function getSearchHouseId(string $house): string
     {
         return match(strtolower($house)) {
@@ -198,7 +109,7 @@ class Converters {
             default => '',
         };
     }
-    
+
     public function getSearchJoinId(string $join): string
     {
         return match(strtolower($join)) {
@@ -207,7 +118,7 @@ class Converters {
             default => '',
         };
     }
-    
+
     public function getSearchActiveTimeId(string $active): string
     {
         return match(strtolower($active)) {
@@ -217,7 +128,7 @@ class Converters {
             default => '',
         };
     }
-    
+
     public function matchesCount(int $count): string
     {
         if ($count >= 1 && $count <= 29) {
@@ -231,7 +142,7 @@ class Converters {
         }
         return $count;
     }
-    
+
     public function pvpRank(int $count): string
     {
         if ($count >= 1 && $count <= 10) {
@@ -247,7 +158,7 @@ class Converters {
         }
         return $count;
     }
-    
+
     public function membersCount(int $count): string
     {
         if ($count >= 1 && $count <= 10) {
@@ -263,11 +174,11 @@ class Converters {
         }
         return $count;
     }
-    
+
     public function languageConvert(string $lang): string
     {
         if (!empty($lang)) {
-            if (!in_array($lang, self::langallowed)) {
+            if (!in_array($lang, Lodestone::langAllowed)) {
                 $lang = 'na';
             }
             if (in_array($lang, ['jp', 'ja'])) {$lang = 'ja';}
@@ -277,7 +188,7 @@ class Converters {
         }
         return $lang;
     }
-    
+
     public function getSearchOrderId(string $order): string
     {
 	    return match(strtolower($order)) {
@@ -290,7 +201,7 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function getSearchGCId(string $gc): string
     {
 	    return match(strtolower($gc)) {
@@ -301,7 +212,7 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function getSearchClanId(string $clan): string
     {
 	    return match(strtolower($clan)) {
@@ -332,7 +243,7 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function classToJob(string $class): string
     {
         return match(strtolower($class)) {
@@ -358,7 +269,7 @@ class Converters {
             'élémentaliste' => 'Mage blanc',
             'pugiliste' => 'Moine',
             'maître d\'hast' => 'Chevalier dragon',
-            'archer', 'waldläufer' => 'Barde',
+            'waldläufer' => 'Barde',
             'occultiste' => 'Mage noir',
             'arcaniste' => 'Invocateur',
             'marodeur' => 'Krieger',
@@ -369,7 +280,7 @@ class Converters {
             default => $class,
 	    };
     }
-    
+
     public function getSearchClassId(string $classname): string
     {
 	    return match(strtolower($classname)) {
@@ -442,7 +353,7 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function getGuardianId(string $guardian): string
     {
         return match(strtolower($guardian)) {
@@ -461,7 +372,7 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function getCityId(string $city): string
     {
         #IDs are based on what I have in my own database, there is no other meaning behind them
@@ -473,71 +384,33 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function getCityName(int $id = 1, string $lang = 'en'): string
     {
         if (!in_array(strtolower($lang), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for City name');
         }
-        switch($id) {
-            case 2:
-                switch(strtolower($lang)) {
-                    case 'na':
-                    case 'eu':
-                    case 'en':
-                    case 'fr':
-                    case 'de':
-                        $name = 'Gridania'; break;
-                    case 'jp':
-                    case 'ja':
-                        $name = 'グリダニア'; break;
-                }
-                break;
-            case 4:
-                switch(strtolower($lang)) {
-                    case 'na':
-                    case 'eu':
-                    case 'en':
-                    case 'fr':
-                    case 'de':
-                        $name = 'Limsa Lominsa'; break;
-                    case 'jp':
-                    case 'ja':
-                        $name = 'リムサ・ロミンサ'; break;
-                }
-                break;
-            case 5:
-                switch(strtolower($lang)) {
-                    case 'na':
-                    case 'eu':
-                    case 'en':
-                    case 'fr':
-                    case 'de':
-                        $name = 'Ul\'dah'; break;
-                    case 'jp':
-                    case 'ja':
-                        $name = 'ウルダハ'; break;
-                }
-                break;
-            case 7:
-                switch(strtolower($lang)) {
-                    case 'na':
-                    case 'eu':
-                    case 'en':
-                    case 'fr':
-                    case 'de':
-                        $name = 'Kugane'; break;
-                    case 'jp':
-                    case 'ja':
-                        $name = 'クガネ'; break;
-                }
-                break;
-            default:
-                $name = '';
-        }
-        return $name;
+        return match ($id) {
+            2 => match (strtolower($lang)) {
+                'na', 'eu', 'en', 'fr', 'de' => 'Gridania',
+                'jp', 'ja' => 'グリダニア',
+            },
+            4 => match (strtolower($lang)) {
+                'na', 'eu', 'en', 'fr', 'de' => 'Limsa Lominsa',
+                'jp', 'ja' => 'リムサ・ロミンサ',
+            },
+            5 => match (strtolower($lang)) {
+                'na', 'eu', 'en', 'fr', 'de' => 'Ul\'dah',
+                'jp', 'ja' => 'ウルダハ',
+            },
+            7 => match (strtolower($lang)) {
+                'na', 'eu', 'en', 'fr', 'de' => 'Kugane',
+                'jp', 'ja' => 'クガネ',
+            },
+            default => '',
+        };
     }
-    
+
     public function getGrandCompanyId(string $gc): string
     {
         return match(strtolower($gc)) {
@@ -547,63 +420,34 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function getGrandCompanyName(int $id = 1, string $lang = 'en'): string
     {
         if (!in_array(strtolower($lang), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for Grand Company name');
         }
-        switch($id) {
-            case 1:
-                switch(strtolower($lang)) {
-                    case 'na':
-                    case 'eu':
-                    case 'en':
-                    case 'fr':
-                        $name = 'Maelstrom'; break;
-                    case 'jp':
-                    case 'ja':
-                        $name = '黒渦団'; break;
-                    case 'de':
-                        $name = 'Mahlstrom'; break;
-                }
-                break;
-            case 2:
-                switch(strtolower($lang)) {
-                    case 'na':
-                    case 'eu':
-                    case 'en':
-                        $name = 'Order of the Twin Adder'; break;
-                    case 'jp':
-                    case 'ja':
-                        $name = '双蛇党'; break;
-                    case 'fr':
-                        $name = 'Ordre des Deux Vipères'; break;
-                    case 'de':
-                        $name = 'Bruderschaft'; break;
-                }
-                break;
-            case 3:
-                switch(strtolower($lang)) {
-                    case 'na':
-                    case 'eu':
-                    case 'en':
-                        $name = 'Immortal Flames'; break;
-                    case 'jp':
-                    case 'ja':
-                        $name = '不滅隊'; break;
-                    case 'fr':
-                        $name = 'Immortels'; break;
-                    case 'de':
-                        $name = 'Legion'; break;
-                }
-                break;
-            default:
-                $name = '';
-        }
-        return $name;
+        return match ($id) {
+            1 => match (strtolower($lang)) {
+                'na', 'eu', 'en', 'fr' => 'Maelstrom',
+                'jp', 'ja' => '黒渦団',
+                'de' => 'Mahlstrom',
+            },
+            2 => match (strtolower($lang)) {
+                'na', 'eu', 'en' => 'Order of the Twin Adder',
+                'jp', 'ja' => '双蛇党',
+                'fr' => 'Ordre des Deux Vipères',
+                'de' => 'Bruderschaft',
+            },
+            3 => match (strtolower($lang)) {
+                'na', 'eu', 'en' => 'Immortal Flames',
+                'jp', 'ja' => '不滅隊',
+                'fr' => 'Immortels',
+                'de' => 'Legion',
+            },
+            default => '',
+        };
     }
-    
+
     #Returns guardian's color
     public function colorGuardians(string $guardian): string
     {
@@ -623,7 +467,7 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     #Returns city's color
     public function colorCities(string $city): string
     {
@@ -635,7 +479,7 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     #Returns grand company's color
     public function colorGC(string $company): string
     {
@@ -646,11 +490,10 @@ class Converters {
             default => '',
 	    };
     }
-    
+
     public function memory($bytes): string
     {
         $unit=array('b','kb','mb','gb','tb','pb');
         return @round($bytes/pow(1024,($i=floor(log($bytes,1024)))),2).' '.$unit[$i];
     }
 }
-?>

@@ -12,10 +12,9 @@ class HttpRequest
      */
     protected array $CURL_OPTIONS = [
         CURLOPT_POST => false,
-        CURLOPT_BINARYTRANSFER => false,
         CURLOPT_HEADER => true,
         CURLOPT_RETURNTRANSFER => true,
-        #Allow cahing and reuse of already open connections
+        #Allow caching and reuse of already open connections
         CURLOPT_FRESH_CONNECT => false,
         CURLOPT_FORBID_REUSE => false,
         #Let cURL determine appropriate HTTP version
@@ -29,15 +28,18 @@ class HttpRequest
         CURLOPT_ENCODING => '',
         CURLOPT_SSL_VERIFYPEER => false,
     ];
-    
+
     const HTTP_OK = 200;
     const HTTP_PERM_REDIRECT = 308;
     const HTTP_SERVICE_NOT_AVAILABLE = 503;
     const HTTP_FORBIDDEN = 403;
     const HTTP_NOT_FOUND = 404;
-    
+
     public static \CurlHandle|null|false $curlHandle = null;
-    
+
+    /**
+     * @throws \Exception
+     */
     public function __construct(string $useragent = '')
     {
         if (!empty($useragent)) {
@@ -55,12 +57,16 @@ class HttpRequest
             }
         }
     }
-    
+
     #Get URL
+
+    /**
+     * @throws \Exception
+     */
     public function get(string $url): string
     {
         $url = str_ireplace(' ', '+', $url);
-        
+
         curl_setopt(self::$curlHandle, CURLOPT_URL, $url);
         // handle response
         $response = curl_exec(self::$curlHandle);
@@ -85,8 +91,8 @@ class HttpRequest
         } elseif ($httpCode < self::HTTP_OK || $httpCode > self::HTTP_PERM_REDIRECT) {
             throw new \Exception('Requested page is not available, '.$httpCode, $httpCode);
         }
-        
-         
+
+
         // check that data is not empty
         if (empty($data)) {
             throw new \Exception('Requested page is empty');
@@ -94,25 +100,4 @@ class HttpRequest
 
         return $data;
     }
-    
-    public function check($object, $name, $id = null): self
-    {
-        $this->object = $object;
-        $this->name = $name;
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function isNotEmpty(): self
-    {
-        if (empty($this->object)) {
-            throw Exceptions::emptyValidation($this);
-        }
-
-        return $this;
-    }
 }
-?>
