@@ -173,6 +173,7 @@ trait Parsers
                 foreach ($tempresult as $key2=>$value) {
                     if (is_numeric($key2) || empty($value)) {
                         unset($tempResults[$key][$key2]);
+                        unset($tempresult[$key2]);
                     }
                 }
                 #Decode HTML entities
@@ -282,7 +283,7 @@ trait Parsers
                             if (!empty($tempresult['focusname'.$i])) {
                                 $tempResults[$key]['focus'][] = [
                                     'name'=>$tempresult['focusname'.$i],
-                                    'enabled'=>($tempresult['focusoff'.$i] ? 0 : 1),
+                                    'enabled'=>(empty($tempresult['focusoff'.$i]) ? 0 : 1),
                                     'icon'=>$tempresult['focusicon'.$i],
                                 ];
                                 unset($tempResults[$key]['focusname'.$i], $tempResults[$key]['focusoff'.$i], $tempResults[$key]['focusicon'.$i]);
@@ -293,14 +294,14 @@ trait Parsers
                             if (!empty($tempresult['seekingname'.$i])) {
                                 $tempResults[$key]['seeking'][] = [
                                     'name'=>$tempresult['seekingname'.$i],
-                                    'enabled'=>($tempresult['seekingoff'.$i] ? 0 : 1),
+                                    'enabled'=>(empty($tempresult['seekingoff'.$i]) ? 0 : 1),
                                     'icon'=>$tempresult['seekingicon'.$i],
                                 ];
                                 unset($tempResults[$key]['seekingname'.$i], $tempResults[$key]['seekingoff'.$i], $tempResults[$key]['seekingicon'.$i]);
                             }
                         }
                         #Trim stuff
-                        $tempResults[$key]['slogan'] = trim($tempresult['slogan']);
+                        $tempResults[$key]['slogan'] = trim($tempresult['slogan'] ?? '');
                         $tempResults[$key]['active'] = trim($tempresult['active']);
                         $tempResults[$key]['recruitment'] = trim($tempresult['recruitment']);
                         $tempResults[$key]['grandCompany'] = trim($tempresult['grandCompany']);
@@ -530,8 +531,8 @@ trait Parsers
                         break;
                     case 'CharacterJobs':
                         $tempresult['id'] = $this->converters->classToJob($tempresult['name']);
-                        $tempresult['expcur'] = preg_replace('/[^0-9]/', '', $tempresult['expcur']);
-                        $tempresult['expmax'] = preg_replace('/[^0-9]/', '', $tempresult['expmax']);
+                        $tempresult['expcur'] = preg_replace('/[^0-9]/', '', $tempresult['expcur'] ?? '');
+                        $tempresult['expmax'] = preg_replace('/[^0-9]/', '', $tempresult['expmax'] ?? '');
                         $tempResults[$key] = [
                             'level'=>(is_numeric($tempresult['level']) ? (int)$tempresult['level'] : 0),
                             'specialist'=> !empty($tempresult['specialist']),
