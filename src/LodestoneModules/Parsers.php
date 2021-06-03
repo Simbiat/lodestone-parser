@@ -283,7 +283,7 @@ trait Parsers
                             if (!empty($tempresult['focusname'.$i])) {
                                 $tempResults[$key]['focus'][] = [
                                     'name'=>$tempresult['focusname'.$i],
-                                    'enabled'=>(empty($tempresult['focusoff'.$i]) ? 0 : 1),
+                                    'enabled'=>(empty($tempresult['focusoff'.$i]) ? 1 : 0),
                                     'icon'=>$tempresult['focusicon'.$i],
                                 ];
                                 unset($tempResults[$key]['focusname'.$i], $tempResults[$key]['focusoff'.$i], $tempResults[$key]['focusicon'.$i]);
@@ -294,7 +294,7 @@ trait Parsers
                             if (!empty($tempresult['seekingname'.$i])) {
                                 $tempResults[$key]['seeking'][] = [
                                     'name'=>$tempresult['seekingname'.$i],
-                                    'enabled'=>(empty($tempresult['seekingoff'.$i]) ? 0 : 1),
+                                    'enabled'=>(empty($tempresult['seekingoff'.$i]) ? 1 : 0),
                                     'icon'=>$tempresult['seekingicon'.$i],
                                 ];
                                 unset($tempResults[$key]['seekingname'.$i], $tempResults[$key]['seekingoff'.$i], $tempResults[$key]['seekingicon'.$i]);
