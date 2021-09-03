@@ -7,9 +7,7 @@ namespace Simbiat\LodestoneModules;
  */
 class HttpRequest
 {
-    /**
-     * curl options
-     */
+    #cURL options
     protected array $CURL_OPTIONS = [
         CURLOPT_POST => false,
         CURLOPT_HEADER => true,
@@ -24,7 +22,7 @@ class HttpRequest
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_MAXREDIRS => 3,
         CURLOPT_HTTPHEADER => ['Content-type: text/html; charset=utf-8', 'Accept-Language: en'],
-        CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36 Edg/87.0.664.55',
+        CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.84',
         CURLOPT_ENCODING => '',
         CURLOPT_SSL_VERIFYPEER => false,
     ];
