@@ -571,9 +571,7 @@ class Lodestone
             if (empty($value) && $value !== '0') {
                 continue;
             }
-            if ($param == 'q') {
-                $query[] = $param .'='. $value;
-            }
+            $query[] = $param .'='. $value;
         }
         return '?'. implode('&', $query);
     }
