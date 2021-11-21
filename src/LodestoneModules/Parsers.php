@@ -334,7 +334,7 @@ trait Parsers
                             ];
                             unset($tempResults[$key]['itemid'], $tempResults[$key]['itemname'], $tempResults[$key]['itemicon']);
                         }
-                        if (empty($character['time'])) {
+                        if (empty($tempresult['time'])) {
                             $tempResults[$key]['time'] = NULL;
                         }
                         if (empty($tempresult['points'])) {
