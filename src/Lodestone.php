@@ -41,7 +41,9 @@ class Lodestone
     public function __destruct()
     {
         #Force close cURL handler
-        curl_close(HttpRequest::$curlHandle);
+        if (!empty(HttpRequest::$curlHandle)) {
+            curl_close(HttpRequest::$curlHandle);
+        }
     }
 
     #############
