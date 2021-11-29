@@ -107,7 +107,7 @@ trait Parsers
                 'searchLinkshell' => Regex::LINKSHELLLIST,
                 'searchFreeCompany' => Regex::FREECOMPANYLIST,
                 'banners' => Regex::BANNERS2,
-                'worlds' => Regex::WORLDS,
+                'worlds' => Regex::DATACENTERS,
                 'feast' => Regex::FEAST,
                 'frontline' => Regex::FRONTLINE,
                 'GrandCompanyRanking' => Regex::GCRANKING,
@@ -645,17 +645,26 @@ trait Parsers
                 break;
             case 'worlds':
                 if ($result != 404) {
-                    if ($this->typeSettings['worlddetails']) {
-                        $this->result[$resultkey][$result['server']] = [
-                            'Online'=> $result['maintenance'] === '1',
-                            'Full maintenance'=> $result['maintenance'] === '3',
-                            'Preferred'=> in_array($result['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt']),
-                            'Congested'=> in_array($result['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet']),
-                            'New characters'=> in_array($result['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich']),
-                        ];
+                    $this->result[$resultkey][$result['dataCenter']] = [];
+                    preg_match_all(Regex::WORLDS, $result['servers'], $servers, PREG_SET_ORDER);
+                    if ($this->typeSettings['worldDetails']) {
+                        foreach ($servers as $server) {
+                            $this->result[$resultkey][$result['dataCenter']][$server['server']] = [
+                                'Online'=> $server['maintenance'] === '1',
+                                'Partial maintenance'=> $server['maintenance'] === '2',
+                                'Full maintenance'=> $server['maintenance'] === '3',
+                                'Preferred'=> in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt']),
+                                'Congested'=> in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet']),
+                                'New characters'=> in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich']),
+                            ];
+                        }
                     } else {
-                        $this->result[$resultkey][$result['server']] = $result['status'];
+                        #$this->result[$resultkey][$result['dataCenter']][$server['server']]] = $server['status'];
+                        foreach ($servers as $server) {
+                            $this->result[$resultkey][$result['dataCenter']][$server['server']] = $server['status'];
+                        }
                     }
+                    ksort($this->result[$resultkey][$result['dataCenter']]);
                 }
                 break;
             case 'feast':
