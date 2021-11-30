@@ -240,7 +240,7 @@ class Lodestone
             foreach ($blog_lang as $key=>$item) {
                 $blog_lang[$key] = $this->converters->languageConvert($item);
             }
-        } elseif (is_string($gcId)) {
+        } elseif (is_string($blog_lang)) {
             $blog_lang = $this->converters->languageConvert($blog_lang);
         } else {
             $blog_lang = '';
@@ -275,7 +275,7 @@ class Lodestone
             foreach ($activities as $key=>$item) {
                 $activities[$key] = $this->converters->getSearchActivitiesId($item);
             }
-        } elseif (is_string($gcId)) {
+        } elseif (is_string($activities)) {
             $activities = $this->converters->getSearchActivitiesId($activities);
         } else {
             $activities = '';
@@ -284,7 +284,7 @@ class Lodestone
             foreach ($roles as $key=>$item) {
                 $roles[$key] = $this->converters->getSearchRolesId($item);
             }
-        } elseif (is_string($gcId)) {
+        } elseif (is_string($roles)) {
             $roles = $this->converters->getSearchRolesId($roles);
         } else {
             $roles = '';
