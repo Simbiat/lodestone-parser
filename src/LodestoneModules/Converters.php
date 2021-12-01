@@ -159,18 +159,24 @@ class Converters {
         return $count;
     }
 
-    public function membersCount(int $count): string
+    public function membersCount(int|string $count): string
     {
-        if ($count >= 1 && $count <= 10) {
-            $count = '1-10';
-        } elseif ($count >= 11 && $count <= 30) {
-            $count = '11-30';
-        } elseif ($count >= 31 && $count <= 50) {
-            $count = '31-50';
-        } elseif ($count >= 51) {
-            $count = '51-';
+        if (is_int($count)) {
+            if ($count >= 1 && $count <= 10) {
+                $count = '1-10';
+            } else if ($count >= 11 && $count <= 30) {
+                $count = '11-30';
+            } else if ($count >= 31 && $count <= 50) {
+                $count = '31-50';
+            } else if ($count >= 51) {
+                $count = '51-';
+            } else {
+                $count = '';
+            }
         } else {
-            $count = '';
+            if (!in_array($count, ['1-10', '11-30', '31-50', '51-'])) {
+                $count = '';
+            }
         }
         return $count;
     }
