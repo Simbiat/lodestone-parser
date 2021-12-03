@@ -356,6 +356,8 @@ class Converters {
             'rdm' => '55a98ea6cf180332222184e9fb788a7941a03ec3',
             'gnb' => '1c29ab32bcd60f4ac37827066709fa17c872edca',
             'dnc' => 'baa255d6ec667f5a88920d8968e86a41261d8576',
+            'rpr' => 'c3c6557ad8cc33a73a392f68e45926710496eb13',
+            'sge' => '3516b2b3881af781dba74a70f7d3e5d01bb73434',
             default => '',
 	    };
     }
