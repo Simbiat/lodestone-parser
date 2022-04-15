@@ -17,7 +17,7 @@ class Regex
     const NONSENAME = '[^<]*';
     const SERVER = '[a-zA-Z]{1,15}';
     #Data center name showed after server in some cases
-    const DATACENTER = '((&nbsp;|\s*)\([a-zA-Z]{1,15}\))?';
+    const DATACENTER = '((&nbsp;|\s*)\[[a-zA-Z]{1,15}\])?';
     const PVPID = '[a-zA-Z0-9]{40}';
     #Icons used for grand companies, ranks, classes, .etc
     const SEICON = 'https:\/\/[\.a-zA-Z0-9\/_\-]{58}\.png';
