@@ -519,7 +519,7 @@ trait Parsers
                             $tempresult['bio'] = '';
                         }
                         if (!empty($tempresult['bio'])) {
-                            $tempResults[$key]['bio'] = strip_tags($tempresult['bio'], '<br>');
+                            $tempResults[$key]['bio'] = $tempresult['bio'];
                         } else {
                             $tempResults[$key]['bio'] = '';
                         }
