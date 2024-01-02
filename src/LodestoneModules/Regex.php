@@ -22,7 +22,7 @@ class Regex
     #Icons used for grand companies, ranks, classes, .etc
     const SEICON = 'https:\/\/[\.a-zA-Z0-9\/_\-]{58}\.png';
     #Items icons
-    const ITEMICON = 'https:\/\/[\.a-zA-Z0-9\/_\-]{97}\.png(\?n\d*\.?\d*)?';
+    const ITEMICON = 'https:\/\/[\.a-zA-Z0-9\/_\-]{80,97}\.png(\?n\d*\.?\d*)?';
     #Dimensions, in case they change
     const DIMENSIONS = 'width="\d*" height="\d*"';
     const AVATAR = '(?<avatar>https:\/\/[\.a-zA-Z0-9\/_\-]{101}\.jpg)\?\d*';
