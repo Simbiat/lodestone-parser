@@ -10,50 +10,50 @@ namespace Simbiat\LodestoneModules;
 class Routes
 {
     #base URL
-    const LODESTONE_URL_BASE = 'https://%s.finalfantasyxiv.com/lodestone';
+    public const string LODESTONE_URL_BASE = 'https://%s.finalfantasyxiv.com/lodestone';
     
     #characters
-    const LODESTONE_CHARACTERS_URL = '/character/%s/';
-    const LODESTONE_CHARACTERS_FRIENDS_URL = '/character/%s/friend/?page=%u';
-    const LODESTONE_CHARACTERS_FOLLOWING_URL = '/character/%s/following/?page=%u';
-    const LODESTONE_CHARACTERS_JOBS_URL = '/character/%s/class_job/';
-    const LODESTONE_CHARACTERS_MINIONS_URL = '/character/%s/minion/';
-    const LODESTONE_CHARACTERS_MOUNTS_URL = '/character/%s/mount/';
-    const LODESTONE_CHARACTERS_SEARCH_URL = '/character/%s';
-    const LODESTONE_ACHIEVEMENTS_URL = '/character/%s/achievement/kind/%u/';
-    const LODESTONE_ACHIEVEMENTS_CAT_URL = '/character/%s/achievement/category/%u/';
-    const LODESTONE_ACHIEVEMENTS_DET_URL = '/character/%s/achievement/detail/%u/';
+    public const string LODESTONE_CHARACTERS_URL = '/character/%s/';
+    public const string LODESTONE_CHARACTERS_FRIENDS_URL = '/character/%s/friend/?page=%u';
+    public const string LODESTONE_CHARACTERS_FOLLOWING_URL = '/character/%s/following/?page=%u';
+    public const string LODESTONE_CHARACTERS_JOBS_URL = '/character/%s/class_job/';
+    public const string LODESTONE_CHARACTERS_MINIONS_URL = '/character/%s/minion/';
+    public const string LODESTONE_CHARACTERS_MOUNTS_URL = '/character/%s/mount/';
+    public const string LODESTONE_CHARACTERS_SEARCH_URL = '/character/%s';
+    public const string LODESTONE_ACHIEVEMENTS_URL = '/character/%s/achievement/kind/%u/';
+    public const string LODESTONE_ACHIEVEMENTS_CAT_URL = '/character/%s/achievement/category/%u/';
+    public const string LODESTONE_ACHIEVEMENTS_DET_URL = '/character/%s/achievement/detail/%u/';
     #free company
-    const LODESTONE_FREECOMPANY_URL = '/freecompany/%s/';
-    const LODESTONE_FREECOMPANY_SEARCH_URL = '/freecompany/%s';
-    const LODESTONE_FREECOMPANY_MEMBERS_URL = '/freecompany/%s/member/?page=%u';
+    public const string LODESTONE_FREECOMPANY_URL = '/freecompany/%s/';
+    public const string LODESTONE_FREECOMPANY_SEARCH_URL = '/freecompany/%s';
+    public const string LODESTONE_FREECOMPANY_MEMBERS_URL = '/freecompany/%s/member/?page=%u';
     #linkshell
-    const LODESTONE_LINKSHELL_SEARCH_URL = '/linkshell/%s';
-    const LODESTONE_LINKSHELL_MEMBERS_URL = '/linkshell/%s/?page=%u';
-    const LODESTONE_CROSSWORLD_LINKSHELL_SEARCH_URL = '/crossworld_linkshell/%s';
-    const LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL = '/crossworld_linkshell/%s/?page=%u';
+    public const string LODESTONE_LINKSHELL_SEARCH_URL = '/linkshell/%s';
+    public const string LODESTONE_LINKSHELL_MEMBERS_URL = '/linkshell/%s/?page=%u';
+    public const string LODESTONE_CROSSWORLD_LINKSHELL_SEARCH_URL = '/crossworld_linkshell/%s';
+    public const string LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL = '/crossworld_linkshell/%s/?page=%u';
     #pvp team
-    const LODESTONE_PVPTEAM_SEARCH_URL = '/pvpteam/%s';
-    const LODESTONE_PVPTEAM_MEMBERS_URL = '/pvpteam/%s/';
+    public const string LODESTONE_PVPTEAM_SEARCH_URL = '/pvpteam/%s';
+    public const string LODESTONE_PVPTEAM_MEMBERS_URL = '/pvpteam/%s/';
     #news
-    const LODESTONE_BANNERS = '/';
-    const LODESTONE_NEWS = '/news/';
-    const LODESTONE_TOPICS = '/topics/?page=%u';
-    const LODESTONE_NOTICES = '/news/category/1/?page=%u';
-    const LODESTONE_MAINTENANCE = '/news/category/2/?page=%u';
-    const LODESTONE_UPDATES = '/news/category/3/?page=%u';
-    const LODESTONE_STATUS = '/news/category/4/?page=%u';
+    public const string LODESTONE_BANNERS = '/';
+    public const string LODESTONE_NEWS = '/news/';
+    public const string LODESTONE_TOPICS = '/topics/?page=%u';
+    public const string LODESTONE_NOTICES = '/news/category/1/?page=%u';
+    public const string LODESTONE_MAINTENANCE = '/news/category/2/?page=%u';
+    public const string LODESTONE_UPDATES = '/news/category/3/?page=%u';
+    public const string LODESTONE_STATUS = '/news/category/4/?page=%u';
     #world status
-    const LODESTONE_WORLD_STATUS = '/worldstatus/';
+    public const string LODESTONE_WORLD_STATUS = '/worldstatus/';
     #feast
-    const LODESTONE_FEAST = '/ranking/thefeast/result/%s/%s';
+    public const string LODESTONE_FEAST = '/ranking/thefeast/result/%s/%s';
     #deep dungeon
-    const LODESTONE_DEEP_DUNGEON = '/ranking/deepdungeon%s/%s';
+    public const string LODESTONE_DEEP_DUNGEON = '/ranking/deepdungeon%s/%s';
     #frontline
-    const LODESTONE_FRONTLINE = '/ranking/frontline/%s/%u/%s';
+    public const string LODESTONE_FRONTLINE = '/ranking/frontline/%s/%u/%s';
     #company rankings
-    const LODESTONE_GCRANKING = '/ranking/gc/%s/%u/%s';
-    const LODESTONE_FCRANKING = '/ranking/fc/%s/%u/%s';
+    public const string LODESTONE_GCRANKING = '/ranking/gc/%s/%u/%s';
+    public const string LODESTONE_FCRANKING = '/ranking/fc/%s/%u/%s';
     #database
-    const LODESTONE_DATABASE_URL = '/playguide/db/%s/%s';
+    public const string LODESTONE_DATABASE_URL = '/playguide/db/%s/%s';
 }

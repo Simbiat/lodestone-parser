@@ -24,14 +24,14 @@ class HttpRequest
         CURLOPT_HTTPHEADER => ['Content-type: text/html; charset=utf-8', 'Accept-Language: en'],
         CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.84',
         CURLOPT_ENCODING => '',
-        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYPEER => true,
     ];
 
-    const HTTP_OK = 200;
-    const HTTP_PERM_REDIRECT = 308;
-    const HTTP_SERVICE_NOT_AVAILABLE = 503;
-    const HTTP_FORBIDDEN = 403;
-    const HTTP_NOT_FOUND = 404;
+    const int HTTP_OK = 200;
+    const int HTTP_PERM_REDIRECT = 308;
+    const int HTTP_SERVICE_NOT_AVAILABLE = 503;
+    const int HTTP_FORBIDDEN = 403;
+    const int HTTP_NOT_FOUND = 404;
 
     public static \CurlHandle|null|false $curlHandle = null;
 
@@ -47,11 +47,10 @@ class HttpRequest
         if (empty(self::$curlHandle)) {
             self::$curlHandle = curl_init();
             if (self::$curlHandle === false) {
-                throw new \Exception('Failed to initiate cURL handle');
-            } else {
-                if(!curl_setopt_array(self::$curlHandle, $this->CURL_OPTIONS)) {
-                    throw new \Exception('Failed to set cURL handle options');
-                }
+                throw new \RuntimeException('Failed to initiate cURL handle');
+            }
+            if (!curl_setopt_array(self::$curlHandle, $this->CURL_OPTIONS)) {
+                throw new \RuntimeException('Failed to set cURL handle options');
             }
         }
     }
@@ -72,28 +71,32 @@ class HttpRequest
         $hlength = curl_getinfo(self::$curlHandle, CURLINFO_HEADER_SIZE);
         $httpCode = curl_getinfo(self::$curlHandle, CURLINFO_HTTP_CODE);
         if ($response === false) {
-            throw new \Exception($curlerror, $httpCode);
-        } else {
-            $data = substr($response, $hlength);
+            throw new \RuntimeException($curlerror, $httpCode);
         }
-
+        $data = mb_substr($response, $hlength, encoding: 'UTF-8');
+        
         // specific conditions to return code on
-        if ($httpCode == self::HTTP_NOT_FOUND) {
-            throw new \Exception('Requested page was not found, '.$httpCode, $httpCode);
-        } elseif ($httpCode == self::HTTP_SERVICE_NOT_AVAILABLE) {
-            throw new \Exception('Lodestone not available, '.$httpCode, $httpCode);
-        } elseif ($httpCode == self::HTTP_FORBIDDEN) {
-            throw new \Exception('Requests are (temporary) blocked, '.$httpCode, $httpCode);
-        } elseif ($httpCode == 0) {
-            throw new \Exception($curlerror, $httpCode);
-        } elseif ($httpCode < self::HTTP_OK || $httpCode > self::HTTP_PERM_REDIRECT) {
-            throw new \Exception('Requested page is not available, '.$httpCode, $httpCode);
+        $httpCode = (int)$httpCode;
+        if ($httpCode === self::HTTP_NOT_FOUND) {
+            throw new \RuntimeException('Requested page was not found, '.$httpCode, $httpCode);
         }
-
-
+        if ($httpCode === self::HTTP_SERVICE_NOT_AVAILABLE) {
+            throw new \RuntimeException('Lodestone not available, '.$httpCode, $httpCode);
+        }
+        if ($httpCode === self::HTTP_FORBIDDEN) {
+            throw new \RuntimeException('Requests are (temporary) blocked, '.$httpCode, $httpCode);
+        }
+        if ($httpCode === 0) {
+            throw new \RuntimeException($curlerror, $httpCode);
+        }
+        if ($httpCode < self::HTTP_OK || $httpCode > self::HTTP_PERM_REDIRECT) {
+            throw new \RuntimeException('Requested page is not available, '.$httpCode, $httpCode);
+        }
+        
+        
         // check that data is not empty
         if (empty($data)) {
-            throw new \Exception('Requested page is empty');
+            throw new \RuntimeException('Requested page is empty');
         }
 
         return $data;

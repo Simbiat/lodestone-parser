@@ -15,10 +15,10 @@ class Lodestone
 {
     #Use trait
     use LodestoneModules\Parsers;
-
-    const langAllowed = ['na', 'jp', 'ja', 'eu', 'fr', 'de'];
+    
+    public const array langAllowed = ['na', 'jp', 'ja', 'eu', 'fr', 'de'];
     #List of achievements categories' ids excluding 1
-    const achKinds = [2, 3, 4, 5, 6, 8, 11, 12, 13];
+    public const array achKinds = [2, 3, 4, 5, 6, 8, 11, 12, 13];
 
     protected string $useragent = '';
     protected string $language = 'na';
@@ -134,7 +134,7 @@ class Lodestone
 
     public function getCharacterAchievements(string|int $id, int|bool $achievementId = false, string|int $kind = 1, bool $category = false, bool $details = false, bool $only_owned = false): self
     {
-        if ($kind == 0) {
+        if ((int)$kind < 1) {
             $category = false;
             $kind = 1;
             $this->typeSettings['allachievements'] = true;
@@ -152,9 +152,9 @@ class Lodestone
         } else {
             $this->type = 'Achievements';
             if ($category === false) {
-                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_URL, $id, strval($kind));
+                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_URL, $id, (string)$kind);
             } else {
-                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_CAT_URL, $id, strval($kind));
+                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_CAT_URL, $id, (string)$kind);
             }
         }
         $this->typeSettings['id'] = $id;
@@ -210,7 +210,7 @@ class Lodestone
     public function searchDatabase(string $type, int $category = 0, int $subCategory = 0, string $search = '', int $page = 1): self
     {
         #Ensure we have lowercase for consistency
-        $type = strtolower($type);
+        $type = mb_strtolower($type, 'UTF-8');
         if (!in_array($type, ['item', 'duty', 'quest', 'recipe', 'gathering', 'achievement', 'shop', 'text_command'])) {
             throw new \UnexpectedValueException('Unsupported type of database \''.$type.'\' element was requested');
         }
@@ -232,7 +232,7 @@ class Lodestone
         return $this->parse();
     }
 
-    public function searchCharacter(string $name = '', string $server = '', string $classJob = '', string $race_tribe = '', array|string|int $gcId = '', $blog_lang = '', string $order = '', int $page = 1): self
+    public function searchCharacter(string $name = '', string $server = '', string $classJob = '', string $race_tribe = '', array|string|int $gcId = '', string|array $blog_lang = '', string $order = '', int $page = 1): self
     {
         $page = $this->pageCheck($page);
         $gcId = $this->gcIdCheck($gcId);
@@ -267,7 +267,7 @@ class Lodestone
         return $this->parse();
     }
 
-    public function searchFreeCompany(string $name = '', string $server = '', int $character_count = 0, $activities = '', $roles = '', string $activeTime = '', string $join = '', string $house = '', array|string|int $gcId = '', string $order = '', int $page = 1): self
+    public function searchFreeCompany(string $name = '', string $server = '', int $character_count = 0, string|array $activities = '', string|array $roles = '', string $activeTime = '', string $join = '', string $house = '', array|string|int $gcId = '', string $order = '', int $page = 1): self
     {
         $page = $this->pageCheck($page);
         $gcId = $this->gcIdCheck($gcId);
@@ -369,15 +369,15 @@ class Lodestone
             'dcGroup' => $dcGroup,
             'rank_type' => $this->converters->getFeastRankId($rank_type),
         ]);
-        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FEAST, strval($season), $query);
+        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FEAST, (string)$season, $query);
         $this->type = 'feast';
         $this->typeSettings['season'] = $season;
         return $this->parse();
     }
 
-    public function getDeepDungeon(int $id = 1, string $dcGroup = '', string $solo_party = 'party', string $subtype = 'PLD'): self
+    public function getDeepDungeon(int|string $id = 1, string $dcGroup = '', string $solo_party = 'party', string $subtype = 'PLD'): self
     {
-        if ($id == 1) {
+        if ((int)$id <= 1) {
             $id = '';
         }
         if ($subtype) {
@@ -391,7 +391,7 @@ class Lodestone
             'solo_party' => $solo_party,
             'subtype' => $this->converters->getDeepDungeonClassId($subtype),
         ]);
-        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_DEEP_DUNGEON, strval($id), $query);
+        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_DEEP_DUNGEON, (string)$id, $query);
         if (empty($id)) {
             $id = 1;
         }
@@ -413,14 +413,12 @@ class Lodestone
         if (!in_array($sort, ['win', 'rate', 'match'])) {
             $sort = 'win';
         }
-        if ($week_month == 'weekly') {
-            if (!preg_match('/^[0-9]{4}(0[1-9]|[1-4][0-9]|5[0-3])$/', strval($week))) {
+        if ($week_month === 'weekly') {
+            if (!preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
                 $week = 0;
             }
-        } else {
-            if (!preg_match('/^[0-9]{4}(0[1-9]|1[0-2])$/', strval($week))) {
-                $week = 0;
-            }
+        } elseif (!preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
+            $week = 0;
         }
         $query = $this->queryBuilder([
             'filter' => 1,
@@ -440,48 +438,26 @@ class Lodestone
 
     public function getGrandCompanyRanking(string $week_month = 'weekly', int $week = 0, string $worldname = '', string $gcId = '', int $page = 1): self
     {
-        $page = $this->pageCheck($page);
-        if (!in_array($week_month, ['weekly','monthly'])) {
-            $week_month = 'weekly';
-        }
-        if ($week_month == 'weekly') {
-            if (!preg_match('/^[0-9]{4}(0[1-9]|[1-4][0-9]|5[0-3])$/', strval($week))) {
-                $week = 0;
-            }
-        } else {
-            if (!preg_match('/^[0-9]{4}(0[1-9]|1[0-2])$/', strval($week))) {
-                $week = 0;
-            }
-        }
-        $query = $this->queryBuilder([
-            'filter' => 1,
-            'worldname' => $worldname,
-            'gcId' => $this->converters->getSearchGCId($gcId),
-            'page' => $page,
-        ]);
-        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_GCRANKING, $week_month, $week, $query);
-        $this->type = 'GrandCompanyRanking';
-        $this->typeSettings['week'] = $week;
-        $this->typeSettings['week_month'] = $week_month;
-        $this->typeSettings['worldname'] = $worldname;
-        $this->typeSettings['gcId'] = $gcId;
-        return $this->parse();
+        return $this->companyRankingHelper($week_month, $week, $worldname, $gcId, $page, true);
     }
 
     public function getFreeCompanyRanking(string $week_month = 'weekly', int $week = 0, string $worldname = '', string $gcId = '', int $page = 1): self
+    {
+        return $this->companyRankingHelper($week_month, $week, $worldname, $gcId, $page);
+    }
+    
+    private function companyRankingHelper(string $week_month = 'weekly', int $week = 0, string $worldname = '', string $gcId = '', int $page = 1, bool $gc = false): self
     {
         $page = $this->pageCheck($page);
         if (!in_array($week_month, ['weekly','monthly'])) {
             $week_month = 'weekly';
         }
-        if ($week_month == 'weekly') {
-            if (!preg_match('/^[0-9]{4}(0[1-9]|[1-4][0-9]|5[0-3])$/', strval($week))) {
+        if ($week_month === 'weekly') {
+            if (!preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
                 $week = 0;
             }
-        } else {
-            if (!preg_match('/^[0-9]{4}(0[1-9]|1[0-2])$/', strval($week))) {
-                $week = 0;
-            }
+        } elseif (!preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
+            $week = 0;
         }
         $query = $this->queryBuilder([
             'filter' => 1,
@@ -489,8 +465,13 @@ class Lodestone
             'gcId' => $this->converters->getSearchGCId($gcId),
             'page' => $page,
         ]);
-        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FCRANKING, $week_month, $week, $query);
-        $this->type = 'FreeCompanyRanking';
+        if ($gc) {
+            $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_GCRANKING, $week_month, $week, $query);
+            $this->type = 'GrandCompanyRanking';
+        } else {
+            $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FCRANKING, $week_month, $week, $query);
+            $this->type = 'FreeCompanyRanking';
+        }
         $this->typeSettings['week'] = $week;
         $this->typeSettings['week_month'] = $week_month;
         $this->typeSettings['worldname'] = $worldname;
@@ -587,7 +568,7 @@ class Lodestone
         return $page;
     }
 
-    private function gcIdCheck(array|string|int $gcId): string
+    private function gcIdCheck(array|string|int $gcId): string|array
     {
         if (is_array($gcId)) {
             foreach ($gcId as $key=> $item) {

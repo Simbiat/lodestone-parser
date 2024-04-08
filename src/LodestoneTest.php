@@ -126,7 +126,7 @@ class LodestoneTest
     {
         echo '<tr>
                     <td><b>'.$type.'</b></td>
-                    <td>'.(!empty($this->Lodestone->getErrors()) && $reverse == false ? '<span style="color: red; font-weight: bold;">error</span>' : '<span style="color: lightgreen; font-weight: bold;">success</span>').'</td>
+                    <td>'.(!empty($this->Lodestone->getErrors()) && $reverse === false ? '<span style="color: red; font-weight: bold;">error</span>' : '<span style="color: lightgreen; font-weight: bold;">success</span>').'</td>
                     <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->Lodestone->getResult(false)['benchmark']['httptime']) : $this->Lodestone->getResult(false)['benchmark']['httptime'][0]).'</td>
                     <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->Lodestone->getResult(false)['benchmark']['parsetime']) : $this->Lodestone->getResult(false)['benchmark']['parsetime'][0]).'</td>
                     <td>'.(empty($this->Lodestone->getErrors()) ? '' : '<pre>'.var_export($this->Lodestone->getErrors(), true).'</pre>').'</td>

@@ -47,7 +47,7 @@ class Converters {
 
     public function imageToBool(string $img): bool
     {
-        return in_array(strtolower($img), [
+        return in_array(mb_strtolower($img, 'UTF-8'), [
             'yes',
             '○',
             'oui',
@@ -60,7 +60,7 @@ class Converters {
 
     public function getFeastRankId(string $rank): string
     {
-        return match(strtolower($rank)) {
+        return match(mb_strtolower($rank, 'UTF-8')) {
             '1', 'bronze', 'verteidiger' => '0',
             '2', 'silver', 'argent', 'silber' => '1',
             '3', 'gold', 'or' => '2',
@@ -72,7 +72,7 @@ class Converters {
 
     public function getSearchRolesId(string $role): string
     {
-        return match(strtolower($role)) {
+        return match(mb_strtolower($role, 'UTF-8')) {
             '0', 'tank', 'tanks', 'verteidiger' => '0',
             '1', 'healer', 'soigneurs', 'heiler' => '1',
             '2', 'dps', 'angreifer' => '2',
@@ -85,7 +85,7 @@ class Converters {
 
     public function getSearchActivitiesId(string $act): string
     {
-        return match(strtolower($act)) {
+        return match(mb_strtolower($act, 'UTF-8')) {
             '0', 'role-playing', 'ロールプレイ', 'jeu de rôle', 'rollenspiel' => '0',
             '1', 'leveling', 'レベリング', 'gain d\'expérience', 'stufenaufstieg' => '1',
             '2', 'casual', 'カジュアル', 'jeu décontracté', 'gelegenheitsspieler' => '2',
@@ -102,7 +102,7 @@ class Converters {
 
     public function getSearchHouseId(string $house): string
     {
-        return match(strtolower($house)) {
+        return match(mb_strtolower($house, 'UTF-8')) {
             '2', 'estate built', '所有あり', 'logement construit', 'besitzt unterkunft' => '2',
             '1', 'plot only', '土地のみ', 'terrain seul', 'nur grundstück' => '1',
             '0', 'no estate or plot', '所有なし', 'sans logement ni terrain', 'besitzt keine unterkunft' => '0',
@@ -112,7 +112,7 @@ class Converters {
 
     public function getSearchJoinId(string $join): string
     {
-        return match(strtolower($join)) {
+        return match(mb_strtolower($join, 'UTF-8')) {
             '1', 'open', '申請可', 'candidatures acceptées', 'nimmt gesuche an' => '1',
             '0', 'closed', '申請不可', 'candidatures refusées', 'nimmt keine gesuche an' => '0',
             default => '',
@@ -121,7 +121,7 @@ class Converters {
 
     public function getSearchActiveTimeId(string $active): string
     {
-        return match(strtolower($active)) {
+        return match(mb_strtolower($active, 'UTF-8')) {
             '1', 'weekdays', 'weekdays only', '平日のみ', 'en semaine seulement', 'nur wochentags' => '1',
             '2', 'weekends', 'weekends only', '週末のみ', 'le week-end seulement', 'nur Wochenende' => '2',
             '3', 'always', '平日/週末', 'toute la semaine', 'jeden Tag' => '3',
@@ -132,31 +132,31 @@ class Converters {
     public function matchesCount(int $count): string
     {
         if ($count >= 1 && $count <= 29) {
-            $count = '1';
+            $countNew = '1';
         } elseif ($count >= 30 && $count <= 49) {
-            $count = '2';
+            $countNew = '2';
         } elseif ($count >= 50) {
-            $count = '3';
+            $countNew = '3';
         } else {
-            $count = '';
+            $countNew = '';
         }
-        return $count;
+        return $countNew;
     }
 
     public function pvpRank(int $count): string
     {
         if ($count >= 1 && $count <= 10) {
-            $count = '1';
+            $countNew = '1';
         } elseif ($count >= 11 && $count <= 20) {
-            $count = '2';
+            $countNew = '2';
         } elseif ($count >= 21 && $count <= 30) {
-            $count = '3';
+            $countNew = '3';
         } elseif ($count >= 31) {
-            $count = '4';
+            $countNew = '4';
         } else {
-            $count = '';
+            $countNew = '';
         }
-        return $count;
+        return $countNew;
     }
 
     public function membersCount(int|string $count): string
@@ -173,10 +173,8 @@ class Converters {
             } else {
                 $count = '';
             }
-        } else {
-            if (!in_array($count, ['1-10', '11-30', '31-50', '51-'])) {
-                $count = '';
-            }
+        } elseif (!in_array($count, ['1-10', '11-30', '31-50', '51-'])) {
+            $count = '';
         }
         return $count;
     }
@@ -197,7 +195,7 @@ class Converters {
 
     public function getSearchOrderId(string $order): string
     {
-	    return match(strtolower($order)) {
+	    return match(mb_strtolower($order, 'UTF-8')) {
 	        '1', 'charaz', 'fcaz', 'lsaz', 'pvpaz' => '1',
             '2', 'charza', 'fcza', 'lsza', 'pvpza' => '2',
             '3', 'worldaz', 'fcmembersza', 'lsmembersza' => '3',
@@ -210,7 +208,7 @@ class Converters {
 
     public function getSearchGCId(string $gc): string
     {
-	    return match(strtolower($gc)) {
+	    return match(mb_strtolower($gc, 'UTF-8')) {
 	        '1', 'maelstrom', '黒渦団', 'le maelstrom', 'mahlstrom' => '1',
             '2', 'order of the twin adder', '双蛇党 ', 'l\'ordre des deux vipères', 'bruderschaft der morgenviper' => '2',
             '3', 'immortal flames', '不滅隊', 'les immortels', 'legion der unsterblichen' => '3',
@@ -221,7 +219,7 @@ class Converters {
 
     public function getSearchClanId(string $clan): string
     {
-	    return match(strtolower($clan)) {
+	    return match(mb_strtolower($clan, 'UTF-8')) {
 	        'hyur', 'ヒューラン', 'hyuran' => 'race_1',
             'midlander', 'ミッドランダー', 'hyurois', 'wiesländer' => 'tribe_1',
             'highlander', 'ハイランダー', 'hyurgoth', 'hochländer' => 'tribe_2',
@@ -252,7 +250,7 @@ class Converters {
 
     public function classToJob(string $class): string
     {
-        return match(strtolower($class)) {
+        return match(mb_strtolower($class, 'UTF-8')) {
 	        'gladiator', 'gladiateur' => 'Paladin',
             'marauder' => 'Warrior',
             'conjurer' => 'White Mage',
@@ -289,7 +287,7 @@ class Converters {
 
     public function getSearchClassId(string $classname): string
     {
-	    return match(strtolower($classname)) {
+	    return match(mb_strtolower($classname, 'UTF-8')) {
 	        'tnk' => '_job_TANK&classjob=_class_TANK',
             'hlr' => '_job_HEALER&classjob=_class_HEALER',
             'dps' => '_job_DPS&classjob=_class_DPS',
@@ -338,7 +336,7 @@ class Converters {
 
     public function getDeepDungeonClassId(string $classname): string
     {
-        return match(strtolower($classname)) {
+        return match(mb_strtolower($classname, 'UTF-8')) {
 	        'gla', 'pld' => '125bf9c1198a3a148377efea9c167726d58fa1a5',
             'mar', 'war' => '741ae8622fa496b4f98b040ff03f623bf46d790f',
             'drk' => 'c31f30f41ab1562461262daa74b4d374e633a790',
@@ -364,7 +362,7 @@ class Converters {
 
     public function getGuardianId(string $guardian): string
     {
-        return match(strtolower($guardian)) {
+        return match(mb_strtolower($guardian, 'UTF-8')) {
 	        'althyk, the keeper', 'アルジク', 'althyk, le contemplateur', 'althyk - der hüter', 'althyk' => '1',
             'azeyma, the warden', 'アーゼマ', 'azeyma, la gardienne', 'azeyma - die aufseherin', 'azeyma' => '2',
             'byregot, the builder', 'ビエルゴ', 'byregot, l\'artisan', 'byregot - der erbauer', 'byregot' => '3',
@@ -384,7 +382,7 @@ class Converters {
     public function getCityId(string $city): string
     {
         #IDs are based on what I have in my own database, there is no other meaning behind them
-        return match(strtolower($city)) {
+        return match(mb_strtolower($city, 'UTF-8')) {
 	        'gridania', 'the lavender beds', 'グリダニア', 'ラベンダーベッド', 'lavandière', 'lavendelbeete' => '2',
             'limsa lominsa', 'mist', 'リムサ・ロミンサ', 'ミスト・ヴィレッジ', 'brumée', 'dorf des Nebels' => '4',
             'ul\'dah', 'the goblet', 'ウルダハ', 'la Coupe', 'ゴブレットビュート', 'kelchkuppe' => '5',
@@ -395,23 +393,23 @@ class Converters {
 
     public function getCityName(int $id = 1, string $lang = 'en'): string
     {
-        if (!in_array(strtolower($lang), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
+        if (!in_array(mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for City name');
         }
         return match ($id) {
-            2 => match (strtolower($lang)) {
+            2 => match (mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Gridania',
                 'jp', 'ja' => 'グリダニア',
             },
-            4 => match (strtolower($lang)) {
+            4 => match (mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Limsa Lominsa',
                 'jp', 'ja' => 'リムサ・ロミンサ',
             },
-            5 => match (strtolower($lang)) {
+            5 => match (mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Ul\'dah',
                 'jp', 'ja' => 'ウルダハ',
             },
-            7 => match (strtolower($lang)) {
+            7 => match (mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Kugane',
                 'jp', 'ja' => 'クガネ',
             },
@@ -421,7 +419,7 @@ class Converters {
 
     public function getGrandCompanyId(string $gc): string
     {
-        return match(strtolower($gc)) {
+        return match(mb_strtolower($gc, 'UTF-8')) {
 	        'maelstrom', '黒渦団', 'mahlstrom' => '1',
             'order of the twin adder', '双蛇党', 'ordre des deux vipères', 'bruderschaft' => '2',
             'immortal flames', '不滅隊', 'immortels', 'legion' => '3',
@@ -431,22 +429,22 @@ class Converters {
 
     public function getGrandCompanyName(int $id = 1, string $lang = 'en'): string
     {
-        if (!in_array(strtolower($lang), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
+        if (!in_array(mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for Grand Company name');
         }
         return match ($id) {
-            1 => match (strtolower($lang)) {
+            1 => match (mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr' => 'Maelstrom',
                 'jp', 'ja' => '黒渦団',
                 'de' => 'Mahlstrom',
             },
-            2 => match (strtolower($lang)) {
+            2 => match (mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en' => 'Order of the Twin Adder',
                 'jp', 'ja' => '双蛇党',
                 'fr' => 'Ordre des Deux Vipères',
                 'de' => 'Bruderschaft',
             },
-            3 => match (strtolower($lang)) {
+            3 => match (mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en' => 'Immortal Flames',
                 'jp', 'ja' => '不滅隊',
                 'fr' => 'Immortels',
@@ -502,6 +500,6 @@ class Converters {
     public function memory($bytes): string
     {
         $unit=array('b','kb','mb','gb','tb','pb');
-        return @round($bytes/pow(1024,($i=floor(log($bytes,1024)))),2).' '.$unit[$i];
+        return @round($bytes/ (1024 ** ($i = floor(log($bytes, 1024)))),2).' '.$unit[$i];
     }
 }
