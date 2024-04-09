@@ -414,11 +414,13 @@ trait Parsers
                         break;
                     case 'Character':
                         #There are cases of characters not returning a proper race or clan (usually both). I've reported this issue to Square Enix several times, and they simply update affected characters. This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
-                        if (trim($tempResults[$key]['race']) === '----') {
+                        $tempResults[$key]['race'] = trim($tempResults[$key]['race']);
+                        $tempResults[$key]['clan'] = trim($tempResults[$key]['clan']);
+                        if ($tempResults[$key]['race'] === '----') {
                             $tempResults[$key]['race'] = NULL;
                             $tempResults[$key]['comment'] = 'No race';
                         }
-                        if (trim($tempResults[$key]['clan']) === '----') {
+                        if ($tempResults[$key]['clan'] === '----') {
                             $tempResults[$key]['clan'] = NULL;
                             if ($tempResults[$key]['comment'] === 'No race') {
                                 $tempResults[$key]['comment'] .= ' and clan';
