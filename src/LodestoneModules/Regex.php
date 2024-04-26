@@ -25,7 +25,7 @@ class Regex
     public const string ITEMICON = 'https:\/\/[\.a-zA-Z0-9\/_\-]{80,97}\.png(\?n\d*\.?\d*)?';
     #Dimensions, in case they change
     public const string DIMENSIONS = 'width="\d*" height="\d*"';
-    public const string AVATAR = '(?<avatar>https:\/\/[\.a-zA-Z0-9\/_\-]{101}\.jpg)\?\d*';
+    public const string AVATAR = '(?<avatar>https:\/\/[\.a-zA-Z0-9\/_\-]{1,101}\.jpg)\?\d*';
     #Representation of float values
     public const string FLOATVAL = '[\d\.]*';
     
