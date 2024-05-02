@@ -186,7 +186,8 @@ trait Parsers
                 switch($this->type) {
                     case 'searchPvPTeam':
                     case 'searchFreeCompany':
-                        $tempResults[$key]['crest'] = $this->crest($tempresult, 'crest'); break;
+                        $tempResults[$key]['crest'] = $this->crest($tempresult, 'crest');
+                        break;
                     case 'searchCharacter':
                     case 'CharacterFriends':
                     case 'CharacterFollowing':
@@ -879,6 +880,12 @@ trait Parsers
         }
         if (!empty($tempresult[$keybase.'3'])) {
             $crest[] = str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'3']);
+        }
+        foreach ($crest as $key => $value) {
+            #Lodestone now serves one of the default emblems using non-standard URL sometimes, so we change it to a standard one
+            if ($value === 'https://lds-img.finalfantasyxiv.com/h/s/79TDIxvk2GApbpkZ8_0xbfvGAM.png') {
+                $crest[$key] = 'https://img2.finalfantasyxiv.com/c/S00_9a8096c55d9b806ba05b5626ccfa14e8_00_128x128.png';
+            }
         }
         return $crest;
     }
