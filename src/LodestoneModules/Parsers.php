@@ -889,10 +889,9 @@ trait Parsers
             if ($value === 'https://lds-img.finalfantasyxiv.com/h/O/qCQ49Y0JW_QjV6fkYMeHiW23qk.png') {
                 $crest[$key] = 'https://img2.finalfantasyxiv.com/c/S02_e4ecc91f18ffeea79c65a3b0a101f184_00_128x128.png';
             }
-            #Do not know the link yet
-            #if ($value === 'https://lds-img.finalfantasyxiv.com/h/O/qCQ49Y0JW_QjV6fkYMeHiW23qk.png') {
-            #    $crest[$key] = 'https://img2.finalfantasyxiv.com/c/S01_49d2902352dde56ae3c6423a937ac151_00_128x128.png';
-            #}
+            if ($value === 'https://lds-img.finalfantasyxiv.com/h/H/yJIZkIxUaa4hjXq_3lBQtumV20.png') {
+                $crest[$key] = 'https://img2.finalfantasyxiv.com/c/S01_49d2902352dde56ae3c6423a937ac151_00_128x128.png';
+            }
         }
         return $crest;
     }
