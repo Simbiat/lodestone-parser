@@ -1,7 +1,12 @@
 {
     "name": "simbiat/lodestone-parser",
     "type": "library",
-    "keywords": ["ffxiv","php","parser","lodestone"],
+    "keywords": [
+        "ffxiv",
+        "php",
+        "parser",
+        "lodestone"
+    ],
     "description": "FFXIV Lodestone parser in PHP",
     "homepage": "https://github.com/Simbiat/lodestone-parser",
     "license": "AGPL-3.0-or-later",
@@ -18,15 +23,15 @@
         "ext-curl": "*"
     },
     "replace": {
-    	"simbiat/lodestone-php": "*"
+        "simbiat/lodestone-php": "*"
     },
     "autoload": {
         "psr-4": {
             "Simbiat\\": "src/"
         }
     },
-	"support": {
-		"issues": "https://github.com/Simbiat/lodestone-parser/issues",
-		"source": "https://github.com/Simbiat/lodestone-parser"
-	}
+    "support": {
+        "issues": "https://github.com/Simbiat/lodestone-parser/issues",
+        "source": "https://github.com/Simbiat/lodestone-parser"
+    }
 }

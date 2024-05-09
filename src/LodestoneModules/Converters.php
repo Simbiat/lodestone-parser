@@ -1,50 +1,71 @@
 <?php
 #Functions used to convert textual filters to appropriate IDs used by Lodestone
-declare(strict_types=1);
+declare(strict_types = 1);
+
 namespace Simbiat\LodestoneModules;
+
+use JetBrains\PhpStorm\ExpectedValues;
+use JetBrains\PhpStorm\Pure;
+use function in_array;
 
 use Simbiat\Lodestone;
 
-class Converters {
-
+/**
+ * List of functions, that convert something to something else
+ */
+class Converters
+{
+    
+    /**
+     * Convert image of the Free Company rank to rank ID
+     * @param string $image
+     *
+     * @return string
+     */
     public function FCRankID(string $image): string
     {
-    	if (str_contains($image, 'W5a6yeRyN2eYiaV-AGU7mJKEhs')) {
-    		$rank = '0';
-    	} elseif (str_contains($image, 'SO2DiXPE4vb5ZquxK9qZzaS2FI')) {
-    		$rank = '12';
-    	} elseif (str_contains($image, 'hOa5rExOnxaN1WNnQqZYe3Vb7c')) {
-    		$rank = '8';
-    	} elseif (str_contains($image, 'eWQ8n_shMm6W0LoRN9KodNZ8tw')) {
-    		$rank = '14';
-    	} elseif (str_contains($image, 'p94F1j-5xhM2ySM16VNrA08qjU')) {
-    		$rank = '1';
-    	} elseif (str_contains($image, 'nw6rom1Gt5lCuBPbSsRUeFEAYo')) {
-    		$rank = '9';
-    	} elseif (str_contains($image, 'qm0y-fW7o2TvgYFH-vvcL-IH8s')) {
-    		$rank = '10';
-    	} elseif (str_contains($image, 'hU1Eoa9YXYljYZSLr_PDKlS9rA')) {
-    		$rank = '11';
-    	} elseif (str_contains($image, 'cliLaxMGlva579Q7-BGQofaHoU')) {
-    		$rank = '3';
-    	} elseif (str_contains($image, 'zXxmuKQfvR0_XbK-Q9tGafCvZQ')) {
-    		$rank = '4';
-    	} elseif (str_contains($image, 'ZgBF9xaOv1cXJ5hpqJk775gPnU')) {
-    		$rank = '7';
-    	} elseif (str_contains($image, 'MORWKTwHdU9RwJjwTjA8Goqczg')) {
-    		$rank = '13';
-    	} elseif (str_contains($image, 'uIrHic2MOYHNS316SWOpAFgMKM')) {
-    		$rank = '6';
-    	} elseif (str_contains($image, 'wy6luU_yTtJcSMjKaq-g7_uxX0')) {
-    		$rank = '2';
-    	} elseif (str_contains($image, 'IjnNzh88h17r2k16noer9mUzZo')) {
-    		$rank = '5';
-    	} else {
-    	    $rank = '';
-    	}
-    	return $rank;
+        if (str_contains($image, 'W5a6yeRyN2eYiaV-AGU7mJKEhs')) {
+            $rank = '0';
+        } elseif (str_contains($image, 'SO2DiXPE4vb5ZquxK9qZzaS2FI')) {
+            $rank = '12';
+        } elseif (str_contains($image, 'hOa5rExOnxaN1WNnQqZYe3Vb7c')) {
+            $rank = '8';
+        } elseif (str_contains($image, 'eWQ8n_shMm6W0LoRN9KodNZ8tw')) {
+            $rank = '14';
+        } elseif (str_contains($image, 'p94F1j-5xhM2ySM16VNrA08qjU')) {
+            $rank = '1';
+        } elseif (str_contains($image, 'nw6rom1Gt5lCuBPbSsRUeFEAYo')) {
+            $rank = '9';
+        } elseif (str_contains($image, 'qm0y-fW7o2TvgYFH-vvcL-IH8s')) {
+            $rank = '10';
+        } elseif (str_contains($image, 'hU1Eoa9YXYljYZSLr_PDKlS9rA')) {
+            $rank = '11';
+        } elseif (str_contains($image, 'cliLaxMGlva579Q7-BGQofaHoU')) {
+            $rank = '3';
+        } elseif (str_contains($image, 'zXxmuKQfvR0_XbK-Q9tGafCvZQ')) {
+            $rank = '4';
+        } elseif (str_contains($image, 'ZgBF9xaOv1cXJ5hpqJk775gPnU')) {
+            $rank = '7';
+        } elseif (str_contains($image, 'MORWKTwHdU9RwJjwTjA8Goqczg')) {
+            $rank = '13';
+        } elseif (str_contains($image, 'uIrHic2MOYHNS316SWOpAFgMKM')) {
+            $rank = '6';
+        } elseif (str_contains($image, 'wy6luU_yTtJcSMjKaq-g7_uxX0')) {
+            $rank = '2';
+        } elseif (str_contains($image, 'IjnNzh88h17r2k16noer9mUzZo')) {
+            $rank = '5';
+        } else {
+            $rank = '';
+        }
+        return $rank;
     }
-
+    
+    /**
+     * Convert certain images (and not only) to a boolean value
+     * @param string $img
+     *
+     * @return bool
+     */
     public function imageToBool(string $img): bool
     {
         return in_array(mb_strtolower($img, 'UTF-8'), [
@@ -57,10 +78,16 @@ class Converters {
             'https://img.finalfantasyxiv.com/lds/h/D/_VRXR3uARNQzxAv1v16NYvS5xk.png',
         ]);
     }
-
+    
+    /**
+     * Get Feast rank ID  (for filter) based on value provided
+     * @param string $rank
+     *
+     * @return string
+     */
     public function getFeastRankId(string $rank): string
     {
-        return match(mb_strtolower($rank, 'UTF-8')) {
+        return match (mb_strtolower($rank, 'UTF-8')) {
             '1', 'bronze', 'verteidiger' => '0',
             '2', 'silver', 'argent', 'silber' => '1',
             '3', 'gold', 'or' => '2',
@@ -69,10 +96,16 @@ class Converters {
             default => 'all',
         };
     }
-
+    
+    /**
+     * Get role ID  (for filter) based on value provided
+     * @param string $role
+     *
+     * @return string
+     */
     public function getSearchRolesId(string $role): string
     {
-        return match(mb_strtolower($role, 'UTF-8')) {
+        return match (mb_strtolower($role, 'UTF-8')) {
             '0', 'tank', 'tanks', 'verteidiger' => '0',
             '1', 'healer', 'soigneurs', 'heiler' => '1',
             '2', 'dps', 'angreifer' => '2',
@@ -82,10 +115,16 @@ class Converters {
             default => '',
         };
     }
-
+    
+    /**
+     * Get activity ID  (for filter) based on value provided
+     * @param string $act
+     *
+     * @return string
+     */
     public function getSearchActivitiesId(string $act): string
     {
-        return match(mb_strtolower($act, 'UTF-8')) {
+        return match (mb_strtolower($act, 'UTF-8')) {
             '0', 'role-playing', 'ロールプレイ', 'jeu de rôle', 'rollenspiel' => '0',
             '1', 'leveling', 'レベリング', 'gain d\'expérience', 'stufenaufstieg' => '1',
             '2', 'casual', 'カジュアル', 'jeu décontracté', 'gelegenheitsspieler' => '2',
@@ -99,36 +138,60 @@ class Converters {
             default => '',
         };
     }
-
+    
+    /**
+     * Get house estate ID  (for filter) based on value provided
+     * @param string $house
+     *
+     * @return string
+     */
     public function getSearchHouseId(string $house): string
     {
-        return match(mb_strtolower($house, 'UTF-8')) {
+        return match (mb_strtolower($house, 'UTF-8')) {
             '2', 'estate built', '所有あり', 'logement construit', 'besitzt unterkunft' => '2',
             '1', 'plot only', '土地のみ', 'terrain seul', 'nur grundstück' => '1',
             '0', 'no estate or plot', '所有なし', 'sans logement ni terrain', 'besitzt keine unterkunft' => '0',
             default => '',
         };
     }
-
+    
+    /**
+     * Get Free Company open status ID  (for filter) based on value provided
+     * @param string $join
+     *
+     * @return string
+     */
     public function getSearchJoinId(string $join): string
     {
-        return match(mb_strtolower($join, 'UTF-8')) {
+        return match (mb_strtolower($join, 'UTF-8')) {
             '1', 'open', '申請可', 'candidatures acceptées', 'nimmt gesuche an' => '1',
             '0', 'closed', '申請不可', 'candidatures refusées', 'nimmt keine gesuche an' => '0',
             default => '',
         };
     }
-
+    
+    /**
+     * Get Free Company activity time ID  (for filter) based on value provided
+     * @param string $active
+     *
+     * @return string
+     */
     public function getSearchActiveTimeId(string $active): string
     {
-        return match(mb_strtolower($active, 'UTF-8')) {
+        return match (mb_strtolower($active, 'UTF-8')) {
             '1', 'weekdays', 'weekdays only', '平日のみ', 'en semaine seulement', 'nur wochentags' => '1',
             '2', 'weekends', 'weekends only', '週末のみ', 'le week-end seulement', 'nur Wochenende' => '2',
             '3', 'always', '平日/週末', 'toute la semaine', 'jeden Tag' => '3',
             default => '',
         };
     }
-
+    
+    /**
+     * Get matches count ID (for filter) based on value provided
+     * @param int $count
+     *
+     * @return string
+     */
     public function matchesCount(int $count): string
     {
         if ($count >= 1 && $count <= 29) {
@@ -142,7 +205,13 @@ class Converters {
         }
         return $countNew;
     }
-
+    
+    /**
+     * Get PvP rank ID (for filter) based on value provided
+     * @param int $count
+     *
+     * @return string
+     */
     public function pvpRank(int $count): string
     {
         if ($count >= 1 && $count <= 10) {
@@ -158,17 +227,23 @@ class Converters {
         }
         return $countNew;
     }
-
+    
+    /**
+     * Get members count ID (for filter) based on value provided
+     * @param int|string $count
+     *
+     * @return string
+     */
     public function membersCount(int|string $count): string
     {
-        if (is_int($count)) {
+        if (\is_int($count)) {
             if ($count >= 1 && $count <= 10) {
                 $count = '1-10';
-            } else if ($count >= 11 && $count <= 30) {
+            } elseif ($count >= 11 && $count <= 30) {
                 $count = '11-30';
-            } else if ($count >= 31 && $count <= 50) {
+            } elseif ($count >= 31 && $count <= 50) {
                 $count = '31-50';
-            } else if ($count >= 51) {
+            } elseif ($count >= 51) {
                 $count = '51-';
             } else {
                 $count = '';
@@ -178,49 +253,77 @@ class Converters {
         }
         return $count;
     }
-
+    
+    /**
+     * Convert region identifier to language
+     * @param string $lang
+     *
+     * @return string
+     */
     public function languageConvert(string $lang): string
     {
         if (!empty($lang)) {
             if (!in_array($lang, Lodestone::langAllowed)) {
                 $lang = 'na';
             }
-            if (in_array($lang, ['jp', 'ja'])) {$lang = 'ja';}
-            if (in_array($lang, ['na', 'eu'])) {$lang = 'en';}
+            if (in_array($lang, ['jp', 'ja'])) {
+                $lang = 'ja';
+            }
+            if (in_array($lang, ['na', 'eu'])) {
+                $lang = 'en';
+            }
         } else {
             $lang = '';
         }
         return $lang;
     }
-
+    
+    /**
+     * Get order ID (for filter) based on value provided
+     * @param string $order
+     *
+     * @return string
+     */
     public function getSearchOrderId(string $order): string
     {
-	    return match(mb_strtolower($order, 'UTF-8')) {
-	        '1', 'charaz', 'fcaz', 'lsaz', 'pvpaz' => '1',
+        return match (mb_strtolower($order, 'UTF-8')) {
+            '1', 'charaz', 'fcaz', 'lsaz', 'pvpaz' => '1',
             '2', 'charza', 'fcza', 'lsza', 'pvpza' => '2',
             '3', 'worldaz', 'fcmembersza', 'lsmembersza' => '3',
             '4', 'worldza', 'fcmembersaz', 'lsmembersaz' => '4',
             '5', 'levelza', 'fcfoundza' => '5',
             '6', 'levelaz', 'fcfoundaz' => '6',
             default => '',
-	    };
+        };
     }
-
+    
+    /**
+     * Get grand company ID (for filter) based on value provided
+     * @param string $gc
+     *
+     * @return string
+     */
     public function getSearchGCId(string $gc): string
     {
-	    return match(mb_strtolower($gc, 'UTF-8')) {
-	        '1', 'maelstrom', '黒渦団', 'le maelstrom', 'mahlstrom' => '1',
+        return match (mb_strtolower($gc, 'UTF-8')) {
+            '1', 'maelstrom', '黒渦団', 'le maelstrom', 'mahlstrom' => '1',
             '2', 'order of the twin adder', '双蛇党 ', 'l\'ordre des deux vipères', 'bruderschaft der morgenviper' => '2',
             '3', 'immortal flames', '不滅隊', 'les immortels', 'legion der unsterblichen' => '3',
             '0', 'no affiliation', '所属なし', 'sans allégeance', 'keine gesellschaft' => '0',
             default => '',
-	    };
+        };
     }
-
+    
+    /**
+     * Get race/clan ID (for filter) based on value provided
+     * @param string $clan
+     *
+     * @return string
+     */
     public function getSearchClanId(string $clan): string
     {
-	    return match(mb_strtolower($clan, 'UTF-8')) {
-	        'hyur', 'ヒューラン', 'hyuran' => 'race_1',
+        return match (mb_strtolower($clan, 'UTF-8')) {
+            'hyur', 'ヒューラン', 'hyuran' => 'race_1',
             'midlander', 'ミッドランダー', 'hyurois', 'wiesländer' => 'tribe_1',
             'highlander', 'ハイランダー', 'hyurgoth', 'hochländer' => 'tribe_2',
             'elezen', 'エレゼン', 'élézen' => 'race_2',
@@ -245,13 +348,19 @@ class Converters {
             'rava', 'ラヴァ・ヴィエラ' => 'tribe_15',
             'veena', 'ヴィナ・ヴィエラ' => 'tribe_16',
             default => '',
-	    };
+        };
     }
-
+    
+    /**
+     * Convert class to Job. This is for original classes only
+     * @param string $class
+     *
+     * @return string
+     */
     public function classToJob(string $class): string
     {
-        return match(mb_strtolower($class, 'UTF-8')) {
-	        'gladiator', 'gladiateur' => 'Paladin',
+        return match (mb_strtolower($class, 'UTF-8')) {
+            'gladiator', 'gladiateur' => 'Paladin',
             'marauder' => 'Warrior',
             'conjurer' => 'White Mage',
             'pugilist' => 'Monk',
@@ -282,13 +391,19 @@ class Converters {
             'thaumaturg' => 'Schwarzmagier',
             'hermetiker' => 'Beschwörer',
             default => $class,
-	    };
+        };
     }
-
+    
+    /**
+     * Get class or job ID (for filter) based on value provided
+     * @param string $classname
+     *
+     * @return string
+     */
     public function getSearchClassId(string $classname): string
     {
-	    return match(mb_strtolower($classname, 'UTF-8')) {
-	        'tnk' => '_job_TANK&classjob=_class_TANK',
+        return match (mb_strtolower($classname, 'UTF-8')) {
+            'tnk' => '_job_TANK&classjob=_class_TANK',
             'hlr' => '_job_HEALER&classjob=_class_HEALER',
             'dps' => '_job_DPS&classjob=_class_DPS',
             'doh' => '_class_CRAFTER',
@@ -331,13 +446,19 @@ class Converters {
             'gnb' => '37',
             'dnc' => '38',
             default => '',
-	    };
+        };
     }
-
+    
+    /**
+     * Get deep dungeon class ID (for filter) based on value provided
+     * @param string $classname
+     *
+     * @return string
+     */
     public function getDeepDungeonClassId(string $classname): string
     {
-        return match(mb_strtolower($classname, 'UTF-8')) {
-	        'gla', 'pld' => '125bf9c1198a3a148377efea9c167726d58fa1a5',
+        return match (mb_strtolower($classname, 'UTF-8')) {
+            'gla', 'pld' => '125bf9c1198a3a148377efea9c167726d58fa1a5',
             'mar', 'war' => '741ae8622fa496b4f98b040ff03f623bf46d790f',
             'drk' => 'c31f30f41ab1562461262daa74b4d374e633a790',
             'cnj', 'whm' => '56d60f8dbf527ab9a4f96f2906f044b33e7bd349',
@@ -357,13 +478,19 @@ class Converters {
             'rpr' => 'c3c6557ad8cc33a73a392f68e45926710496eb13',
             'sge' => '3516b2b3881af781dba74a70f7d3e5d01bb73434',
             default => '',
-	    };
+        };
     }
-
+    
+    /**
+     * Get guardian ID (for filter) based on value provided
+     * @param string $guardian
+     *
+     * @return string
+     */
     public function getGuardianId(string $guardian): string
     {
-        return match(mb_strtolower($guardian, 'UTF-8')) {
-	        'althyk, the keeper', 'アルジク', 'althyk, le contemplateur', 'althyk - der hüter', 'althyk' => '1',
+        return match (mb_strtolower($guardian, 'UTF-8')) {
+            'althyk, the keeper', 'アルジク', 'althyk, le contemplateur', 'althyk - der hüter', 'althyk' => '1',
             'azeyma, the warden', 'アーゼマ', 'azeyma, la gardienne', 'azeyma - die aufseherin', 'azeyma' => '2',
             'byregot, the builder', 'ビエルゴ', 'byregot, l\'artisan', 'byregot - der erbauer', 'byregot' => '3',
             'halone, the fury', 'ハルオーネ', 'halone, la conquérante', 'halone - die furie', 'halone' => '4',
@@ -376,22 +503,35 @@ class Converters {
             'rhalgr, the destroyer', 'ラールガー', 'rhalgr, le destructeur', 'rhalgr - der zerstörer', 'rhalgr' => '11',
             'thaliak, the scholar', 'サリャク', 'thaliak, l\'érudit', 'thaliak - der forscher', 'thaliak' => '12',
             default => '',
-	    };
+        };
     }
-
+    
+    /**
+     * Get city ID (for filter) based on value provided
+     * @param string $city
+     *
+     * @return string
+     */
     public function getCityId(string $city): string
     {
         #IDs are based on what I have in my own database, there is no other meaning behind them
-        return match(mb_strtolower($city, 'UTF-8')) {
-	        'gridania', 'the lavender beds', 'グリダニア', 'ラベンダーベッド', 'lavandière', 'lavendelbeete' => '2',
+        return match (mb_strtolower($city, 'UTF-8')) {
+            'gridania', 'the lavender beds', 'グリダニア', 'ラベンダーベッド', 'lavandière', 'lavendelbeete' => '2',
             'limsa lominsa', 'mist', 'リムサ・ロミンサ', 'ミスト・ヴィレッジ', 'brumée', 'dorf des Nebels' => '4',
             'ul\'dah', 'the goblet', 'ウルダハ', 'la Coupe', 'ゴブレットビュート', 'kelchkuppe' => '5',
             'kugane', 'クガネ', 'shirogane', 'シロガネ' => '7',
             default => '',
-	    };
+        };
     }
-
-    public function getCityName(int $id = 1, string $lang = 'en'): string
+    
+    /**
+     * Get city name for specific language
+     * @param int    $id   City ID
+     * @param string $lang Expected language
+     *
+     * @return string
+     */
+    public function getCityName(int $id = 1, #[ExpectedValues(['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])] string $lang = 'en'): string
     {
         if (!in_array(mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for City name');
@@ -416,18 +556,31 @@ class Converters {
             default => '',
         };
     }
-
+    
+    /**
+     * Get grand company ID (for filter) based on value provided
+     * @param string $gc
+     *
+     * @return string
+     */
     public function getGrandCompanyId(string $gc): string
     {
-        return match(mb_strtolower($gc, 'UTF-8')) {
-	        'maelstrom', '黒渦団', 'mahlstrom' => '1',
+        return match (mb_strtolower($gc, 'UTF-8')) {
+            'maelstrom', '黒渦団', 'mahlstrom' => '1',
             'order of the twin adder', '双蛇党', 'ordre des deux vipères', 'bruderschaft' => '2',
             'immortal flames', '不滅隊', 'immortels', 'legion' => '3',
             default => '',
-	    };
+        };
     }
-
-    public function getGrandCompanyName(int $id = 1, string $lang = 'en'): string
+    
+    /**
+     * Get grand company name in specific language
+     * @param int    $id   ID of the company
+     * @param string $lang Expected language
+     *
+     * @return string
+     */
+    public function getGrandCompanyName(int $id = 1, #[ExpectedValues(['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])] string $lang = 'en'): string
     {
         if (!in_array(mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for Grand Company name');
@@ -453,12 +606,17 @@ class Converters {
             default => '',
         };
     }
-
-    #Returns guardian's color
-    public function colorGuardians(string $guardian): string
+    
+    /**
+     * Returns guardian's color
+     * @param string $guardian
+     *
+     * @return string
+     */
+    #[Pure] public function colorGuardians(string $guardian): string
     {
-        return match($this->getGuardianId($guardian)) {
-	        '1' => '#776c3e',
+        return match ($this->getGuardianId($guardian)) {
+            '1' => '#776c3e',
             '2' => '#6b3e3d',
             '3' => '#4e3a61',
             '4' => '#536f7b',
@@ -471,35 +629,51 @@ class Converters {
             '11' => '#6b4e88',
             '12' => '#506b8c',
             default => '',
-	    };
+        };
     }
-
-    #Returns city's color
-    public function colorCities(string $city): string
+    
+    /**
+     * Returns city's color
+     * @param string $city
+     *
+     * @return string
+     */
+    #[Pure] public function colorCities(string $city): string
     {
-        return match($this->getCityId($city)) {
-	        '2' => '#ffb200',
+        return match ($this->getCityId($city)) {
+            '2' => '#ffb200',
             '4' => '#bd0421',
             '5' => '#080300',
             '7' => '#8d5810',
             default => '',
-	    };
+        };
     }
-
-    #Returns grand company's color
-    public function colorGC(string $company): string
+    
+    /**
+     * Returns grand company's color
+     * @param string $company
+     *
+     * @return string
+     */
+    #[Pure] public function colorGC(string $company): string
     {
-        return match($this->getGrandCompanyId($company)) {
-	        '1' => '#c22e46',
+        return match ($this->getGrandCompanyId($company)) {
+            '1' => '#c22e46',
             '2' => '#e8a01f',
             '3' => '#414849',
             default => '',
-	    };
+        };
     }
-
+    
+    /**
+     * Convert memory size for benchmark
+     * @param $bytes
+     *
+     * @return string
+     */
     public function memory($bytes): string
     {
-        $unit=array('b','kb','mb','gb','tb','pb');
-        return @round($bytes/ (1024 ** ($i = floor(log($bytes, 1024)))),2).' '.$unit[$i];
+        $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
+        return round($bytes / (1024 ** ($i = (int)floor(log($bytes, 1024)))), 2).' '.$unit[$i];
     }
 }

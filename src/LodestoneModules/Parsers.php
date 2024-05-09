@@ -1,14 +1,24 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
+
 namespace Simbiat\LodestoneModules;
 
+use function in_array, is_array;
+
+/**
+ * Main parsing logic
+ */
 trait Parsers
 {
+    /**
+     * Parse Lodestone HTML
+     * @return \Simbiat\LodestoneModules\Parsers|\Simbiat\Lodestone
+     */
     protected function parse(): self
     {
         $started = hrtime(true);
         #Set array key for results
-        $resultkey = match($this->type) {
+        $resultkey = match ($this->type) {
             'searchCharacter', 'Character', 'CharacterJobs', 'CharacterFriends', 'CharacterFollowing', 'Achievements', 'AchievementDetails' => 'characters',
             'FreeCompanyMembers', 'searchFreeCompany', 'FreeCompany' => 'freecompanies',
             'LinkshellMembers', 'searchLinkshell' => 'linkshells',
@@ -16,7 +26,7 @@ trait Parsers
             'Database' => 'database',
             default => $this->type,
         };
-        $resultsubkey = match($this->type) {
+        $resultsubkey = match ($this->type) {
             'CharacterJobs' => 'jobs',
             'CharacterFriends' => 'friends',
             'CharacterFollowing' => 'following',
@@ -39,7 +49,7 @@ trait Parsers
         if ($this->benchmark) {
             $finished = hrtime(true);
             $duration = $finished - $started;
-            $this->result['benchmark']['httptime'][] = date('H:i:s.'.sprintf("%06d", ($duration / 1000)), (int)($duration / 1000000000));
+            $this->result['benchmark']['httptime'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
         }
         $started = hrtime(true);
         try {
@@ -61,24 +71,24 @@ trait Parsers
                 'updates',
                 'status',
             ])) {
-                if (!$this->regexfail(preg_match_all(Regex::PAGECOUNT,$this->html,$pages,PREG_SET_ORDER), preg_last_error(), 'PAGECOUNT')) {
+                if (!$this->regexfail(preg_match_all(Regex::PAGECOUNT, $this->html, $pages, PREG_SET_ORDER), preg_last_error(), 'PAGECOUNT')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
             }
             if (in_array($this->type, ['GrandCompanyRanking', 'FreeCompanyRanking'])) {
-                if (!$this->regexfail(preg_match_all(Regex::PAGECOUNT2,$this->html,$pages,PREG_SET_ORDER), preg_last_error(), 'PAGECOUNT2')) {
+                if (!$this->regexfail(preg_match_all(Regex::PAGECOUNT2, $this->html, $pages, PREG_SET_ORDER), preg_last_error(), 'PAGECOUNT2')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
             }
             if ($this->type === 'Database') {
-                if (!$this->regexfail(preg_match_all(Regex::DBPAGECOUNT,$this->html,$pages,PREG_SET_ORDER), preg_last_error(), 'DBPAGECOUNT')) {
+                if (!$this->regexfail(preg_match_all(Regex::DBPAGECOUNT, $this->html, $pages, PREG_SET_ORDER), preg_last_error(), 'DBPAGECOUNT')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
             }
-
+            
             #Banners special precut
             if ($this->type === 'banners') {
                 if (!$this->regexfail(preg_match(Regex::BANNERS, $this->html, $banners), preg_last_error(), 'BANNERS')) {
@@ -86,7 +96,7 @@ trait Parsers
                 }
                 $this->html = $banners[0];
             }
-
+            
             #Notices special precut for pinned items
             if (in_array($this->type, [
                 'notices',
@@ -99,10 +109,10 @@ trait Parsers
                 }
                 $this->html = $notices[0][0];
             }
-
+            
             #Main (general) parser
             #Setting initial regex
-            $regex = match($this->type) {
+            $regex = match ($this->type) {
                 'searchPvPTeam' => Regex::PVPTEAMLIST,
                 'searchLinkshell' => Regex::LINKSHELLLIST,
                 'searchFreeCompany' => Regex::FREECOMPANYLIST,
@@ -123,11 +133,11 @@ trait Parsers
                 'Database' => Regex::DBLIST,
                 default => Regex::CHARACTERLIST,
             };
-
+            
             #Uncomment for debugging purposes
             #file_put_contents(__DIR__.'/regex.txt', $regex);
             #file_put_contents(__DIR__.'/html.txt', $this->html);
-
+            
             if (!$this->regexfail(preg_match_all($regex, $this->html, $tempResults, PREG_SET_ORDER), preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
                     'searchCharacter',
@@ -153,37 +163,37 @@ trait Parsers
                     return $this;
                 }
             }
-
+            
             #Character results update
             if ($this->type === 'Character') {
                 #Remove non-named groups before rearranging results to avoid overwrites
-                foreach ($tempResults as $key=> $tempresult) {
-                    foreach ($tempresult as $key2=>$details) {
+                foreach ($tempResults as $key => $tempresult) {
+                    foreach ($tempresult as $key2 => $details) {
                         if (is_numeric($key2) || empty($details)) {
-                            unset($tempResults[$key][$key2]);
+                            unset($tempResults[$key][(int)$key2]);
                         }
                     }
                 }
                 $tempResults = [array_merge($tempResults[0], $tempResults[1], $tempResults[2])];
             }
-
-            foreach ($tempResults as $key=> $tempresult) {
+            
+            foreach ($tempResults as $key => $tempresult) {
                 #Remove unnamed groups and empty values
-                foreach ($tempresult as $key2=>$value) {
+                foreach ($tempresult as $key2 => $value) {
                     if (is_numeric($key2) || empty($value)) {
-                        unset($tempResults[ $key ][ $key2 ], $tempresult[ $key2 ]);
+                        unset($tempResults[$key][$key2], $tempresult[$key2]);
                     }
                 }
                 #Decode HTML entities
-                foreach ($tempresult as $key2=>$value) {
+                foreach ($tempresult as $key2 => $value) {
                     #Decode in the data inside loop
                     $tempresult[$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                     #Decode in original data (for consistency)
                     $tempResults[$key][$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                 }
-
+                
                 #Specific processing
-                switch($this->type) {
+                switch ($this->type) {
                     case 'searchPvPTeam':
                     case 'searchFreeCompany':
                         $tempResults[$key]['crest'] = $this->crest($tempresult, 'crest');
@@ -244,8 +254,8 @@ trait Parsers
                         break;
                     case 'deepdungeon':
                         $tempResults[$key]['job'] = [
-                            'name'=>$tempresult['job'],
-                            'icon'=>$tempresult['jobicon'],
+                            'name' => $tempresult['job'],
+                            'icon' => $tempresult['jobicon'],
                         ];
                         if (!empty($tempresult['jobform'])) {
                             $tempResults[$key]['job']['form'] = $tempresult['jobform'];
@@ -281,9 +291,9 @@ trait Parsers
                         for ($i = 1; $i <= 9; $i++) {
                             if (!empty($tempresult['focusname'.$i])) {
                                 $tempResults[$key]['focus'][] = [
-                                    'name'=>$tempresult['focusname'.$i],
-                                    'enabled'=>(empty($tempresult['focusoff'.$i]) ? 1 : 0),
-                                    'icon'=>$tempresult['focusicon'.$i],
+                                    'name' => $tempresult['focusname'.$i],
+                                    'enabled' => (empty($tempresult['focusoff'.$i]) ? 1 : 0),
+                                    'icon' => $tempresult['focusicon'.$i],
                                 ];
                                 unset($tempResults[$key]['focusname'.$i], $tempResults[$key]['focusoff'.$i], $tempResults[$key]['focusicon'.$i]);
                             }
@@ -292,9 +302,9 @@ trait Parsers
                         for ($i = 1; $i <= 5; $i++) {
                             if (!empty($tempresult['seekingname'.$i])) {
                                 $tempResults[$key]['seeking'][] = [
-                                    'name'=>$tempresult['seekingname'.$i],
-                                    'enabled'=>(empty($tempresult['seekingoff'.$i]) ? 1 : 0),
-                                    'icon'=>$tempresult['seekingicon'.$i],
+                                    'name' => $tempresult['seekingname'.$i],
+                                    'enabled' => (empty($tempresult['seekingoff'.$i]) ? 1 : 0),
+                                    'icon' => $tempresult['seekingicon'.$i],
                                 ];
                                 unset($tempResults[$key]['seekingname'.$i], $tempResults[$key]['seekingoff'.$i], $tempResults[$key]['seekingicon'.$i]);
                             }
@@ -327,9 +337,9 @@ trait Parsers
                         }
                         if (!empty($tempresult['itemname'])) {
                             $tempResults[$key]['item'] = [
-                                'id'=>$tempresult['itemid'],
-                                'name'=>$tempresult['itemname'],
-                                'icon'=>$tempresult['itemicon'],
+                                'id' => $tempresult['itemid'],
+                                'name' => $tempresult['itemname'],
+                                'icon' => $tempresult['itemicon'],
                             ];
                             unset($tempResults[$key]['itemid'], $tempResults[$key]['itemname'], $tempResults[$key]['itemicon']);
                         }
@@ -342,22 +352,22 @@ trait Parsers
                         break;
                     case 'Database':
                         $tempResults[$key]['name'] = str_replace(['<i>', '</i>'], '', trim($tempResults[$key]['name']));
-                        switch($this->typeSettings['type']) {
+                        switch ($this->typeSettings['type']) {
                             case 'achievement':
-                                $tempResults[$key]['reward'] = (trim($tempResults[$key]['column1'])==='-' ? NULL : trim($tempResults[$key]['column1']));
-                                $tempResults[$key]['points'] = (int)($tempResults[ $key ]['column2'] ?? 0);
+                                $tempResults[$key]['reward'] = (trim($tempResults[$key]['column1']) === '-' ? NULL : trim($tempResults[$key]['column1']));
+                                $tempResults[$key]['points'] = (int)($tempResults[$key]['column2'] ?? 0);
                                 break;
                             case 'quest':
-                                $tempResults[$key]['area'] = (trim($tempResults[$key]['column1'])==='-' ? NULL : trim($tempResults[$key]['column1']));
-                                $tempResults[$key]['character_level'] = (int)($tempResults[ $key ]['column2'] ?? 0);
+                                $tempResults[$key]['area'] = (trim($tempResults[$key]['column1']) === '-' ? NULL : trim($tempResults[$key]['column1']));
+                                $tempResults[$key]['character_level'] = (int)($tempResults[$key]['column2'] ?? 0);
                                 break;
                             case 'duty':
-                                $tempResults[$key]['character_level'] = (int)($tempResults[ $key ]['column1'] ?? 0);
-                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column2'])==='-' ? 0 : (int)$tempResults[ $key ]['column2']);
+                                $tempResults[$key]['character_level'] = (int)($tempResults[$key]['column1'] ?? 0);
+                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column2']) === '-' ? 0 : (int)$tempResults[$key]['column2']);
                                 break;
                             case 'item':
-                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column1'])==='-' ? 0 : (int)$tempResults[ $key ]['column1']);
-                                $tempResults[$key]['character_level'] = (trim($tempResults[$key]['column2'])==='-' ? 0 : (int)$tempResults[ $key ]['column2']);
+                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column1']) === '-' ? 0 : (int)$tempResults[$key]['column1']);
+                                $tempResults[$key]['character_level'] = (trim($tempResults[$key]['column2']) === '-' ? 0 : (int)$tempResults[$key]['column2']);
                                 break;
                             case 'recipe':
                                 if (isset($tempResults[$key]['extraicon'])) {
@@ -368,14 +378,14 @@ trait Parsers
                                 if (!isset($tempResults[$key]['master'])) {
                                     $tempResults[$key]['master'] = NULL;
                                 }
-                                $tempResults[$key]['recipe_level'] = (trim($tempResults[$key]['column1'])==='-' ? 0 : (int)$tempResults[ $key ]['column1']);
+                                $tempResults[$key]['recipe_level'] = (trim($tempResults[$key]['column1']) === '-' ? 0 : (int)$tempResults[$key]['column1']);
                                 $tempResults[$key]['stars'] = $this->stars($tempResults[$key]);
                                 if (isset($tempResults[$key]['expert'])) {
                                     $tempResults[$key]['expert'] = true;
                                 } else {
                                     $tempResults[$key]['expert'] = false;
                                 }
-                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column2'])==='-' ? 0 : (int)$tempResults[ $key ]['column2']);
+                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column2']) === '-' ? 0 : (int)$tempResults[$key]['column2']);
                                 break;
                             case 'gathering':
                                 if (isset($tempResults[$key]['extraicon'])) {
@@ -388,7 +398,7 @@ trait Parsers
                                 } else {
                                     $tempResults[$key]['hidden'] = false;
                                 }
-                                $tempResults[$key]['level'] = (trim($tempResults[$key]['column1'])==='-' ? 0 : (int)$tempResults[ $key ]['column1']);
+                                $tempResults[$key]['level'] = (trim($tempResults[$key]['column1']) === '-' ? 0 : (int)$tempResults[$key]['column1']);
                                 $tempResults[$key]['stars'] = $this->stars($tempResults[$key]);
                                 break;
                             case 'shop':
@@ -429,7 +439,7 @@ trait Parsers
                                 $tempResults[$key]['comment'] = 'No clan';
                             }
                         }
-                        $tempResults[$key]['nameday'] = str_replace("32st", "32nd", $tempResults[$key]['nameday']);
+                        $tempResults[$key]['nameday'] = str_replace('32st', '32nd', $tempResults[$key]['nameday']);
                         if (!empty($tempresult['uppertitle'])) {
                             $tempResults[$key]['title'] = $tempresult['uppertitle'];
                         } elseif (!empty($tempresult['undertitle'])) {
@@ -441,7 +451,7 @@ trait Parsers
                         $tempResults[$key]['gender'] = ($tempresult['gender'] === '♂' ? 'male' : 'female');
                         #Guardian
                         if (empty($tempResults[$key]['guardian'])) {
-                            $tempResults[$key]['guardian']['name'] = match(mb_strtolower($this->language, 'UTF-8')) {
+                            $tempResults[$key]['guardian']['name'] = match (mb_strtolower($this->language, 'UTF-8')) {
                                 'jp', 'ja' => 'ハルオーネ',
                                 'fr' => 'Halone, la Conquérante',
                                 'de' => 'Halone - Die Furie',
@@ -455,14 +465,14 @@ trait Parsers
                             }
                         } else {
                             $tempResults[$key]['guardian'] = [
-                                'name'=>$tempresult['guardian'],
-                                'icon'=>$tempresult['guardianicon'],
+                                'name' => $tempresult['guardian'],
+                                'icon' => $tempresult['guardianicon'],
                             ];
                         }
                         #City
                         $tempResults[$key]['city'] = [
-                            'name'=>$tempresult['city'],
-                            'icon'=>$tempresult['cityicon'],
+                            'name' => $tempresult['city'],
+                            'icon' => $tempresult['cityicon'],
                         ];
                         #Portrait
                         $tempResults[$key]['portrait'] = str_replace('c0_96x96', 'l0_640x873', $tempresult['avatar']);
@@ -477,8 +487,8 @@ trait Parsers
                         #PvP Team
                         if (!empty($tempresult['pvpid'])) {
                             $tempResults[$key]['pvp'] = [
-                                'id'=>$tempresult['pvpid'],
-                                'name'=>$tempresult['pvpname'],
+                                'id' => $tempresult['pvpid'],
+                                'name' => $tempresult['pvpname'],
                             ];
                             $tempResults[$key]['pvp']['crest'] = $this->crest($tempresult, 'pvpcrest');
                         }
@@ -494,8 +504,8 @@ trait Parsers
                         }
                         $tempResults[$key]['attributes'] = $this->attributes();
                         #Minions and mounts now show only icon on Lodestone, thus it's not really practically to grab them
-                        #$tempResults[$key]['mounts'] = $this->collectibales('mounts');
-                        #$tempResults[$key]['minions'] = $this->collectibales('minions');
+                        #$tempResults[$key]['mounts'] = $this->collectibles('mounts');
+                        #$tempResults[$key]['minions'] = $this->collectibles('minions');
                         $tempResults[$key]['gear'] = $this->items();
                         break;
                     case 'CharacterJobs':
@@ -505,14 +515,14 @@ trait Parsers
                         $tempResults[$key] = $this->jobDetails($tempresult);
                         break;
                 }
-
+                
                 #Unset stuff for cleaner look. Since it does not trigger warnings if variable is missing, no need to "switch" it
-                unset($tempResults[$key]['crest1'], $tempResults[$key]['crest2'], $tempResults[$key]['crest3'], $tempResults[$key]['fccrestimg1'], $tempResults[$key]['fccrestimg2'], $tempResults[$key]['fccrestimg3'], $tempResults[$key]['gcname'], $tempResults[$key]['gcrank'], $tempResults[$key]['gcrankicon'], $tempResults[$key]['fcid'], $tempResults[$key]['fcname'], $tempResults[$key]['lsrankicon'], $tempResults[$key]['jobicon'], $tempResults[$key]['jobform'], $tempResults[$key]['estate_greeting'],  $tempResults[$key]['estate_address'],  $tempResults[$key]['estate_name'], $tempResults[$key]['cityicon'], $tempResults[$key]['guardianicon'], $tempResults[$key]['gcicon'], $tempResults[$key]['uppertitle'], $tempResults[$key]['undertitle'], $tempResults[$key]['pvpid'], $tempResults[$key]['pvpname'], $tempResults[$key]['pvpcrest1'], $tempResults[$key]['pvpcrest2'], $tempResults[$key]['pvpcrest3'], $tempResults[$key]['rank1'], $tempResults[$key]['rank2'], $tempResults[$key]['id'], $tempResults[$key]['column1'], $tempResults[$key]['column2'], $tempResults[$key]['column3'], $tempResults[$key]['star1'], $tempResults[$key]['star2'], $tempResults[$key]['star3'], $tempResults[$key]['extraicon']);
-
+                unset($tempResults[$key]['crest1'], $tempResults[$key]['crest2'], $tempResults[$key]['crest3'], $tempResults[$key]['fccrestimg1'], $tempResults[$key]['fccrestimg2'], $tempResults[$key]['fccrestimg3'], $tempResults[$key]['gcname'], $tempResults[$key]['gcrank'], $tempResults[$key]['gcrankicon'], $tempResults[$key]['fcid'], $tempResults[$key]['fcname'], $tempResults[$key]['lsrankicon'], $tempResults[$key]['jobicon'], $tempResults[$key]['jobform'], $tempResults[$key]['estate_greeting'], $tempResults[$key]['estate_address'], $tempResults[$key]['estate_name'], $tempResults[$key]['cityicon'], $tempResults[$key]['guardianicon'], $tempResults[$key]['gcicon'], $tempResults[$key]['uppertitle'], $tempResults[$key]['undertitle'], $tempResults[$key]['pvpid'], $tempResults[$key]['pvpname'], $tempResults[$key]['pvpcrest1'], $tempResults[$key]['pvpcrest2'], $tempResults[$key]['pvpcrest3'], $tempResults[$key]['rank1'], $tempResults[$key]['rank2'], $tempResults[$key]['id'], $tempResults[$key]['column1'], $tempResults[$key]['column2'], $tempResults[$key]['column3'], $tempResults[$key]['star1'], $tempResults[$key]['star2'], $tempResults[$key]['star3'], $tempResults[$key]['extraicon']);
+                
                 #Adding to results
                 $this->addToResults($resultkey, $resultsubkey, $tempResults[$key], (empty($tempresult['id']) ? null : $tempresult['id']));
             }
-
+            
             #Worlds sort
             if ($this->type === 'worlds') {
                 ksort($this->result[$resultkey]);
@@ -527,10 +537,10 @@ trait Parsers
             $duration = $finished - $started;
             $this->benchUpdate($duration);
         }
-
+        
         #Doing achievements details last to get proper order of timings for benchmarking
         if ($this->type === 'Achievements' && $this->typeSettings['details']) {
-            foreach ($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey] as $key=> $ach) {
+            foreach ($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey] as $key => $ach) {
                 $this->getCharacterAchievements($this->typeSettings['id'], $key, 1, false, true);
             }
         }
@@ -541,13 +551,22 @@ trait Parsers
             }
         }
         $this->allpagesproc($resultkey);
-
+        
         return $this;
     }
-
+    
+    /**
+     * Add  entity to results
+     * @param string          $resultkey    Result key (essentially type of the entity)
+     * @param string          $resultsubkey Sub-key of result
+     * @param array|int       $result       Actual result
+     * @param string|int|null $id           ID of an entity we are adding
+     *
+     * @return void
+     */
     protected function addToResults(string $resultkey, string $resultsubkey, array|int $result, string|int|null $id = null): void
     {
-        switch($this->type) {
+        switch ($this->type) {
             case 'searchPvPTeam':
             case 'searchLinkshell':
             case 'searchFreeCompany':
@@ -581,7 +600,7 @@ trait Parsers
                 }
                 break;
             case 'Achievements':
-                if ($result !== 404 && ($this->typeSettings['only_owned'] === false || ($this->typeSettings['only_owned'] === true && $result['time'] !== NULL))) {
+                if ($result !== 404 && ($this->typeSettings['only_owned'] === false || ($this->typeSettings['only_owned'] === true && is_array($result) && $result['time'] !== NULL))) {
                     $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey][$id] = $result;
                 }
                 break;
@@ -605,18 +624,18 @@ trait Parsers
                 }
                 break;
             case 'worlds':
-                if ($result !== 404) {
+                if ($result !== 404 && is_array($result)) {
                     $this->result[$resultkey][$result['dataCenter']] = [];
                     preg_match_all(Regex::WORLDS, $result['servers'], $servers, PREG_SET_ORDER);
                     if ($this->typeSettings['worldDetails']) {
                         foreach ($servers as $server) {
                             $this->result[$resultkey][$result['dataCenter']][$server['server']] = [
-                                'Online'=> $server['maintenance'] === '1',
-                                'Partial maintenance'=> $server['maintenance'] === '2',
-                                'Full maintenance'=> $server['maintenance'] === '3',
-                                'Preferred'=> in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt']),
-                                'Congested'=> in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet']),
-                                'New characters'=> in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich']),
+                                'Online' => $server['maintenance'] === '1',
+                                'Partial maintenance' => $server['maintenance'] === '2',
+                                'Full maintenance' => $server['maintenance'] === '3',
+                                'Preferred' => in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt']),
+                                'Congested' => in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet']),
+                                'New characters' => in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich']),
                             ];
                         }
                     } else {
@@ -659,8 +678,13 @@ trait Parsers
                 break;
         }
     }
-
-    #Function to check if we need to grab all pages and there are still pages left
+    
+    /**
+     * Function to check if we need to grab all pages and there are still pages left
+     * @param string $resultkey
+     *
+     * @return bool
+     */
     protected function allpagesproc(string $resultkey): bool
     {
         if ($this->allPages === true && in_array($this->type, [
@@ -681,7 +705,7 @@ trait Parsers
                 'FreeCompanyRanking',
                 'Database',
             ])) {
-            switch($this->type) {
+            switch ($this->type) {
                 case 'CharacterFriends':
                 case 'CharacterFollowing':
                 case 'FreeCompanyMembers':
@@ -709,7 +733,7 @@ trait Parsers
             $current_page++;
             ini_set('max_execution_time', '6000');
             $this->allPages = false;
-            switch($this->type) {
+            switch ($this->type) {
                 case 'CharacterFriends':
                 case 'CharacterFollowing':
                 case 'FreeCompanyMembers':
@@ -721,7 +745,7 @@ trait Parsers
                     break;
                 case 'GrandCompanyRanking':
                 case 'FreeCompanyRanking':
-                    $function_to_call = "get".$this->type;
+                    $function_to_call = 'get'.$this->type;
                     for ($i = $current_page; $i <= $total_page; $i++) {
                         $this->$function_to_call($this->typeSettings['week_month'], $this->typeSettings['week'], $this->typeSettings['worldname'], $this->typeSettings['gcid'], $i);
                     }
@@ -756,7 +780,7 @@ trait Parsers
                 case 'maintenance':
                 case 'updates':
                 case 'status':
-                    $function_to_call = "getLodestone".ucfirst($this->type);
+                    $function_to_call = 'getLodestone'.ucfirst($this->type);
                     for ($i = $current_page; $i <= $total_page; $i++) {
                         $this->$function_to_call($i);
                     }
@@ -766,11 +790,17 @@ trait Parsers
         }
         return false;
     }
-
-    #Function to parse pages
+    
+    /**
+     * Function to parse pages
+     * @param array  $pages     List of pages
+     * @param string $resultkey Result key (essentially entity type)
+     *
+     * @return \Simbiat\LodestoneModules\Parsers|\Simbiat\Lodestone
+     */
     protected function pages(array $pages, string $resultkey): self
     {
-        switch($this->type) {
+        switch ($this->type) {
             case 'CharacterFriends':
             case 'CharacterFollowing':
             case 'FreeCompanyMembers':
@@ -870,8 +900,14 @@ trait Parsers
         }
         return $this;
     }
-
-    #Getting crest from array based on "keybase" identifying numbered keys in the array
+    
+    /**
+     * Getting crest from array based on "keybase" identifying numbered keys in the array
+     * @param array  $tempresult Array to process
+     * @param string $keybase    Prefix for key
+     *
+     * @return array
+     */
     protected function crest(array $tempresult, string $keybase): array
     {
         $crest[] = str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'1']);
@@ -895,7 +931,13 @@ trait Parsers
         }
         return $crest;
     }
-
+    
+    /**
+     * Generate Grand Company details
+     * @param array $tempresult
+     *
+     * @return array
+     */
     protected function grandcompany(array $tempresult): array
     {
         $gc = [];
@@ -907,16 +949,26 @@ trait Parsers
         }
         return $gc;
     }
-
+    
+    /**
+     * Generate free company details
+     * @param array $tempresult
+     *
+     * @return array
+     */
     protected function freecompany(array $tempresult): array
     {
         return [
-                    'id'=>$tempresult['fcid'],
-                    'name'=>$tempresult['fcname'],
-                    'crest'=>$this->crest($tempresult, 'fccrestimg'),
-                ];
+            'id' => $tempresult['fcid'],
+            'name' => $tempresult['fcname'],
+            'crest' => $this->crest($tempresult, 'fccrestimg'),
+        ];
     }
-
+    
+    /**
+     * Process character jobs
+     * @return array
+     */
     protected function jobs(): array
     {
         $tempJobs = [];
@@ -931,17 +983,27 @@ trait Parsers
         return $tempJobs;
     }
     
+    /**
+     * Process job details
+     * @param array $job
+     *
+     * @return array
+     */
     protected function jobDetails(array $job): array
     {
         return [
-            'level'=>(is_numeric($job['level']) ? (int)$job['level'] : 0),
-            'specialist'=> !empty($job['specialist']),
-            'expcur'=>(is_numeric($job['expcur']) ? (int)$job['expcur'] : 0),
-            'expmax'=>(is_numeric($job['expmax']) ? (int)$job['expmax'] : 0),
-            'icon'=>$job['icon'],
+            'level' => (is_numeric($job['level']) ? (int)$job['level'] : 0),
+            'specialist' => !empty($job['specialist']),
+            'expcur' => (is_numeric($job['expcur']) ? (int)$job['expcur'] : 0),
+            'expmax' => (is_numeric($job['expmax']) ? (int)$job['expmax'] : 0),
+            'icon' => $job['icon'],
         ];
     }
-
+    
+    /**
+     * Process character attributes
+     * @return array
+     */
     protected function attributes(): array
     {
         $tempAttrs = [];
@@ -957,8 +1019,14 @@ trait Parsers
         }
         return $tempAttrs;
     }
-
-    protected function collectibales(string $type): array
+    
+    /**
+     * Process collectibles
+     * @param string $type
+     *
+     * @return array
+     */
+    protected function collectibles(string $type): array
     {
         $colls = [];
         if ($type === 'mounts') {
@@ -974,17 +1042,21 @@ trait Parsers
         }
         return $colls;
     }
-
+    
+    /**
+     * Process items
+     * @return array
+     */
     protected function items(): array
     {
         if (!$this->regexfail(preg_match_all(Regex::CHARACTER_GEAR, $this->html, $tempresults, PREG_SET_ORDER), preg_last_error(), 'CHARACTER_GEAR')) {
             return [];
         }
         #Remove non-named groups
-        foreach ($tempresults as $key=>$tempresult) {
-            foreach ($tempresult as $key2=>$details) {
+        foreach ($tempresults as $key => $tempresult) {
+            foreach ($tempresult as $key2 => $details) {
                 if (is_numeric($key2) || empty($details)) {
-                    unset($tempresults[$key][$key2]);
+                    unset($tempresults[$key][(int)$key2]);
                 }
             }
             $tempresults[$key]['armoireable'] = $this->converters->imageToBool($tempresult['armoireable']);
@@ -992,8 +1064,8 @@ trait Parsers
             $tempresults[$key]['unique'] = !empty($tempresult['unique']);
             #Requirements
             $tempresults[$key]['requirements'] = [
-                'level'=>$tempresult['level'],
-                'classes'=>(in_array($tempresult['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス']) ? $tempresult['classes'] : explode(' ', $tempresult['classes'])),
+                'level' => $tempresult['level'],
+                'classes' => (in_array($tempresult['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス']) ? $tempresult['classes'] : explode(' ', $tempresult['classes'])),
             ];
             #Attributes
             for ($i = 1; $i <= 15; $i++) {
@@ -1003,14 +1075,17 @@ trait Parsers
                 }
             }
             #Materia
-            for ($i = 1; $i <= 5; $i++) {
-                if (!empty($tempresult['materianame'.$i])) {
-                    $tempresults[$key]['materia'][] = [
-                        'name'=>$tempresult['materianame'.$i],
-                        'attribute'=>$tempresult['materiaattr'.$i],
-                        'bonus'=>$tempresult['materiaval'.$i],
-                    ];
-                    unset($tempresults[$key]['materianame'.$i], $tempresults[$key]['materiaattr'.$i], $tempresults[$key]['materiaval'.$i]);
+            if (!empty($tempresult['materianame1']) || !empty($tempresult['materianame2']) || !empty($tempresult['materianame3']) || !empty($tempresult['materianame4']) || !empty($tempresult['materianame5'])) {
+                $tempresults[$key]['materia'] = [];
+                for ($i = 1; $i <= 5; $i++) {
+                    if (!empty($tempresult['materianame'.$i])) {
+                        $tempresults[$key]['materia'] = [
+                            'name' => $tempresult['materianame'.$i],
+                            'attribute' => $tempresult['materiaattr'.$i],
+                            'bonus' => $tempresult['materiaval'.$i],
+                        ];
+                        unset($tempresults[$key]['materianame'.$i], $tempresults[$key]['materiaattr'.$i], $tempresults[$key]['materiaval'.$i]);
+                    }
                 }
             }
             #Crafting
@@ -1041,23 +1116,23 @@ trait Parsers
             $tempresults[$key]['trading']['tradeable'] = empty($tempresult['untradeable']);
             #Link to shop, if present
             if (empty($tempresult['shop'])) {
-                    $tempresults[$key]['trading']['shop'] = NULL;
-                } else {
-                    $tempresults[$key]['trading']['shop'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$tempresult['shop'];
+                $tempresults[$key]['trading']['shop'] = NULL;
+            } else {
+                $tempresults[$key]['trading']['shop'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$tempresult['shop'];
             }
             #Customization
             $tempresults[$key]['customization'] = [
-                'crestable'=>$this->converters->imageToBool($tempresult['crestable']),
-                'glamourable'=>$this->converters->imageToBool($tempresult['glamourable']),
-                'projectable'=>$this->converters->imageToBool($tempresult['projectable']),
-                'dyeable'=>$this->converters->imageToBool($tempresult['dyeable']),
+                'crestable' => $this->converters->imageToBool($tempresult['crestable']),
+                'glamourable' => $this->converters->imageToBool($tempresult['glamourable']),
+                'projectable' => $this->converters->imageToBool($tempresult['projectable']),
+                'dyeable' => $this->converters->imageToBool($tempresult['dyeable']),
             ];
             #Glamour
             if (!empty($tempresult['glamourname'])) {
                 $tempresults[$key]['customization']['glamour'] = [
-                    'id'=>$tempresult['glamourid'],
-                    'name'=>$tempresult['glamourname'],
-                    'icon'=>$tempresult['glamouricon'],
+                    'id' => $tempresult['glamourid'],
+                    'name' => $tempresult['glamourname'],
+                    'icon' => $tempresult['glamouricon'],
                 ];
             }
             unset($tempresults[$key]['level'], $tempresults[$key]['classes'], $tempresults[$key]['price'], $tempresults[$key]['unsellable'], $tempresults[$key]['marketprohibited'], $tempresults[$key]['repair'], $tempresults[$key]['materials'], $tempresults[$key]['desynthesizable'], $tempresults[$key]['melding'], $tempresults[$key]['advancedmelding'], $tempresults[$key]['convertible'], $tempresults[$key]['glamourname'], $tempresults[$key]['glamourid'], $tempresults[$key]['glamouricon'], $tempresults[$key]['crestable'], $tempresults[$key]['glamourable'], $tempresults[$key]['projectable'], $tempresults[$key]['dyeable'], $tempresults[$key]['untradeable'], $tempresults[$key]['shop']);
@@ -1065,6 +1140,12 @@ trait Parsers
         return $tempresults;
     }
     
+    /**
+     * Convert stars to integer
+     * @param array $stars
+     *
+     * @return int
+     */
     protected function stars(array $stars): int
     {
         if (isset($stars['star4'])) {
@@ -1081,9 +1162,17 @@ trait Parsers
         }
         return 0;
     }
-
-    #Function to return error in case regex resulted in 0 or error
-    protected function regexfail($matchescount, $errorcode, $regexid): bool
+    
+    /**
+     * Function to return error in case regex resulted in 0 or error
+     *
+     * @param int|bool   $matchescount Number of matches or `false`
+     * @param int|string $errorcode    Error code, if available
+     * @param int|string $regexid      Regex, that failed
+     *
+     * @return bool
+     */
+    protected function regexfail(int|bool $matchescount, int|string $errorcode, int|string $regexid): bool
     {
         if ($matchescount === 0) {
             $this->errorRegister('No matches found for regex ('.$regexid.')');
@@ -1095,11 +1184,19 @@ trait Parsers
         }
         return true;
     }
-
-    #Function to save error
+    
+    /**
+     * Function to save error
+     * @param string $errormessage
+     * @param string $type
+     * @param int    $started
+     *
+     * @return void
+     */
     protected function errorRegister(string $errormessage, string $type = 'parse', int $started = 0): void
     {
-        $this->errors[] = $this->lasterror = ['type'=>$this->type, 'id'=>($this->typeSettings['id'] ?? NULL), 'error'=>$errormessage,'url'=>$this->url];
+        $this->lasterror = ['type' => $this->type, 'id' => ($this->typeSettings['id'] ?? NULL), 'error' => $errormessage, 'url' => $this->url];
+        $this->errors[] = $this->lasterror;
         if ($this->benchmark) {
             if ($started === 0) {
                 $duration = 0;
@@ -1108,21 +1205,30 @@ trait Parsers
                 $duration = $finished - $started;
             }
             if ($type === 'http') {
-                $this->result['benchmark']['httptime'][] = date('H:i:s.'.sprintf("%06d", ($duration / 1000)), (int)($duration / 1000000000));
+                $this->result['benchmark']['httptime'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
                 $duration = 0;
             }
             $this->benchUpdate($duration);
         }
     }
     
+    /**
+     * Update benchmark details
+     * @param int $duration
+     *
+     * @return void
+     */
     protected function benchUpdate(int $duration): void
     {
-        $this->result['benchmark']['parsetime'][] = date('H:i:s.'.sprintf("%06d", ($duration / 1000)), (int)($duration / 1000000000));
+        $this->result['benchmark']['parsetime'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
         $this->result['benchmark']['memory'] = $this->converters->memory(memory_get_usage(true));
         $this->result['benchmark']['memorypeak'] = $this->converters->memory(memory_get_peak_usage(true));
     }
-
-    #Function to reset last error (in case false positive)
+    
+    /**
+     * Function to reset last error (in case false positive)
+     * @return void
+     */
     protected function errorUnregister(): void
     {
         array_pop($this->errors);

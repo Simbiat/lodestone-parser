@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
+
 namespace Simbiat\LodestoneModules;
 
 /**
- * Class HttpRequest
+ * Class to make HTTP requests
  */
 class HttpRequest
 {
@@ -26,17 +27,18 @@ class HttpRequest
         CURLOPT_ENCODING => '',
         CURLOPT_SSL_VERIFYPEER => true,
     ];
-
-    const int HTTP_OK = 200;
-    const int HTTP_PERM_REDIRECT = 308;
-    const int HTTP_SERVICE_NOT_AVAILABLE = 503;
-    const int HTTP_FORBIDDEN = 403;
-    const int HTTP_NOT_FOUND = 404;
-
+    
+    protected const int HTTP_OK = 200;
+    protected const int HTTP_PERM_REDIRECT = 308;
+    protected const int HTTP_SERVICE_NOT_AVAILABLE = 503;
+    protected const int HTTP_FORBIDDEN = 403;
+    protected const int HTTP_NOT_FOUND = 404;
+    
     public static \CurlHandle|null|false $curlHandle = null;
-
+    
     /**
-     * @throws \Exception
+     * Main constructor
+     * @param string $useragent User-agent to use
      */
     public function __construct(string $useragent = '')
     {
@@ -54,16 +56,15 @@ class HttpRequest
             }
         }
     }
-
-    #Get URL
-
+    
     /**
+     * Get content from page
      * @throws \Exception
      */
     public function get(string $url): string
     {
         $url = str_ireplace(' ', '+', $url);
-
+        
         curl_setopt(self::$curlHandle, CURLOPT_URL, $url);
         // handle response
         $response = curl_exec(self::$curlHandle);
@@ -73,7 +74,7 @@ class HttpRequest
         if ($response === false) {
             throw new \RuntimeException($curlerror, $httpCode);
         }
-        $data = mb_substr($response, $hlength, encoding: 'UTF-8');
+        $data = mb_substr($response, $hlength, null, 'UTF-8');
         
         // specific conditions to return code on
         $httpCode = (int)$httpCode;
@@ -98,7 +99,7 @@ class HttpRequest
         if (empty($data)) {
             throw new \RuntimeException('Requested page is empty');
         }
-
+        
         return $data;
     }
 }

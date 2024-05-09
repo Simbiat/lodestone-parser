@@ -1,22 +1,32 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
+
 namespace Simbiat;
 
+use function in_array;
+
+/**
+ * Class to generate test report for Lodestone Parser
+ */
 class LodestoneTest
 {
     private object $Lodestone;
-
+    
+    /**
+     * Creation of the test object
+     * @param string $language
+     */
     public function __construct(string $language = 'na')
     {
-        ini_set("max_execution_time", "6000");
+        ini_set('max_execution_time', '6000');
         ob_clean();
         echo '<style>
                 table, th, td, tr {border: 1px solid black; border-collapse: collapse;}
                 pre {height: 5pc; max-width: 600px; overflow-y: scroll;}
             </style>
             <table><th>Type of test</th><th>Result</th><th>Page time, hh:mm:ss.ms</th><th>Parse time, hh:mm:ss.ms</th><th>Errors</th><th>Output</th>';
-        $this->Lodestone = (new Lodestone)->setLanguage($language)->setUseragent('Simbiat Software UAT')->setBenchmark(true);
-
+        $this->Lodestone = (new Lodestone())->setLanguage($language)->setUseragent('Simbiat Software UAT')->setBenchmark(true);
+        
         #Checking characters
         $this->Lodestone->getCharacter('6691027');
         $this->tableLine('Character (regular)', $this->Lodestone->getResult(false)['characters']['6691027']);
@@ -32,7 +42,7 @@ class LodestoneTest
         $this->tableLine('Character following', $this->Lodestone->getResult(false)['characters']['6691027']['following']);
         $this->Lodestone->getCharacterAchievements('6691027', false, 39, true, true);
         $this->tableLine('Achievements', $this->Lodestone->getResult(false)['characters']['6691027']['achievements']);
-
+        
         #Checking groups
         $this->Lodestone->getFreeCompany('9234631035923213559');
         $this->tableLine('Free company (regular)', $this->Lodestone->getResult(false)['freecompanies']['9234631035923213559']);
@@ -46,7 +56,7 @@ class LodestoneTest
         $this->tableLine('Linkshell', $this->Lodestone->getResult(false)['linkshells']['19984723346535274']);
         $this->Lodestone->getPvPTeam('d1ce24446f4fbf6e0eabd31334feef2bc16966d1');
         $this->tableLine('PvP team', $this->Lodestone->getResult(false)['pvpteams']['d1ce24446f4fbf6e0eabd31334feef2bc16966d1']);
-
+        
         #Checking searches
         $this->Lodestone->searchCharacter();
         $this->tableLine('Character search', $this->Lodestone->getResult(false)['characters']);
@@ -56,7 +66,7 @@ class LodestoneTest
         $this->tableLine('Linkshell search', $this->Lodestone->getResult(false)['linkshells']);
         $this->Lodestone->searchPvPTeam();
         $this->tableLine('PvP teams search', $this->Lodestone->getResult(false)['pvpteams']);
-
+        
         #Checking specials
         $this->Lodestone->getLodestoneBanners();
         $this->tableLine('Banners', $this->Lodestone->getResult(false)['banners']);
@@ -74,7 +84,7 @@ class LodestoneTest
         $this->tableLine('Status', $this->Lodestone->getResult(false)['status']);
         $this->Lodestone->getWorldStatus();
         $this->tableLine('Worlds', $this->Lodestone->getResult(false)['worlds']);
-
+        
         #Checking rankings
         $this->Lodestone->getFeast();
         $this->tableLine('Feast (older format)', $this->Lodestone->getResult(false)['feast'][1]);
@@ -90,7 +100,7 @@ class LodestoneTest
         $this->tableLine('Grand Company Ranking', $this->Lodestone->getResult(false)['GrandCompanyRanking']['weekly'][0]);
         $this->Lodestone->getFreeCompanyRanking('weekly', 0, 'Cerberus');
         $this->tableLine('Free Company Ranking', $this->Lodestone->getResult(false)['FreeCompanyRanking']['weekly'][0]);
-
+        
         #Checking database
         $this->Lodestone->searchDatabase('achievement', 1);
         $this->tableLine('Play guide: achievements', $this->Lodestone->getResult(false)['database']['achievement']);
@@ -108,21 +118,29 @@ class LodestoneTest
         $this->tableLine('Play guide: shops', $this->Lodestone->getResult(false)['database']['shop']);
         $this->Lodestone->searchDatabase('text_command', 1);
         $this->tableLine('Play guide: text commands', $this->Lodestone->getResult(false)['database']['text_command']);
-
+        
         #Checking Errors
         $this->Lodestone->getFreeCompany('1');
-        $this->tableLine('Non-existent free company', @$this->Lodestone->getResult(false)['freecompanies']['1'], true);
+        $this->tableLine('Non-existent free company', $this->Lodestone->getResult(false)['freecompanies']['1'], true);
         $this->Lodestone->getLinkshellMembers('1');
-        $this->tableLine('Non-existent linkshell', @$this->Lodestone->getResult(false)['linkshells']['1'], true);
+        $this->tableLine('Non-existent linkshell', $this->Lodestone->getResult(false)['linkshells']['1'], true);
         $this->Lodestone->getCharacter('9234631035923213559');
-        $this->tableLine('Non-existent character', @$this->Lodestone->getResult(false)['characters']['9234631035923213559'], true);
+        $this->tableLine('Non-existent character', $this->Lodestone->getResult(false)['characters']['9234631035923213559'], true);
         $this->Lodestone->getCharacterAchievements('4339591', false, 39, false, true);
-        $this->tableLine('Character with private achievements', @$this->Lodestone->getResult()['characters']['4339591']['achievements'], true);
+        $this->tableLine('Character with private achievements', $this->Lodestone->getResult()['characters']['4339591']['achievements'], true);
         unset($this->Lodestone);
         echo '</table>';
     }
-
-    private function tableLine(string $type, $what, bool $reverse = false): void
+    
+    /**
+     * Generate table row for the report
+     * @param string $type    Type of the test
+     * @param mixed  $what    Contents of the test
+     * @param bool   $reverse Whether to reverse `good/bad` logic
+     *
+     * @return void
+     */
+    private function tableLine(string $type, mixed $what, bool $reverse = false): void
     {
         echo '<tr>
                     <td><b>'.$type.'</b></td>
@@ -132,9 +150,9 @@ class LodestoneTest
                     <td>'.(empty($this->Lodestone->getErrors()) ? '' : '<pre>'.var_export($this->Lodestone->getErrors(), true).'</pre>').'</td>
                     <td>'.(empty($what) ? '' : '<pre>'.var_export($what, true).'</pre>').'</td>
                 </tr>';
-        $this->Lodestone->setResult([]);
-        $this->Lodestone->setErrors([]);
+        $this->Lodestone->resetResult();
+        $this->Lodestone->resetErrors();
         ob_flush();
-		flush();
+        flush();
     }
 }
