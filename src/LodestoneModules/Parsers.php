@@ -170,7 +170,7 @@ trait Parsers
                 foreach ($tempResults as $key => $tempresult) {
                     foreach ($tempresult as $key2 => $details) {
                         if (is_numeric($key2) || empty($details)) {
-                            unset($tempResults[$key][(int)$key2]);
+                            unset($tempResults[$key][$key2]);
                         }
                     }
                 }
