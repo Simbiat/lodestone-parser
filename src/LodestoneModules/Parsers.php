@@ -221,13 +221,13 @@ trait Parsers
                         }
                         if (!empty($tempresult['lsrank'])) {
                             $tempResults[$key]['rankicon'] = $tempresult['lsrankicon'];
-                            #Specific for linkshell members
-                            if (empty($this->result['server'])) {
-                                $this->result[$resultkey][$this->typeSettings['id']]['server'] = $tempresult['server'];
-                            }
-                            if (!empty($pages[0]['linkshellserver'])) {
-                                $this->result[$resultkey][$this->typeSettings['id']]['server'] = $pages[0]['linkshellserver'];
-                            }
+                        }
+                        #Specific for linkshell members
+                        if (empty($this->result['server'])) {
+                            $this->result[$resultkey][$this->typeSettings['id']]['server'] = $tempresult['server'];
+                        }
+                        if (!empty($pages[0]['linkshellserver'])) {
+                            $this->result[$resultkey][$this->typeSettings['id']]['server'] = $pages[0]['linkshellserver'];
                         }
                         break;
                     case 'frontline':
@@ -800,6 +800,13 @@ trait Parsers
      */
     protected function pages(array $pages, string $resultkey): self
     {
+        foreach ($pages as $page => $data) {
+            foreach ($data as $key => $value) {
+                if (is_string($value)) {
+                    $pages[$page][$key] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
+                }
+            }
+        }
         switch ($this->type) {
             case 'CharacterFriends':
             case 'CharacterFollowing':
