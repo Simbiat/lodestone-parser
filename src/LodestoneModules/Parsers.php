@@ -219,7 +219,7 @@ trait Parsers
                         if (!empty($tempresult['fcid'])) {
                             $tempResults[$key]['freeCompany'] = $this->freecompany($tempresult);
                         }
-                        if (!empty($tempresult['lsrank'])) {
+                        if (!empty($tempresult['lsrank']) && !empty($tempresult['lsrankicon'])) {
                             $tempResults[$key]['rankicon'] = $tempresult['lsrankicon'];
                         }
                         #Specific for linkshell members
