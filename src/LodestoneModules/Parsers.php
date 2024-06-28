@@ -475,7 +475,7 @@ trait Parsers
                             'icon' => $tempresult['cityicon'],
                         ];
                         #Portrait
-                        $tempResults[$key]['portrait'] = str_replace('c0_96x96', 'l0_640x873', $tempresult['avatar']);
+                        $tempResults[$key]['portrait'] = str_replace('c0.jpg', 'l0.jpg', $tempresult['avatar']);
                         #Grand Company
                         if (!empty($tempresult['gcname'])) {
                             $tempResults[$key]['grandCompany'] = $this->grandcompany($tempresult);
