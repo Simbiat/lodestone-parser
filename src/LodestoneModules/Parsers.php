@@ -41,8 +41,10 @@ trait Parsers
             $this->html = (new HttpRequest($this->useragent))->get($this->url);
         } catch (\Exception $e) {
             $this->errorRegister($e->getMessage(), 'http', $started);
-            if ($e->getMessage() === 'Requested page was not found, 404') {
+            if ($e->getCode() === 404) {
                 $this->addToResults($resultkey, $resultsubkey, 404);
+            } elseif ($this->type === 'Character' && $e->getCode() === 403) {
+                $this->addToResults($resultkey, $resultsubkey, ['private' => true]);
             }
             return $this;
         }
