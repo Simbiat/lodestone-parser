@@ -174,7 +174,7 @@ trait Parsers
                         }
                     }
                 }
-                $tempResults = [array_merge($tempResults[0], $tempResults[1], $tempResults[2])];
+                $tempResults = [array_merge($tempResults[0], $tempResults[1], $tempResults[2] ?? [])];
             }
             
             foreach ($tempResults as $key => $tempresult) {
@@ -424,89 +424,95 @@ trait Parsers
                         }
                         break;
                     case 'Character':
-                        #There are cases of characters not returning a proper race or clan (usually both). I've reported this issue to Square Enix several times, and they simply update affected characters. This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
-                        $tempResults[$key]['race'] = trim($tempResults[$key]['race']);
-                        $tempResults[$key]['clan'] = trim($tempResults[$key]['clan']);
-                        if ($tempResults[$key]['race'] === '----') {
-                            $tempResults[$key]['race'] = NULL;
-                            $tempResults[$key]['comment'] = 'No race';
-                        }
-                        if ($tempResults[$key]['clan'] === '----') {
-                            $tempResults[$key]['clan'] = NULL;
-                            if ($tempResults[$key]['comment'] === 'No race') {
-                                $tempResults[$key]['comment'] .= ' and clan';
-                            } else {
-                                $tempResults[$key]['comment'] = 'No clan';
-                            }
-                        }
-                        $tempResults[$key]['nameday'] = str_replace('32st', '32nd', $tempResults[$key]['nameday']);
-                        if (!empty($tempresult['uppertitle'])) {
-                            $tempResults[$key]['title'] = $tempresult['uppertitle'];
-                        } elseif (!empty($tempresult['undertitle'])) {
-                            $tempResults[$key]['title'] = $tempresult['undertitle'];
-                        } else {
-                            $tempResults[$key]['title'] = '';
-                        }
-                        #Gender to text
-                        $tempResults[$key]['gender'] = ($tempresult['gender'] === '♂' ? 'male' : 'female');
-                        #Guardian
-                        if (empty($tempResults[$key]['guardian'])) {
-                            $tempResults[$key]['guardian']['name'] = match (mb_strtolower($this->language, 'UTF-8')) {
-                                'jp', 'ja' => 'ハルオーネ',
-                                'fr' => 'Halone, la Conquérante',
-                                'de' => 'Halone - Die Furie',
-                                default => 'Halone, the Fury',
-                            };
-                            $tempResults[$key]['guardian']['icon'] = 'https://img.finalfantasyxiv.com/lds/h/5/qmgVmQ1o6skxdK4hDEbIV5NETA.png';
-                            if (empty($tempResults[$key]['comment'])) {
-                                $tempResults[$key]['comment'] = 'Defaulted guardian';
-                            } else {
-                                $tempResults[$key]['comment'] .= ' and guardian';
-                            }
-                        } else {
-                            $tempResults[$key]['guardian'] = [
-                                'name' => $tempresult['guardian'],
-                                'icon' => $tempresult['guardianicon'],
-                            ];
-                        }
-                        #City
-                        $tempResults[$key]['city'] = [
-                            'name' => $tempresult['city'],
-                            'icon' => $tempresult['cityicon'],
-                        ];
+                        #There are cases of characters not returning a proper race or clan (usually both).
+                        #I've reported this issue to Square Enix several times, and they simply update affected characters.
+                        #This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
+                        $tempResults[$key]['private'] = !empty($tempResults[$key]['private']);
                         #Portrait
                         $tempResults[$key]['portrait'] = str_replace('c0.jpg', 'l0.jpg', $tempresult['avatar']);
-                        #Grand Company
-                        if (!empty($tempresult['gcname'])) {
-                            $tempResults[$key]['grandCompany'] = $this->grandcompany($tempresult);
-                        }
-                        #Free Company
-                        if (!empty($tempresult['fcid'])) {
-                            $tempResults[$key]['freeCompany'] = $this->freecompany($tempresult);
-                        }
-                        #PvP Team
-                        if (!empty($tempresult['pvpid'])) {
-                            $tempResults[$key]['pvp'] = [
-                                'id' => $tempresult['pvpid'],
-                                'name' => $tempresult['pvpname'],
+                        #Since release of Dawntrail, if profile is private you won't get any of the fields below
+                        if ($tempResults[$key]['private'] === false) {
+                            $tempResults[$key]['race'] = trim($tempResults[$key]['race']);
+                            $tempResults[$key]['clan'] = trim($tempResults[$key]['clan']);
+                            if ($tempResults[$key]['race'] === '----') {
+                                $tempResults[$key]['race'] = null;
+                                $tempResults[$key]['comment'] = 'No race';
+                            }
+                            if ($tempResults[$key]['clan'] === '----') {
+                                $tempResults[$key]['clan'] = null;
+                                if ($tempResults[$key]['comment'] === 'No race') {
+                                    $tempResults[$key]['comment'] .= ' and clan';
+                                } else {
+                                    $tempResults[$key]['comment'] = 'No clan';
+                                }
+                            }
+                            $tempResults[$key]['nameday'] = str_replace('32st', '32nd', $tempResults[$key]['nameday']);
+                            if (!empty($tempresult['uppertitle'])) {
+                                $tempResults[$key]['title'] = $tempresult['uppertitle'];
+                            } elseif (!empty($tempresult['undertitle'])) {
+                                $tempResults[$key]['title'] = $tempresult['undertitle'];
+                            } else {
+                                $tempResults[$key]['title'] = '';
+                            }
+                            #Gender to text
+                            $tempResults[$key]['gender'] = ($tempresult['gender'] === '♂' ? 'male' : 'female');
+                            #Guardian
+                            if (empty($tempResults[$key]['guardian'])) {
+                                $tempResults[$key]['guardian']['name'] = match (mb_strtolower($this->language, 'UTF-8')) {
+                                    'jp', 'ja' => 'ハルオーネ',
+                                    'fr' => 'Halone, la Conquérante',
+                                    'de' => 'Halone - Die Furie',
+                                    default => 'Halone, the Fury',
+                                };
+                                $tempResults[$key]['guardian']['icon'] = 'https://img.finalfantasyxiv.com/lds/h/5/qmgVmQ1o6skxdK4hDEbIV5NETA.png';
+                                if (empty($tempResults[$key]['comment'])) {
+                                    $tempResults[$key]['comment'] = 'Defaulted guardian';
+                                } else {
+                                    $tempResults[$key]['comment'] .= ' and guardian';
+                                }
+                            } else {
+                                $tempResults[$key]['guardian'] = [
+                                    'name' => $tempresult['guardian'],
+                                    'icon' => $tempresult['guardianicon'],
+                                ];
+                            }
+                            #City
+                            $tempResults[$key]['city'] = [
+                                'name' => $tempresult['city'],
+                                'icon' => $tempresult['cityicon'],
                             ];
-                            $tempResults[$key]['pvp']['crest'] = $this->crest($tempresult, 'pvpcrest');
+                            #Grand Company
+                            if (!empty($tempresult['gcname'])) {
+                                $tempResults[$key]['grandCompany'] = $this->grandcompany($tempresult);
+                            }
+                            #Free Company
+                            if (!empty($tempresult['fcid'])) {
+                                $tempResults[$key]['freeCompany'] = $this->freecompany($tempresult);
+                            }
+                            #PvP Team
+                            if (!empty($tempresult['pvpid'])) {
+                                $tempResults[$key]['pvp'] = [
+                                    'id' => $tempresult['pvpid'],
+                                    'name' => $tempresult['pvpname'],
+                                ];
+                                $tempResults[$key]['pvp']['crest'] = $this->crest($tempresult, 'pvpcrest');
+                            }
+                            #Bio
+                            $tempresult['bio'] = trim($tempresult['bio']);
+                            if ($tempresult['bio'] === '-') {
+                                $tempresult['bio'] = '';
+                            }
+                            if (!empty($tempresult['bio'])) {
+                                $tempResults[$key]['bio'] = $tempresult['bio'];
+                            } else {
+                                $tempResults[$key]['bio'] = '';
+                            }
+                            $tempResults[$key]['attributes'] = $this->attributes();
+                            #Minions and mounts now show only icon on Lodestone, thus it's not really practically to grab them
+                            #$tempResults[$key]['mounts'] = $this->collectibles('mounts');
+                            #$tempResults[$key]['minions'] = $this->collectibles('minions');
+                            $tempResults[$key]['gear'] = $this->items();
                         }
-                        #Bio
-                        $tempresult['bio'] = trim($tempresult['bio']);
-                        if ($tempresult['bio'] === '-') {
-                            $tempresult['bio'] = '';
-                        }
-                        if (!empty($tempresult['bio'])) {
-                            $tempResults[$key]['bio'] = $tempresult['bio'];
-                        } else {
-                            $tempResults[$key]['bio'] = '';
-                        }
-                        $tempResults[$key]['attributes'] = $this->attributes();
-                        #Minions and mounts now show only icon on Lodestone, thus it's not really practically to grab them
-                        #$tempResults[$key]['mounts'] = $this->collectibles('mounts');
-                        #$tempResults[$key]['minions'] = $this->collectibles('minions');
-                        $tempResults[$key]['gear'] = $this->items();
                         break;
                     case 'CharacterJobs':
                         $tempresult['id'] = $this->converters->classToJob($tempresult['name']);

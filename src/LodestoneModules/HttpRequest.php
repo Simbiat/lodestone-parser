@@ -85,7 +85,9 @@ class HttpRequest
             throw new \RuntimeException('Lodestone not available, '.$httpCode, $httpCode);
         }
         if ($httpCode === self::HTTP_FORBIDDEN) {
-            throw new \RuntimeException('Requests are (temporary) blocked, '.$httpCode, $httpCode);
+            #Get message from Lodestone
+            $message = preg_replace('/(.*<h1 class="error__heading">)([^<]+)(<\/h1>\s*<p class="error__text">)([^<]+)(<\/p>.*)/muis', '$2: $4', $data ?? '');
+            throw new \RuntimeException(empty($message) ? 'Requests are (temporary) blocked, '.$httpCode : $message.' (403)', $httpCode);
         }
         if ($httpCode === 0) {
             throw new \RuntimeException($curlerror, $httpCode);
