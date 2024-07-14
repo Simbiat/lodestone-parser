@@ -28,13 +28,6 @@ class HttpRequest
         CURLOPT_SSL_VERIFYPEER => true,
     ];
     
-    protected const int HTTP_OK = 200;
-    protected const int HTTP_PERM_REDIRECT = 308;
-    protected const int HTTP_SERVICE_NOT_AVAILABLE = 503;
-    protected const int HTTP_FORBIDDEN = 403;
-    protected const int HTTP_NOT_FOUND = 404;
-    protected const int HTTP_TOO_MANY_REQUESTS = 429;
-    
     public static \CurlHandle|null|false $curlHandle = null;
     
     /**
@@ -79,16 +72,13 @@ class HttpRequest
         
         // specific conditions to return code on
         $httpCode = (int)$httpCode;
-        if ($httpCode === self::HTTP_NOT_FOUND) {
+        if ($httpCode === 404) {
             throw new \RuntimeException('Requested page was not found, '.$httpCode, $httpCode);
         }
-        if ($httpCode === self::HTTP_SERVICE_NOT_AVAILABLE) {
+        if ($httpCode === 503) {
             throw new \RuntimeException('Lodestone not available, '.$httpCode, $httpCode);
         }
-        if ($httpCode === self::HTTP_TOO_MANY_REQUESTS) {
-            throw new \RuntimeException('Lodestone has throttled the request, '.$httpCode, $httpCode);
-        }
-        if ($httpCode === self::HTTP_FORBIDDEN) {
+        if ($httpCode === 403) {
             #Get message from Lodestone
             $message = preg_replace('/(.*<h1 class="error__heading">)([^<]+)(<\/h1>\s*<p class="error__text">)([^<]+)(<\/p>.*)/muis', '$2: $4', $data ?? '');
             throw new \RuntimeException((empty($message) ? 'No access, possibly private entity' : $message).', '.$httpCode, $httpCode);
@@ -96,10 +86,13 @@ class HttpRequest
         if ($httpCode === 0) {
             throw new \RuntimeException($curlerror, $httpCode);
         }
-        if ($httpCode < self::HTTP_OK || $httpCode > self::HTTP_PERM_REDIRECT) {
-            file_put_contents(__DIR__.'/html.txt', $data);
+        if ($httpCode < 200 || $httpCode > 308) {
+            if ($httpCode === 429 || preg_match('/The server is experiencing unusually heavy traffic/ui', $data ?? '') === 1) {
+                throw new \RuntimeException('Lodestone has throttled the request, '.$httpCode, $httpCode);
+            }
+            file_put_contents(__DIR__.'/html.txt', $data ?? '');
             #Get message from Lodestone
-            $message = preg_replace('/(.*<h1 class="error__heading">)([^<]+)(<\/h1>\s*<p class="error__text">)([^<]+)(<\/p>.*)/muis', '$2: $4', $data ?? '');
+            $message = preg_replace('/(.*?<h1 class="(error|maintenance)__heading">)([^<]+)(<\/h1>\s*<p class="(error|maintenance)__text">)([^<]+)(<\/p>.*)/muis', '$3: $6', $data ?? '');
             throw new \RuntimeException((empty($message) ? 'Requested page is not available' : $message).', '.$httpCode, $httpCode);
         }
         
