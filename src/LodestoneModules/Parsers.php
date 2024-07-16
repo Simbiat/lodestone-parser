@@ -318,6 +318,8 @@ trait Parsers
                         $tempResults[$key]['grandCompany'] = trim($tempresult['grandCompany']);
                         if (empty($tempresult['members_count'])) {
                             $tempResults[$key]['members_count'] = 0;
+                        } else {
+                            $tempResults[$key]['members_count'] = (int)$tempresult['members_count'];
                         }
                         break;
                     case 'Achievements':
