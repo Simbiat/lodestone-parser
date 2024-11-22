@@ -903,6 +903,10 @@ trait Parsers
             if (!empty($pages[0]['linkshellformed'])) {
                 $this->result[$resultkey][$this->typeSettings['id']]['formed'] = $pages[0]['linkshellformed'];
             }
+            if (!empty($pages[0]['emptygroup'])) {
+                $this->result[$resultkey][$this->typeSettings['id']]['pageCurrent'] = 0;
+                $this->result[$resultkey][$this->typeSettings['id']]['pageTotal'] = 0;
+            }
         }
         #PvpTeam members specific
         if (!empty($pages[0]['pvpname'])) {
