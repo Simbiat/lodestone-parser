@@ -19,9 +19,11 @@ class Routes
     public const string LODESTONE_CHARACTERS_MINIONS_URL = '/character/%s/minion/';
     public const string LODESTONE_CHARACTERS_MOUNTS_URL = '/character/%s/mount/';
     public const string LODESTONE_CHARACTERS_SEARCH_URL = '/character/%s';
+    #achievements
     public const string LODESTONE_ACHIEVEMENTS_URL = '/character/%s/achievement/kind/%u/';
     public const string LODESTONE_ACHIEVEMENTS_CAT_URL = '/character/%s/achievement/category/%u/';
     public const string LODESTONE_ACHIEVEMENTS_DET_URL = '/character/%s/achievement/detail/%u/';
+    public const string LODESTONE_ACHIEVEMENTS_DB_URL = '/playguide/db/achievement/%s/';
     #free company
     public const string LODESTONE_FREECOMPANY_URL = '/freecompany/%s/';
     public const string LODESTONE_FREECOMPANY_SEARCH_URL = '/freecompany/%s';

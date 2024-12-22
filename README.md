@@ -154,15 +154,10 @@ To get results of parsers (listed below) you need to run `->getResult($close)`, 
         <th colspan="4">Search</th>
     </tr>
     <tr>
-        <td><code>searchDatabase</code></td>
-        <td><ul><li><code>string $type</code> - mandatory type of entity to search for on Lodestone taken from <code>https://eu.finalfantasyxiv.com/lodestone/playguide/db/$type</code>.</li><li><code>int $category = 0</code> - optional ID of category taken from <code>https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=$category</code>.</li><li><code>int $subcategory = 0</code> - optional ID of subcategory taken from <code>https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=2&category3=$subcategory</code>. Will be ignored if category is not set.</li><li><code>string $search = ''</code> - optional string to search for.</li><li><code>int $page = 1</code> - number of the page to parse. Defaults to <code>1</code>.</li></ul></td>
-        <td><code>database[$type][$entityid]</code>, where <code>$type</code> is type of entities searched, and <code>$entityid</code> is ID of the entity in the database returned with respective details as an array.</td>
-        <td rowspan="5">Returns array fo entities from respective search function with array keys being respective entity's id on Lodestone.</td>
-    </tr>
-    <tr>
         <td><code>searchCharacter</code></td>
         <td><ul><li><code>string $name = ''</code> - optional name to search.</li><li><code>string $server = ''</code> - optional server name to filter.</li><li><code>string $classJob = ''</code> - optional filter by class/job. Supports types of jobs and common 3-letter abbreviations.</li><li><code>string $race_tribe = ''</code> - optional filter by tribe/clan. Multilingual.</li><li><code>$gcId = ''</code> - optional filter by Grand Company affiliation. Accepts singular string or an array of such. Multilingual.</li><li><code>string|array $blog_lang = ''</code> - optional filter by character language. Accepts same variables as for language setting. Accepts singular string or an array of such.</li><li><code>string $order = ''</code> - optional sorting order. Refer to Converters.php for possible values.</li><li><code>int $page = 1</code> - number of the page to parse. Defaults to <code>1</code>.</li></ul></td>
         <td><code>characters[$character]</code>, where <code>$character</code> is id of each character returned with respective details as an array.</td>
+        <td rowspan="4">Returns array for entities from respective search function with array keys being respective entity's id on Lodestone.</td>    
     </tr>
     <tr>
         <td><code>searchFreeCompany</code></td>
@@ -178,6 +173,21 @@ To get results of parsers (listed below) you need to run `->getResult($close)`, 
         <td><code>searchPvPTeam</code></td>
         <td><ul><li><code>string $name = ''</code> - optional name to search.</li><li><code>string $server = ''</code> - optional server name to filter.</li><li><code>string $order = ''</code> - optional sorting order. Refer to Converters.php for possible values.</li><li><code>int $page = 1</code> - number of the page to parse. Defaults to <code>1</code>.</li></ul></td>
         <td><code>pvpteams[$pvpteam]</code>, where <code>$pvpteam</code> is id of each PvP Team returned with respective details as an array.</td>
+    </tr>
+    <tr>
+        <th colspan="4">Database</th>
+    </tr>
+    <tr>
+        <td><code>searchDatabase</code></td>
+        <td><ul><li><code>string $type</code> - mandatory type of entity to search for on Lodestone taken from <code>https://eu.finalfantasyxiv.com/lodestone/playguide/db/$type</code>.</li><li><code>int $category = 0</code> - optional ID of category taken from <code>https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=$category</code>.</li><li><code>int $subcategory = 0</code> - optional ID of subcategory taken from <code>https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=2&category3=$subcategory</code>. Will be ignored if category is not set.</li><li><code>string $search = ''</code> - optional string to search for.</li><li><code>int $page = 1</code> - number of the page to parse. Defaults to <code>1</code>.</li></ul></td>
+        <td><code>database[$type][$entityid]</code>, where <code>$type</code> is type of entities searched, and <code>$entityid</code> is ID of the entity in the database returned with respective details as an array.</td>
+        <td>Returns array for entities from respective search function with array keys being respective entity's id on Lodestone.</td>
+    </tr>
+    <tr>
+        <td><code>getAchievementFromDB</code></td>
+        <td><code>string $dbid</code> - database ID for achievement taken from <code>https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/$dbid</code>.</td>
+        <td><code>database['achievement']['dbid']</code>, where <code>$dbid</code> is ID of the achievement in the database returned with respective details as an array.</td>
+        <td>Returns achievement details. Result is equivalent to <code>getCharacterAchievements</code> when getting details for 1 achievement.</td>
     </tr>
     <tr>
         <th colspan="4">News</th>

@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Simbiat\LodestoneModules;
 
-use function in_array, is_array;
+use function in_array, is_array, sprintf;
 
 /**
  * Main parsing logic
@@ -23,7 +23,7 @@ trait Parsers
             'FreeCompanyMembers', 'searchFreeCompany', 'FreeCompany' => 'freecompanies',
             'LinkshellMembers', 'searchLinkshell' => 'linkshells',
             'PvPTeamMembers', 'searchPvPTeam' => 'pvpteams',
-            'Database' => 'database',
+            'Database', 'AchievementFromDB' => 'database',
             default => $this->type,
         };
         $resultsubkey = match ($this->type) {
@@ -133,6 +133,7 @@ trait Parsers
                 'topics', 'news' => Regex::NEWS,
                 'notices', 'maintenance', 'updates', 'status' => Regex::NOTICES2,
                 'Database' => Regex::DBLIST,
+                'AchievementFromDB' => Regex::ACHIEVEMENT_DB,
                 default => Regex::CHARACTERLIST,
             };
             
@@ -172,6 +173,8 @@ trait Parsers
                 foreach ($tempResults as $key => $tempresult) {
                     foreach ($tempresult as $key2 => $details) {
                         if (is_numeric($key2) || empty($details)) {
+                            #No idea why EA thinks $key2 is float, when it's either string or int. Probably gets confused by is_numeric check
+                            /** @noinspection OffsetOperationsInspection */
                             unset($tempResults[$key][$key2]);
                         }
                     }
@@ -333,8 +336,11 @@ trait Parsers
                         }
                         break;
                     case 'AchievementDetails':
+                    case 'AchievementFromDB':
                         if (empty($tempresult['title'])) {
                             $tempResults[$key]['title'] = NULL;
+                        } else {
+                            $tempresult['title'] = trim($tempresult['title']);
                         }
                         if (empty($tempresult['item'])) {
                             $tempResults[$key]['item'] = NULL;
@@ -556,8 +562,8 @@ trait Parsers
         }
         if ($this->type === 'Achievements' && $this->typeSettings['allachievements']) {
             $this->typeSettings['allachievements'] = false;
-            foreach (self::achKinds as $kindid) {
-                $this->getCharacterAchievements($this->typeSettings['id'], false, (string)$kindid, false, $this->typeSettings['details'], $this->typeSettings['only_owned']);
+            for ($i = 1; $i <= 13; $i++) {
+                $this->getCharacterAchievements($this->typeSettings['id'], false, (string)$i, false, $this->typeSettings['details'], $this->typeSettings['only_owned']);
             }
         }
         $this->allpagesproc($resultkey);
@@ -595,7 +601,7 @@ trait Parsers
             case 'FreeCompanyMembers':
             case 'LinkshellMembers':
                 if ($result === 404) {
-                    if (!isset($this->result[$resultkey]) || (!is_scalar($this->result[$resultkey][$this->typeSettings['id']]) && !is_array($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey]))) {
+                    if (!isset($this->result[$resultkey]) || (!\is_scalar($this->result[$resultkey][$this->typeSettings['id']]) && !is_array($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey]))) {
                         $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey] = $result;
                     }
                 } else {
@@ -621,6 +627,9 @@ trait Parsers
                 break;
             case 'Database':
                 $this->result[$resultkey][$resultsubkey][$id] = $result;
+                break;
+            case 'AchievementFromDB':
+                $this->result[$resultkey]['achievement'][$this->typeSettings['id']] = $result;
                 break;
             case 'banners':
             case 'topics':
@@ -812,7 +821,7 @@ trait Parsers
     {
         foreach ($pages as $page => $data) {
             foreach ($data as $key => $value) {
-                if (is_string($value)) {
+                if (\is_string($value)) {
                     $pages[$page][$key] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                 }
             }

@@ -8,7 +8,7 @@ use Simbiat\LodestoneModules\{Converters, Routes, HttpRequest};
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 
-use function is_array, is_string, in_array;
+use function is_array, is_string, in_array, sprintf;
 
 /**
  * Provides quick functions to various parsing routes
@@ -19,8 +19,6 @@ class Lodestone
     use LodestoneModules\Parsers;
     
     public const array langAllowed = ['na', 'jp', 'ja', 'eu', 'fr', 'de'];
-    #List of achievements categories' ids excluding 1
-    public const array achKinds = [2, 3, 4, 5, 6, 8, 11, 12, 13];
     
     protected string $useragent = '';
     protected string $language = 'na';
@@ -221,6 +219,21 @@ class Lodestone
         $this->typeSettings['id'] = $id;
         $this->typeSettings['details'] = $details;
         $this->typeSettings['achievementId'] = $achievementId;
+        return $this->parse();
+    }
+    
+    /**
+     * Get achievement details from Lodestone Database page
+     * @param string $dbid
+     *
+     * @return self
+     */
+    public function getAchievementFromDB(string $dbid): self
+    {
+        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_DB_URL, $dbid);
+        $this->type = 'AchievementFromDB';
+        $this->typeSettings['type'] = 'achievement';
+        $this->typeSettings['id'] = $dbid;
         return $this->parse();
     }
     
