@@ -228,10 +228,10 @@ trait Parsers
                             $tempResults[$key]['rankicon'] = $tempresult['lsrankicon'];
                         }
                         #Specific for linkshell members
-                        if (empty($this->result['server'])) {
+                        if (empty($this->result['server']) && !empty($this->typeSettings['id'])) {
                             $this->result[$resultkey][$this->typeSettings['id']]['server'] = $tempresult['server'];
                         }
-                        if (!empty($pages[0]['linkshellserver'])) {
+                        if (!empty($pages[0]['linkshellserver']) && !empty($this->typeSettings['id'])) {
                             $this->result[$resultkey][$this->typeSettings['id']]['server'] = $pages[0]['linkshellserver'];
                         }
                         break;
