@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Simbiat\FFXIV;
 
 // use all the things
-use Simbiat\LodestoneModules\{Converters, Routes, HttpRequest};
+use Simbiat\FFXIV\LodestoneModules\{Converters, Routes, HttpRequest};
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 

@@ -12,7 +12,7 @@ trait Parsers
 {
     /**
      * Parse Lodestone HTML
-     * @return \Simbiat\LodestoneModules\Parsers|\Simbiat\Lodestone
+     * @return \Simbiat\FFXIV\LodestoneModules\Parsers|\Simbiat\FFXIV\Lodestone
      */
     protected function parse(): self
     {
@@ -815,7 +815,7 @@ trait Parsers
      * @param array  $pages     List of pages
      * @param string $resultkey Result key (essentially entity type)
      *
-     * @return \Simbiat\LodestoneModules\Parsers|\Simbiat\Lodestone
+     * @return \Simbiat\FFXIV\LodestoneModules\Parsers|\Simbiat\FFXIV\Lodestone
      */
     protected function pages(array $pages, string $resultkey): self
     {

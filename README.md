@@ -40,7 +40,7 @@ All parsers accepting `page` number support value of `0`, which will return all 
 
 ## Test script
 
-There is a `\Simbiat\LodestoneTest` class to test run all the available functions in some general scenarios. Run it to get samples of output formatting and timings for each type of test in a table format. Note, that the last 2 tests are 'error tests', so their results are purposefully reversed for the report's consistency. Additionally, achievements' test is purposefully ran with `details` set to true and Free Company members in `All pages` mode, because of this their benchmark results will be presented as list of timings.
+There is a `\Simbiat\FFXIV\LodestoneTest` class to test run all the available functions in some general scenarios. Run it to get samples of output formatting and timings for each type of test in a table format. Note, that the last 2 tests are 'error tests', so their results are purposefully reversed for the report's consistency. Additionally, achievements' test is purposefully ran with `details` set to true and Free Company members in `All pages` mode, because of this their benchmark results will be presented as list of timings.
 
 ## Getting results
 
