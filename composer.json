@@ -28,7 +28,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Simbiat\\": "src/"
+            "Simbiat\\FFXIV\\": "src/"
         }
     },
     "support": {

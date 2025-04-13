@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Simbiat\LodestoneModules;
+namespace Simbiat\FFXIV\LodestoneModules;
 
 /**
  * URL's for Lodestone content

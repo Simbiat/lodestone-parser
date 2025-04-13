@@ -2,13 +2,13 @@
 #Functions used to convert textual filters to appropriate IDs used by Lodestone
 declare(strict_types = 1);
 
-namespace Simbiat\LodestoneModules;
+namespace Simbiat\FFXIV\LodestoneModules;
 
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use function in_array;
 
-use Simbiat\Lodestone;
+use Simbiat\FFXIV\Lodestone;
 
 /**
  * List of functions, that convert something to something else

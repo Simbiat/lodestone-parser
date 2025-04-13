@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Simbiat;
+namespace Simbiat\FFXIV;
 
 // use all the things
 use Simbiat\LodestoneModules\{Converters, Routes, HttpRequest};
