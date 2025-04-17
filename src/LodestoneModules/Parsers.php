@@ -315,10 +315,10 @@ trait Parsers
                             }
                         }
                         #Trim stuff
-                        $tempResults[$key]['slogan'] = trim($tempresult['slogan'] ?? '');
-                        $tempResults[$key]['active'] = trim($tempresult['active']);
-                        $tempResults[$key]['recruitment'] = trim($tempresult['recruitment']);
-                        $tempResults[$key]['grandCompany'] = trim($tempresult['grandCompany']);
+                        $tempResults[$key]['slogan'] = mb_trim($tempresult['slogan'] ?? '', encoding: 'UTF-8');
+                        $tempResults[$key]['active'] = mb_trim($tempresult['active'], encoding: 'UTF-8');
+                        $tempResults[$key]['recruitment'] = mb_trim($tempresult['recruitment'], encoding: 'UTF-8');
+                        $tempResults[$key]['grandCompany'] = mb_trim($tempresult['grandCompany'], encoding: 'UTF-8');
                         if (empty($tempresult['members_count'])) {
                             $tempResults[$key]['members_count'] = 0;
                         } else {
@@ -340,7 +340,7 @@ trait Parsers
                         if (empty($tempresult['title'])) {
                             $tempResults[$key]['title'] = NULL;
                         } else {
-                            $tempresult['title'] = trim($tempresult['title']);
+                            $tempresult['title'] = mb_trim($tempresult['title'], encoding: 'UTF-8');
                         }
                         if (empty($tempresult['item'])) {
                             $tempResults[$key]['item'] = NULL;
@@ -361,23 +361,23 @@ trait Parsers
                         }
                         break;
                     case 'Database':
-                        $tempResults[$key]['name'] = str_replace(['<i>', '</i>'], '', trim($tempResults[$key]['name']));
+                        $tempResults[$key]['name'] = str_replace(['<i>', '</i>'], '', mb_trim($tempResults[$key]['name'], encoding: 'UTF-8'));
                         switch ($this->typeSettings['type']) {
                             case 'achievement':
-                                $tempResults[$key]['reward'] = (trim($tempResults[$key]['column1']) === '-' ? NULL : trim($tempResults[$key]['column1']));
+                                $tempResults[$key]['reward'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? null : mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8'));
                                 $tempResults[$key]['points'] = (int)($tempResults[$key]['column2'] ?? 0);
                                 break;
                             case 'quest':
-                                $tempResults[$key]['area'] = (trim($tempResults[$key]['column1']) === '-' ? NULL : trim($tempResults[$key]['column1']));
+                                $tempResults[$key]['area'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? null : mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8'));
                                 $tempResults[$key]['character_level'] = (int)($tempResults[$key]['column2'] ?? 0);
                                 break;
                             case 'duty':
                                 $tempResults[$key]['character_level'] = (int)($tempResults[$key]['column1'] ?? 0);
-                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column2']) === '-' ? 0 : (int)$tempResults[$key]['column2']);
+                                $tempResults[$key]['item_level'] = (mb_trim($tempResults[$key]['column2'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column2']);
                                 break;
                             case 'item':
-                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column1']) === '-' ? 0 : (int)$tempResults[$key]['column1']);
-                                $tempResults[$key]['character_level'] = (trim($tempResults[$key]['column2']) === '-' ? 0 : (int)$tempResults[$key]['column2']);
+                                $tempResults[$key]['item_level'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column1']);
+                                $tempResults[$key]['character_level'] = (mb_trim($tempResults[$key]['column2'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column2']);
                                 break;
                             case 'recipe':
                                 if (isset($tempResults[$key]['extraicon'])) {
@@ -388,14 +388,14 @@ trait Parsers
                                 if (!isset($tempResults[$key]['master'])) {
                                     $tempResults[$key]['master'] = NULL;
                                 }
-                                $tempResults[$key]['recipe_level'] = (trim($tempResults[$key]['column1']) === '-' ? 0 : (int)$tempResults[$key]['column1']);
+                                $tempResults[$key]['recipe_level'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column1']);
                                 $tempResults[$key]['stars'] = $this->stars($tempResults[$key]);
                                 if (isset($tempResults[$key]['expert'])) {
                                     $tempResults[$key]['expert'] = true;
                                 } else {
                                     $tempResults[$key]['expert'] = false;
                                 }
-                                $tempResults[$key]['item_level'] = (trim($tempResults[$key]['column2']) === '-' ? 0 : (int)$tempResults[$key]['column2']);
+                                $tempResults[$key]['item_level'] = (mb_trim($tempResults[$key]['column2'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column2']);
                                 break;
                             case 'gathering':
                                 if (isset($tempResults[$key]['extraicon'])) {
@@ -408,11 +408,11 @@ trait Parsers
                                 } else {
                                     $tempResults[$key]['hidden'] = false;
                                 }
-                                $tempResults[$key]['level'] = (trim($tempResults[$key]['column1']) === '-' ? 0 : (int)$tempResults[$key]['column1']);
+                                $tempResults[$key]['level'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column1']);
                                 $tempResults[$key]['stars'] = $this->stars($tempResults[$key]);
                                 break;
                             case 'shop':
-                                $tempResults[$key]['area'] = preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', str_replace(['<i>', '</i>'], '', trim($tempResults[$key]['column1'])));
+                                $tempResults[$key]['area'] = preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', str_replace(['<i>', '</i>'], '', mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8')));
                                 break;
                             case 'text_command':
                                 if (in_array($tempResults[$key]['column1'], ['Yes', '○', 'oui', '○']) === true) {
@@ -442,8 +442,8 @@ trait Parsers
                         $tempResults[$key]['portrait'] = str_replace('c0.jpg', 'l0.jpg', $tempresult['avatar']);
                         #Since release of Dawntrail, if profile is private you won't get any of the fields below
                         if ($tempResults[$key]['private'] === false) {
-                            $tempResults[$key]['race'] = trim($tempResults[$key]['race']);
-                            $tempResults[$key]['clan'] = trim($tempResults[$key]['clan']);
+                            $tempResults[$key]['race'] = mb_trim($tempResults[$key]['race'], encoding: 'UTF-8');
+                            $tempResults[$key]['clan'] = mb_trim($tempResults[$key]['clan'], encoding: 'UTF-8');
                             if ($tempResults[$key]['race'] === '----') {
                                 $tempResults[$key]['race'] = null;
                                 $tempResults[$key]['comment'] = 'No race';
@@ -508,7 +508,7 @@ trait Parsers
                                 $tempResults[$key]['pvp']['crest'] = $this->crest($tempresult, 'pvpcrest');
                             }
                             #Bio
-                            $tempresult['bio'] = trim($tempresult['bio']);
+                            $tempresult['bio'] = mb_trim($tempresult['bio'], encoding: 'UTF-8');
                             if ($tempresult['bio'] === '-') {
                                 $tempresult['bio'] = '';
                             }
@@ -799,7 +799,7 @@ trait Parsers
                 case 'maintenance':
                 case 'updates':
                 case 'status':
-                    $function_to_call = 'getLodestone'.ucfirst($this->type);
+                    $function_to_call = 'getLodestone'.mb_ucfirst($this->type, 'UTF-8');
                     for ($i = $current_page; $i <= $total_page; $i++) {
                         $this->$function_to_call($i);
                     }
@@ -901,7 +901,7 @@ trait Parsers
         }
         #Linkshell members specific
         if (!empty($pages[0]['linkshellname'])) {
-            $this->result[$resultkey][$this->typeSettings['id']]['name'] = trim($pages[0]['linkshellname']);
+            $this->result[$resultkey][$this->typeSettings['id']]['name'] = mb_trim($pages[0]['linkshellname'], encoding: 'UTF-8');
             if (!empty($pages[0]['linkshellserver'])) {
                 if (preg_match('/[a-zA-Z0-9]{40}/mi', $this->typeSettings['id'])) {
                     $this->result[$resultkey][$this->typeSettings['id']]['dataCenter'] = $pages[0]['linkshellserver'];
