@@ -39,7 +39,7 @@ trait Parsers
         try {
             $this->lasterror = NULL;
             $this->html = (new HttpRequest($this->useragent))->get($this->url);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->errorRegister($e->getMessage(), 'http', $started);
             if ($e->getCode() === 404) {
                 $this->addToResults($resultkey, $resultsubkey, 404);
@@ -543,7 +543,7 @@ trait Parsers
             if ($this->type === 'worlds') {
                 ksort($this->result[$resultkey]);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->errorRegister($e->getMessage(), 'parse', $started);
             return $this;
         }
