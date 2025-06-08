@@ -32,14 +32,14 @@ class HttpRequest
     
     /**
      * Main constructor
-     * @param string $useragent User-agent to use
+     * @param string $user_agent User-agent to use
      */
-    public function __construct(string $useragent = '')
+    public function __construct(string $user_agent = '')
     {
-        if (!empty($useragent)) {
-            $this->CURL_OPTIONS[CURLOPT_USERAGENT] = $useragent;
+        if (!empty($user_agent)) {
+            $this->CURL_OPTIONS[CURLOPT_USERAGENT] = $user_agent;
         }
-        #Check if handle already created
+        #Check if the handle already created
         if (empty(self::$curlHandle)) {
             self::$curlHandle = curl_init();
             if (self::$curlHandle === false) {
