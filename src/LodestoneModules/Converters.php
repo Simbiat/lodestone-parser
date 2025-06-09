@@ -263,7 +263,7 @@ class Converters
     public function languageConvert(string $lang): string
     {
         if (!empty($lang)) {
-            if (!in_array($lang, Lodestone::langAllowed)) {
+            if (!in_array($lang, Lodestone::LANGUAGES_ALLOWED)) {
                 $lang = 'na';
             }
             if (in_array($lang, ['jp', 'ja'])) {

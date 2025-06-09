@@ -18,7 +18,7 @@ class Lodestone
     #Use trait
     use LodestoneModules\Parsers;
     
-    public const array langAllowed = ['na', 'jp', 'ja', 'eu', 'fr', 'de'];
+    public const array LANGUAGES_ALLOWED = ['na', 'jp', 'ja', 'eu', 'fr', 'de'];
     
     protected string $user_agent = '';
     protected string $language = 'na';
@@ -888,7 +888,7 @@ class Lodestone
      */
     public function setLanguage(string $language = ''): self
     {
-        if (!in_array($language, self::langAllowed)) {
+        if (!in_array($language, self::LANGUAGES_ALLOWED, true)) {
             $language = 'na';
         }
         if (in_array($language, ['jp', 'ja'])) {
