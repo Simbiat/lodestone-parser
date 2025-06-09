@@ -216,7 +216,7 @@ trait Parsers
                             $tempResults[$key]['community_id'] = $tempresult['pvpTeamCommunityId'];
                         }
                         if ($this->type === 'FreeCompanyMembers') {
-                            $tempResults[$key]['rank_id'] = $this->converters->FCRankID($tempresult['rankicon']);
+                            $tempResults[$key]['rank_id'] = $this->converters->fcRankId($tempresult['rankicon']);
                         }
                         if (!empty($tempresult['gc_name'])) {
                             $tempResults[$key]['grand_company'] = $this->grandcompany($tempresult);

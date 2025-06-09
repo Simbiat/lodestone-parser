@@ -22,7 +22,7 @@ class Converters
      *
      * @return string
      */
-    public function FCRankID(string $image): string
+    public function fcRankId(string $image): string
     {
         if (str_contains($image, 'W5a6yeRyN2eYiaV-AGU7mJKEhs')) {
             $rank = '0';
