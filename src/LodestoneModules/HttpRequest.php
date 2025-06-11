@@ -9,7 +9,7 @@ namespace Simbiat\FFXIV\LodestoneModules;
 class HttpRequest
 {
     #cURL options
-    protected array $CURL_OPTIONS = [
+    protected static array $curl_options = [
         CURLOPT_POST => false,
         CURLOPT_HEADER => true,
         CURLOPT_RETURNTRANSFER => true,
@@ -37,7 +37,7 @@ class HttpRequest
     public function __construct(string $user_agent = '')
     {
         if (!empty($user_agent)) {
-            $this->CURL_OPTIONS[CURLOPT_USERAGENT] = $user_agent;
+            self::$curl_options[CURLOPT_USERAGENT] = $user_agent;
         }
         #Check if the handle already created
         if (empty(self::$curlHandle)) {
@@ -45,7 +45,7 @@ class HttpRequest
             if (self::$curlHandle === false) {
                 throw new \RuntimeException('Failed to initiate cURL handle');
             }
-            if (!curl_setopt_array(self::$curlHandle, $this->CURL_OPTIONS)) {
+            if (!curl_setopt_array(self::$curlHandle, self::$curl_options)) {
                 throw new \RuntimeException('Failed to set cURL handle options');
             }
         }

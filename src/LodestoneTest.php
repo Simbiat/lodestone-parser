@@ -10,7 +10,7 @@ use function in_array;
  */
 class LodestoneTest
 {
-    private object $Lodestone;
+    private object $lodestone;
     
     /**
      * Creation of the test object
