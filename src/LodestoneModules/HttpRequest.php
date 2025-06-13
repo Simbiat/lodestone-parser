@@ -28,7 +28,7 @@ class HttpRequest
         CURLOPT_SSL_VERIFYPEER => true,
     ];
     
-    public static \CurlHandle|null|false $curlHandle = null;
+    public static \CurlHandle|null|false $curl_handle = null;
     
     /**
      * Main constructor
@@ -40,12 +40,12 @@ class HttpRequest
             self::$curl_options[CURLOPT_USERAGENT] = $user_agent;
         }
         #Check if the handle already created
-        if (empty(self::$curlHandle)) {
-            self::$curlHandle = curl_init();
-            if (self::$curlHandle === false) {
+        if (empty(self::$curl_handle)) {
+            self::$curl_handle = curl_init();
+            if (self::$curl_handle === false) {
                 throw new \RuntimeException('Failed to initiate cURL handle');
             }
-            if (!curl_setopt_array(self::$curlHandle, self::$curl_options)) {
+            if (!curl_setopt_array(self::$curl_handle, self::$curl_options)) {
                 throw new \RuntimeException('Failed to set cURL handle options');
             }
         }
@@ -59,12 +59,12 @@ class HttpRequest
     {
         $url = str_ireplace(' ', '+', $url);
         
-        curl_setopt(self::$curlHandle, CURLOPT_URL, $url);
+        curl_setopt(self::$curl_handle, CURLOPT_URL, $url);
         // handle response
-        $response = curl_exec(self::$curlHandle);
-        $curlerror = curl_error(self::$curlHandle);
-        $hlength = curl_getinfo(self::$curlHandle, CURLINFO_HEADER_SIZE);
-        $httpCode = curl_getinfo(self::$curlHandle, CURLINFO_HTTP_CODE);
+        $response = curl_exec(self::$curl_handle);
+        $curlerror = curl_error(self::$curl_handle);
+        $hlength = curl_getinfo(self::$curl_handle, CURLINFO_HEADER_SIZE);
+        $httpCode = curl_getinfo(self::$curl_handle, CURLINFO_HTTP_CODE);
         if ($response === false) {
             throw new \RuntimeException($curlerror, $httpCode);
         }
