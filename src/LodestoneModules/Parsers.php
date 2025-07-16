@@ -289,7 +289,7 @@ trait Parsers
                         for ($iteration = 1; $iteration <= 3; $iteration++) {
                             if (!empty($temp_result['gc_name_'.$iteration])) {
                                 $temp_results[$key]['reputation'][$temp_result['gc_name_'.$iteration]] = $temp_result['gcrepu'.$iteration];
-                                unset($temp_results[$key]['gc_name_'.$i], $temp_results[$key]['gcrepu'.$i]);
+                                unset($temp_results[$key]['gc_name_'.$iteration], $temp_results[$key]['gcrepu'.$iteration]);
                             }
                         }
                         #Focus
@@ -752,19 +752,33 @@ trait Parsers
             $this->all_pages = false;
             switch ($this->type) {
                 case 'character_friends':
-                case 'character_following':
-                case 'free_company_members':
-                case 'linkshell_members':
-                    $function_to_call = 'get'.$this->type;
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
-                        $this->$function_to_call($this->type_settings['id'], $iteration);
+                        $this->getCharacterFriends($this->type_settings['id'], $iteration);
+                    }
+                    break;
+                case 'character_following':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->getCharacterFollowing($this->type_settings['id'], $iteration);
+                    }
+                    break;
+                case 'free_company_members':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->getFreeCompanyMembers($this->type_settings['id'], $iteration);
+                    }
+                    break;
+                case 'linkshell_members':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->getLinkshellMembers($this->type_settings['id'], $iteration);
                     }
                     break;
                 case 'grand_company_ranking':
-                case 'free_company_ranking':
-                    $function_to_call = 'get'.$this->type;
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
-                        $this->$function_to_call($this->type_settings['week_month'], $this->type_settings['week'], $this->type_settings['worldname'], $this->type_settings['gcid'], $iteration);
+                        $this->getGrandCompanyRanking($this->type_settings['week_month'], $this->type_settings['week'], $this->type_settings['worldname'], $this->type_settings['gcid'], $iteration);
+                    }
+                    break;
+                case 'free_company_ranking':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->getFreeCompanyRanking($this->type_settings['week_month'], $this->type_settings['week'], $this->type_settings['worldname'], $this->type_settings['gcid'], $iteration);
                     }
                     break;
                 case 'search_character':
