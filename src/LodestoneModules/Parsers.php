@@ -19,31 +19,31 @@ trait Parsers
         $started = hrtime(true);
         #Set array key for results
         $resultkey = match ($this->type) {
-            'searchCharacter', 'Character', 'CharacterJobs', 'CharacterFriends', 'CharacterFollowing', 'Achievements', 'AchievementDetails' => 'characters',
-            'FreeCompanyMembers', 'searchFreeCompany', 'FreeCompany' => 'freecompanies',
-            'LinkshellMembers', 'searchLinkshell' => 'linkshells',
-            'PvPTeamMembers', 'searchPvPTeam' => 'pvpteams',
-            'Database', 'AchievementFromDB' => 'database',
+            'search_character', 'character', 'character_jobs', 'character_friends', 'character_following', 'achievements', 'achievement_details' => 'characters',
+            'free_company_members', 'search_free_company', 'free_company' => 'freecompanies',
+            'linkshell_members', 'search_linkshell' => 'linkshells',
+            'pvp_team_members', 'search_pvp_team' => 'pvpteams',
+            'database', 'achievement_from_db' => 'database',
             default => $this->type,
         };
         $resultsubkey = match ($this->type) {
-            'CharacterJobs' => 'jobs',
-            'CharacterFriends' => 'friends',
-            'CharacterFollowing' => 'following',
-            'Achievements', 'AchievementDetails' => 'achievements',
-            'FreeCompanyMembers', 'LinkshellMembers', 'PvPTeamMembers' => 'members',
-            'frontline', 'GrandCompanyRanking', 'FreeCompanyRanking' => $this->typeSettings['week_month'],
-            'Database' => $this->typeSettings['type'],
+            'character_jobs' => 'jobs',
+            'character_friends' => 'friends',
+            'character_following' => 'following',
+            'achievements', 'achievement_details' => 'achievements',
+            'free_company_members', 'linkshell_members', 'pvp_team_members' => 'members',
+            'frontline', 'grand_company_ranking', 'free_company_ranking' => $this->type_settings['week_month'],
+            'database' => $this->type_settings['type'],
             default => '',
         };
         try {
-            $this->lasterror = NULL;
+            $this->last_error = NULL;
             $this->html = new HttpRequest($this->user_agent)->get($this->url);
-        } catch (\Throwable $e) {
-            $this->errorRegister($e->getMessage(), 'http', $started);
-            if ($e->getCode() === 404) {
+        } catch (\Throwable $exception) {
+            $this->errorRegister($exception->getMessage(), 'http', $started);
+            if ($exception->getCode() === 404) {
                 $this->addToResults($resultkey, $resultsubkey, 404);
-            } elseif ($this->type === 'Character' && $e->getCode() === 403) {
+            } elseif ($this->type === 'character' && $exception->getCode() === 403) {
                 $this->addToResults($resultkey, $resultsubkey, ['private' => true]);
             }
             return $this;
@@ -51,22 +51,22 @@ trait Parsers
         if ($this->benchmark) {
             $finished = hrtime(true);
             $duration = $finished - $started;
-            $this->result['benchmark']['httptime'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+            $this->result['benchmark']['http_time'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
         }
         $started = hrtime(true);
         try {
-            $this->lasterror = NULL;
+            $this->last_error = NULL;
             #Parsing of pages
             if (in_array($this->type, [
-                'searchCharacter',
-                'CharacterFriends',
-                'CharacterFollowing',
-                'FreeCompanyMembers',
-                'LinkshellMembers',
-                'PvPTeamMembers',
-                'searchFreeCompany',
-                'searchLinkshell',
-                'searchPvPTeam',
+                'search_character',
+                'character_friends',
+                'character_following',
+                'free_company_members',
+                'linkshell_members',
+                'pvp_team_members',
+                'search_free_company',
+                'search_linkshell',
+                'search_pvp_team',
                 'topics',
                 'notices',
                 'maintenance',
@@ -78,13 +78,13 @@ trait Parsers
                 }
                 $this->pages($pages, $resultkey);
             }
-            if (in_array($this->type, ['GrandCompanyRanking', 'FreeCompanyRanking'])) {
+            if (in_array($this->type, ['grand_company_ranking', 'free_company_ranking'])) {
                 if (!$this->regexfail(preg_match_all(Regex::PAGECOUNT2, $this->html, $pages, PREG_SET_ORDER), preg_last_error(), 'PAGECOUNT2')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
             }
-            if ($this->type === 'Database') {
+            if ($this->type === 'database') {
                 if (!$this->regexfail(preg_match_all(Regex::DBPAGECOUNT, $this->html, $pages, PREG_SET_ORDER), preg_last_error(), 'DBPAGECOUNT')) {
                     return $this;
                 }
@@ -115,25 +115,25 @@ trait Parsers
             #Main (general) parser
             #Setting initial regex
             $regex = match ($this->type) {
-                'searchPvPTeam' => Regex::PVPTEAMLIST,
-                'searchLinkshell' => Regex::LINKSHELLLIST,
-                'searchFreeCompany' => Regex::FREECOMPANYLIST,
+                'search_pvp_team' => Regex::PVPTEAMLIST,
+                'search_linkshell' => Regex::LINKSHELLLIST,
+                'search_free_company' => Regex::FREECOMPANYLIST,
                 'banners' => Regex::BANNERS2,
                 'worlds' => Regex::DATACENTERS,
                 'feast' => Regex::FEAST,
                 'frontline' => Regex::FRONTLINE,
-                'GrandCompanyRanking' => Regex::GCRANKING,
-                'FreeCompanyRanking' => Regex::FCRANKING,
-                'deepdungeon' => Regex::DEEPDUNGEON,
-                'FreeCompany' => Regex::FREECOMPANY,
-                'Achievements' => Regex::ACHIEVEMENTS_LIST,
-                'AchievementDetails' => Regex::ACHIEVEMENT_DETAILS,
-                'Character' => Regex::CHARACTER_GENERAL,
-                'CharacterJobs' => Regex::CHARACTER_JOBS,
+                'grand_company_ranking' => Regex::GCRANKING,
+                'free_company_ranking' => Regex::FCRANKING,
+                'deep_dungeon' => Regex::DEEPDUNGEON,
+                'free_company' => Regex::FREECOMPANY,
+                'achievements' => Regex::ACHIEVEMENTS_LIST,
+                'achievement_details' => Regex::ACHIEVEMENT_DETAILS,
+                'character' => Regex::CHARACTER_GENERAL,
+                'character_jobs' => Regex::CHARACTER_JOBS,
                 'topics', 'news' => Regex::NEWS,
                 'notices', 'maintenance', 'updates', 'status' => Regex::NOTICES2,
-                'Database' => Regex::DBLIST,
-                'AchievementFromDB' => Regex::ACHIEVEMENT_DB,
+                'database' => Regex::DBLIST,
+                'achievement_from_db' => Regex::ACHIEVEMENT_DB,
                 default => Regex::CHARACTERLIST,
             };
             
@@ -141,24 +141,24 @@ trait Parsers
             #file_put_contents(__DIR__.'/regex.txt', $regex);
             #file_put_contents(__DIR__.'/html.txt', $this->html);
             
-            if (!$this->regexfail(preg_match_all($regex, $this->html, $tempResults, PREG_SET_ORDER), preg_last_error(), 'main regex')) {
+            if (!$this->regexfail(preg_match_all($regex, $this->html, $temp_results, PREG_SET_ORDER), preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
-                    'searchCharacter',
-                    'CharacterFriends',
-                    'CharacterFollowing',
-                    'FreeCompanyMembers',
-                    'LinkshellMembers',
-                    'PvPTeamMembers',
-                    'searchFreeCompany',
-                    'searchLinkshell',
-                    'searchPvPTeam',
+                    'search_character',
+                    'character_friends',
+                    'character_following',
+                    'free_company_members',
+                    'linkshell_members',
+                    'pvp_team_members',
+                    'search_free_company',
+                    'search_linkshell',
+                    'search_pvp_team',
                     'topics',
                     'notices',
                     'maintenance',
                     'updates',
                     'status',
                 ])) {
-                    if (!empty($this->typeSettings['id']) && !empty($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey]['total'])) {
+                    if (!empty($this->type_settings['id']) && !empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]['total'])) {
                         return $this;
                     }
                     $this->errorUnregister();
@@ -168,86 +168,86 @@ trait Parsers
             }
             
             #Character results update
-            if ($this->type === 'Character') {
+            if ($this->type === 'character') {
                 #Remove non-named groups before rearranging results to avoid overwrites
-                foreach ($tempResults as $key => $tempresult) {
-                    foreach ($tempresult as $key2 => $details) {
+                foreach ($temp_results as $key => $temp_result) {
+                    foreach ($temp_result as $key2 => $details) {
                         if (is_numeric($key2) || empty($details)) {
                             #No idea why EA thinks $key2 is float, when it's either string or int. Probably gets confused by is_numeric check
                             /** @noinspection OffsetOperationsInspection */
-                            unset($tempResults[$key][$key2]);
+                            unset($temp_results[$key][$key2]);
                         }
                     }
                 }
-                $tempResults = [array_merge($tempResults[0], $tempResults[1], $tempResults[2] ?? [])];
+                $temp_results = [array_merge($temp_results[0], $temp_results[1], $temp_results[2] ?? [])];
             }
             
-            foreach ($tempResults as $key => $tempresult) {
+            foreach ($temp_results as $key => $temp_result) {
                 #Remove unnamed groups and empty values
-                foreach ($tempresult as $key2 => $value) {
+                foreach ($temp_result as $key2 => $value) {
                     if (is_numeric($key2) || empty($value)) {
-                        unset($tempResults[$key][$key2], $tempresult[$key2]);
+                        unset($temp_results[$key][$key2], $temp_result[$key2]);
                     }
                 }
                 #Decode HTML entities
-                foreach ($tempresult as $key2 => $value) {
+                foreach ($temp_result as $key2 => $value) {
                     #Decode in the data inside loop
-                    $tempresult[$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
+                    $temp_result[$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                     #Decode in original data (for consistency)
-                    $tempResults[$key][$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
+                    $temp_results[$key][$key2] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                 }
                 
                 #Specific processing
                 switch ($this->type) {
-                    case 'searchPvPTeam':
-                    case 'searchFreeCompany':
-                        $tempResults[$key]['crest'] = $this->crest($tempresult, 'crest');
+                    case 'search_pvp_team':
+                    case 'search_free_company':
+                        $temp_results[$key]['crest'] = $this->crest($temp_result, 'crest');
                         break;
-                    case 'searchCharacter':
-                    case 'CharacterFriends':
-                    case 'CharacterFollowing':
-                    case 'FreeCompanyMembers':
-                    case 'LinkshellMembers':
-                    case 'PvPTeamMembers':
-                        if (!empty($tempresult['linkshellCommunityId'])) {
-                            $tempResults[$key]['community_id'] = $tempresult['linkshellCommunityId'];
+                    case 'search_character':
+                    case 'character_friends':
+                    case 'character_following':
+                    case 'free_company_members':
+                    case 'linkshell_members':
+                    case 'pvp_team_members':
+                        if (!empty($temp_result['linkshell_community_id'])) {
+                            $temp_results[$key]['community_id'] = $temp_result['linkshell_community_id'];
                         }
-                        if (!empty($tempresult['pvpTeamCommunityId'])) {
-                            $tempResults[$key]['community_id'] = $tempresult['pvpTeamCommunityId'];
+                        if (!empty($temp_result['pvp_team_community_id'])) {
+                            $temp_results[$key]['community_id'] = $temp_result['pvp_team_community_id'];
                         }
-                        if ($this->type === 'FreeCompanyMembers') {
-                            $tempResults[$key]['rank_id'] = $this->converters->fcRankId($tempresult['rankicon']);
+                        if ($this->type === 'free_company_members') {
+                            $temp_results[$key]['rank_id'] = $this->converters->fcRankId($temp_result['rank_icon']);
                         }
-                        if (!empty($tempresult['gc_name'])) {
-                            $tempResults[$key]['grand_company'] = $this->grandcompany($tempresult);
+                        if (!empty($temp_result['gc_name'])) {
+                            $temp_results[$key]['grand_company'] = $this->grandcompany($temp_result);
                         }
-                        if (!empty($tempresult['fc_id'])) {
-                            $tempResults[$key]['free_company'] = $this->freecompany($tempresult);
+                        if (!empty($temp_result['fc_id'])) {
+                            $temp_results[$key]['free_company'] = $this->freecompany($temp_result);
                         }
-                        if (!empty($tempresult['lsRank']) && !empty($tempresult['lsRankIcon'])) {
-                            $tempResults[$key]['rankicon'] = $tempresult['lsRankIcon'];
+                        if (!empty($temp_result['ls_rank']) && !empty($temp_result['ls_rank_icon'])) {
+                            $temp_results[$key]['rank_icon'] = $temp_result['ls_rank_icon'];
                         }
                         #Specific for linkshell members
-                        if (empty($this->result['server']) && !empty($this->typeSettings['id'])) {
-                            $this->result[$resultkey][$this->typeSettings['id']]['server'] = $tempresult['server'];
+                        if (empty($this->result['server']) && !empty($this->type_settings['id'])) {
+                            $this->result[$resultkey][$this->type_settings['id']]['server'] = $temp_result['server'];
                         }
-                        if (!empty($pages[0]['linkshellserver']) && !empty($this->typeSettings['id'])) {
-                            $this->result[$resultkey][$this->typeSettings['id']]['server'] = $pages[0]['linkshellserver'];
+                        if (!empty($pages[0]['linkshell_server']) && !empty($this->type_settings['id'])) {
+                            $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
                         }
                         break;
                     case 'frontline':
-                    case 'GrandCompanyRanking':
-                        if (!empty($tempresult['gc_name'])) {
-                            $tempResults[$key]['grand_company'] = $this->grandcompany($tempresult);
+                    case 'grand_company_ranking':
+                        if (!empty($temp_result['gc_name'])) {
+                            $temp_results[$key]['grand_company'] = $this->grandcompany($temp_result);
                         }
-                        if (!empty($tempresult['fc_id'])) {
-                            $tempResults[$key]['free_company'] = $this->freecompany($tempresult);
+                        if (!empty($temp_result['fc_id'])) {
+                            $temp_results[$key]['free_company'] = $this->freecompany($temp_result);
                         }
-                        $tempResults[$key]['rank'] = ($tempresult['rank2'] ?: $tempresult['rank1']);
+                        $temp_results[$key]['rank'] = ($temp_result['rank2'] ?: $temp_result['rank1']);
                         break;
-                    case 'FreeCompanyRanking':
-                        $tempResults[$key]['crest'] = $this->crest($tempresult, 'crest');
-                        $tempResults[$key]['rank'] = ($tempresult['rank2'] ?: $tempresult['rank1']);
+                    case 'free_company_ranking':
+                        $temp_results[$key]['crest'] = $this->crest($temp_result, 'crest');
+                        $temp_results[$key]['rank'] = ($temp_result['rank2'] ?: $temp_result['rank1']);
                         break;
                     case 'topics':
                     case 'news':
@@ -255,296 +255,296 @@ trait Parsers
                     case 'maintenance':
                     case 'updates':
                     case 'status':
-                        $tempResults[$key]['url'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$tempresult['url'];
+                        $temp_results[$key]['url'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$temp_result['url'];
                         break;
-                    case 'deepdungeon':
-                        $tempResults[$key]['job'] = [
-                            'name' => $tempresult['job'],
-                            'icon' => $tempresult['jobicon'],
+                    case 'deep_dungeon':
+                        $temp_results[$key]['job'] = [
+                            'name' => $temp_result['job'],
+                            'icon' => $temp_result['jobicon'],
                         ];
-                        if (!empty($tempresult['jobform'])) {
-                            $tempResults[$key]['job']['form'] = $tempresult['jobform'];
+                        if (!empty($temp_result['jobform'])) {
+                            $temp_results[$key]['job']['form'] = $temp_result['jobform'];
                         }
                         break;
-                    case 'FreeCompany':
-                        $tempResults[$key]['crest'] = $this->crest($tempresult, 'crest');
+                    case 'free_company':
+                        $temp_results[$key]['crest'] = $this->crest($temp_result, 'crest');
                         #Ranking checks for --
-                        if ($tempresult['weekly_rank'] === '--') {
-                            $tempResults[$key]['weekly_rank'] = NULL;
+                        if ($temp_result['weekly_rank'] === '--') {
+                            $temp_results[$key]['weekly_rank'] = NULL;
                         }
-                        if ($tempresult['monthly_rank'] === '--') {
-                            $tempResults[$key]['monthly_rank'] = NULL;
+                        if ($temp_result['monthly_rank'] === '--') {
+                            $temp_results[$key]['monthly_rank'] = NULL;
                         }
                         #Estates
-                        if (!empty($tempresult['estate_name'])) {
-                            $tempResults[$key]['estate']['name'] = $tempresult['estate_name'];
+                        if (!empty($temp_result['estate_name'])) {
+                            $temp_results[$key]['estate']['name'] = $temp_result['estate_name'];
                         }
-                        if (!empty($tempresult['estate_address'])) {
-                            $tempResults[$key]['estate']['address'] = $tempresult['estate_address'];
+                        if (!empty($temp_result['estate_address'])) {
+                            $temp_results[$key]['estate']['address'] = $temp_result['estate_address'];
                         }
-                        if (!empty($tempresult['estate_greeting']) && !in_array($tempresult['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'])) {
-                            $tempResults[$key]['estate']['greeting'] = $tempresult['estate_greeting'];
+                        if (!empty($temp_result['estate_greeting']) && !in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'])) {
+                            $temp_results[$key]['estate']['greeting'] = $temp_result['estate_greeting'];
                         }
                         #Grand companies reputation
-                        for ($i = 1; $i <= 3; $i++) {
-                            if (!empty($tempresult['gc_name_'.$i])) {
-                                $tempResults[$key]['reputation'][$tempresult['gc_name_'.$i]] = $tempresult['gcrepu'.$i];
-                                unset($tempResults[$key]['gc_name_'.$i], $tempResults[$key]['gcrepu'.$i]);
+                        for ($iteration = 1; $iteration <= 3; $iteration++) {
+                            if (!empty($temp_result['gc_name_'.$iteration])) {
+                                $temp_results[$key]['reputation'][$temp_result['gc_name_'.$iteration]] = $temp_result['gcrepu'.$iteration];
+                                unset($temp_results[$key]['gc_name_'.$i], $temp_results[$key]['gcrepu'.$i]);
                             }
                         }
                         #Focus
-                        for ($i = 1; $i <= 9; $i++) {
-                            if (!empty($tempresult['focusname'.$i])) {
-                                $tempResults[$key]['focus'][] = [
-                                    'name' => $tempresult['focusname'.$i],
-                                    'enabled' => (empty($tempresult['focusoff'.$i]) ? 1 : 0),
-                                    'icon' => $tempresult['focusicon'.$i],
+                        for ($iteration = 1; $iteration <= 9; $iteration++) {
+                            if (!empty($temp_result['focusname'.$iteration])) {
+                                $temp_results[$key]['focus'][] = [
+                                    'name' => $temp_result['focusname'.$iteration],
+                                    'enabled' => (empty($temp_result['focusoff'.$iteration]) ? 1 : 0),
+                                    'icon' => $temp_result['focusicon'.$iteration],
                                 ];
-                                unset($tempResults[$key]['focusname'.$i], $tempResults[$key]['focusoff'.$i], $tempResults[$key]['focusicon'.$i]);
+                                unset($temp_results[$key]['focusname'.$iteration], $temp_results[$key]['focusoff'.$iteration], $temp_results[$key]['focusicon'.$iteration]);
                             }
                         }
                         #Seeking
-                        for ($i = 1; $i <= 5; $i++) {
-                            if (!empty($tempresult['seekingname'.$i])) {
-                                $tempResults[$key]['seeking'][] = [
-                                    'name' => $tempresult['seekingname'.$i],
-                                    'enabled' => (empty($tempresult['seekingoff'.$i]) ? 1 : 0),
-                                    'icon' => $tempresult['seekingicon'.$i],
+                        for ($iteration = 1; $iteration <= 5; $iteration++) {
+                            if (!empty($temp_result['seekingname'.$iteration])) {
+                                $temp_results[$key]['seeking'][] = [
+                                    'name' => $temp_result['seekingname'.$iteration],
+                                    'enabled' => (empty($temp_result['seekingoff'.$iteration]) ? 1 : 0),
+                                    'icon' => $temp_result['seekingicon'.$iteration],
                                 ];
-                                unset($tempResults[$key]['seekingname'.$i], $tempResults[$key]['seekingoff'.$i], $tempResults[$key]['seekingicon'.$i]);
+                                unset($temp_results[$key]['seekingname'.$iteration], $temp_results[$key]['seekingoff'.$iteration], $temp_results[$key]['seekingicon'.$iteration]);
                             }
                         }
                         #Trim stuff
-                        $tempResults[$key]['slogan'] = mb_trim($tempresult['slogan'] ?? '', encoding: 'UTF-8');
-                        $tempResults[$key]['active'] = mb_trim($tempresult['active'], encoding: 'UTF-8');
-                        $tempResults[$key]['recruitment'] = mb_trim($tempresult['recruitment'], encoding: 'UTF-8');
-                        $tempResults[$key]['grand_company'] = mb_trim($tempresult['grand_company'], encoding: 'UTF-8');
-                        if (empty($tempresult['members_count'])) {
-                            $tempResults[$key]['members_count'] = 0;
+                        $temp_results[$key]['slogan'] = mb_trim($temp_result['slogan'] ?? '', null, 'UTF-8');
+                        $temp_results[$key]['active'] = mb_trim($temp_result['active'], null, 'UTF-8');
+                        $temp_results[$key]['recruitment'] = mb_trim($temp_result['recruitment'], null, 'UTF-8');
+                        $temp_results[$key]['grand_company'] = mb_trim($temp_result['grand_company'], null, 'UTF-8');
+                        if (empty($temp_result['members_count'])) {
+                            $temp_results[$key]['members_count'] = 0;
                         } else {
-                            $tempResults[$key]['members_count'] = (int)$tempresult['members_count'];
+                            $temp_results[$key]['members_count'] = (int)$temp_result['members_count'];
                         }
                         break;
-                    case 'Achievements':
-                        $tempResults[$key]['title'] = !empty($tempresult['title']);
-                        $tempResults[$key]['item'] = !empty($tempresult['item']);
-                        if (empty($tempresult['time'])) {
-                            $tempResults[$key]['time'] = NULL;
+                    case 'achievements':
+                        $temp_results[$key]['title'] = !empty($temp_result['title']);
+                        $temp_results[$key]['item'] = !empty($temp_result['item']);
+                        if (empty($temp_result['time'])) {
+                            $temp_results[$key]['time'] = NULL;
                         }
-                        if (empty($tempresult['points'])) {
-                            $tempResults[$key]['points'] = 0;
+                        if (empty($temp_result['points'])) {
+                            $temp_results[$key]['points'] = 0;
                         }
                         break;
-                    case 'AchievementDetails':
-                    case 'AchievementFromDB':
-                        if (empty($tempresult['title'])) {
-                            $tempResults[$key]['title'] = NULL;
+                    case 'achievement_details':
+                    case 'achievement_from_db':
+                        if (empty($temp_result['title'])) {
+                            $temp_results[$key]['title'] = NULL;
                         } else {
-                            $tempresult['title'] = mb_trim($tempresult['title'], encoding: 'UTF-8');
+                            $temp_result['title'] = mb_trim($temp_result['title'], null, 'UTF-8');
                         }
-                        if (empty($tempresult['item'])) {
-                            $tempResults[$key]['item'] = NULL;
+                        if (empty($temp_result['item'])) {
+                            $temp_results[$key]['item'] = NULL;
                         }
-                        if (!empty($tempresult['item_name'])) {
-                            $tempResults[$key]['item'] = [
-                                'id' => $tempresult['item_id'],
-                                'name' => $tempresult['item_name'],
-                                'icon' => $tempresult['item_icon'],
+                        if (!empty($temp_result['item_name'])) {
+                            $temp_results[$key]['item'] = [
+                                'id' => $temp_result['item_id'],
+                                'name' => $temp_result['item_name'],
+                                'icon' => $temp_result['item_icon'],
                             ];
-                            unset($tempResults[$key]['item_id'], $tempResults[$key]['item_name'], $tempResults[$key]['item_icon']);
+                            unset($temp_results[$key]['item_id'], $temp_results[$key]['item_name'], $temp_results[$key]['item_icon']);
                         }
-                        if (empty($tempresult['time'])) {
-                            $tempResults[$key]['time'] = NULL;
+                        if (empty($temp_result['time'])) {
+                            $temp_results[$key]['time'] = NULL;
                         }
-                        if (empty($tempresult['points'])) {
-                            $tempResults[$key]['points'] = 0;
+                        if (empty($temp_result['points'])) {
+                            $temp_results[$key]['points'] = 0;
                         }
                         break;
-                    case 'Database':
-                        $tempResults[$key]['name'] = str_replace(['<i>', '</i>'], '', mb_trim($tempResults[$key]['name'], encoding: 'UTF-8'));
-                        switch ($this->typeSettings['type']) {
+                    case 'database':
+                        $temp_results[$key]['name'] = str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['name'], null, 'UTF-8'));
+                        switch ($this->type_settings['type']) {
                             case 'achievement':
-                                $tempResults[$key]['reward'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? null : mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8'));
-                                $tempResults[$key]['points'] = (int)($tempResults[$key]['column2'] ?? 0);
+                                $temp_results[$key]['reward'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
+                                $temp_results[$key]['points'] = (int)($temp_results[$key]['column2'] ?? 0);
                                 break;
                             case 'quest':
-                                $tempResults[$key]['area'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? null : mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8'));
-                                $tempResults[$key]['character_level'] = (int)($tempResults[$key]['column2'] ?? 0);
+                                $temp_results[$key]['area'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
+                                $temp_results[$key]['character_level'] = (int)($temp_results[$key]['column2'] ?? 0);
                                 break;
                             case 'duty':
-                                $tempResults[$key]['character_level'] = (int)($tempResults[$key]['column1'] ?? 0);
-                                $tempResults[$key]['item_level'] = (mb_trim($tempResults[$key]['column2'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column2']);
+                                $temp_results[$key]['character_level'] = (int)($temp_results[$key]['column1'] ?? 0);
+                                $temp_results[$key]['item_level'] = (mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column2']);
                                 break;
                             case 'item':
-                                $tempResults[$key]['item_level'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column1']);
-                                $tempResults[$key]['character_level'] = (mb_trim($tempResults[$key]['column2'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column2']);
+                                $temp_results[$key]['item_level'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column1']);
+                                $temp_results[$key]['character_level'] = (mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column2']);
                                 break;
                             case 'recipe':
-                                if (isset($tempResults[$key]['extraicon'])) {
-                                    $tempResults[$key]['collectable'] = true;
+                                if (isset($temp_results[$key]['extraicon'])) {
+                                    $temp_results[$key]['collectable'] = true;
                                 } else {
-                                    $tempResults[$key]['collectable'] = false;
+                                    $temp_results[$key]['collectable'] = false;
                                 }
-                                if (!isset($tempResults[$key]['master'])) {
-                                    $tempResults[$key]['master'] = NULL;
+                                if (!isset($temp_results[$key]['master'])) {
+                                    $temp_results[$key]['master'] = NULL;
                                 }
-                                $tempResults[$key]['recipe_level'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column1']);
-                                $tempResults[$key]['stars'] = $this->stars($tempResults[$key]);
-                                if (isset($tempResults[$key]['expert'])) {
-                                    $tempResults[$key]['expert'] = true;
+                                $temp_results[$key]['recipe_level'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column1']);
+                                $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
+                                if (isset($temp_results[$key]['expert'])) {
+                                    $temp_results[$key]['expert'] = true;
                                 } else {
-                                    $tempResults[$key]['expert'] = false;
+                                    $temp_results[$key]['expert'] = false;
                                 }
-                                $tempResults[$key]['item_level'] = (mb_trim($tempResults[$key]['column2'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column2']);
+                                $temp_results[$key]['item_level'] = (mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column2']);
                                 break;
                             case 'gathering':
-                                if (isset($tempResults[$key]['extraicon'])) {
-                                    $tempResults[$key]['collectable'] = true;
+                                if (isset($temp_results[$key]['extraicon'])) {
+                                    $temp_results[$key]['collectable'] = true;
                                 } else {
-                                    $tempResults[$key]['collectable'] = false;
+                                    $temp_results[$key]['collectable'] = false;
                                 }
-                                if (isset($tempResults[$key]['hidden'])) {
-                                    $tempResults[$key]['hidden'] = true;
+                                if (isset($temp_results[$key]['hidden'])) {
+                                    $temp_results[$key]['hidden'] = true;
                                 } else {
-                                    $tempResults[$key]['hidden'] = false;
+                                    $temp_results[$key]['hidden'] = false;
                                 }
-                                $tempResults[$key]['level'] = (mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8') === '-' ? 0 : (int)$tempResults[$key]['column1']);
-                                $tempResults[$key]['stars'] = $this->stars($tempResults[$key]);
+                                $temp_results[$key]['level'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column1']);
+                                $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
                                 break;
                             case 'shop':
-                                $tempResults[$key]['area'] = preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', str_replace(['<i>', '</i>'], '', mb_trim($tempResults[$key]['column1'], encoding: 'UTF-8')));
+                                $temp_results[$key]['area'] = preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['column1'], null, 'UTF-8')));
                                 break;
                             case 'text_command':
-                                if (in_array($tempResults[$key]['column1'], ['Yes', '○', 'oui', '○']) === true) {
-                                    $tempResults[$key]['Windows'] = true;
+                                if (in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'])) {
+                                    $temp_results[$key]['Windows'] = true;
                                 } else {
-                                    $tempResults[$key]['Windows'] = false;
+                                    $temp_results[$key]['Windows'] = false;
                                 }
-                                if (in_array($tempResults[$key]['column2'], ['Yes', '○', 'oui', '○']) === true) {
-                                    $tempResults[$key]['PS4'] = true;
+                                if (in_array($temp_results[$key]['column2'], ['Yes', '○', 'oui', '○'])) {
+                                    $temp_results[$key]['PS4'] = true;
                                 } else {
-                                    $tempResults[$key]['PS4'] = false;
+                                    $temp_results[$key]['PS4'] = false;
                                 }
-                                if (in_array($tempResults[$key]['column3'], ['Yes', '○', 'oui', '○']) === true) {
-                                    $tempResults[$key]['Mac'] = true;
+                                if (in_array($temp_results[$key]['column3'], ['Yes', '○', 'oui', '○'])) {
+                                    $temp_results[$key]['Mac'] = true;
                                 } else {
-                                    $tempResults[$key]['Mac'] = false;
+                                    $temp_results[$key]['Mac'] = false;
                                 }
                                 break;
                         }
                         break;
-                    case 'Character':
+                    case 'character':
                         #There are cases of characters not returning a proper race or clan (usually both).
                         #I've reported this issue to Square Enix several times, and they simply update affected characters.
                         #This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
-                        $tempResults[$key]['private'] = !empty($tempResults[$key]['private']);
+                        $temp_results[$key]['private'] = !empty($temp_results[$key]['private']);
                         #Portrait
-                        $tempResults[$key]['portrait'] = str_replace('c0.jpg', 'l0.jpg', $tempresult['avatar']);
+                        $temp_results[$key]['portrait'] = str_replace('c0.jpg', 'l0.jpg', $temp_result['avatar']);
                         #Since release of Dawntrail, if profile is private you won't get any of the fields below
-                        if ($tempResults[$key]['private'] === false) {
-                            $tempResults[$key]['race'] = mb_trim($tempResults[$key]['race'], encoding: 'UTF-8');
-                            $tempResults[$key]['clan'] = mb_trim($tempResults[$key]['clan'], encoding: 'UTF-8');
-                            if ($tempResults[$key]['race'] === '----') {
-                                $tempResults[$key]['race'] = null;
-                                $tempResults[$key]['comment'] = 'No race';
+                        if ($temp_results[$key]['private'] === false) {
+                            $temp_results[$key]['race'] = mb_trim($temp_results[$key]['race'], null, 'UTF-8');
+                            $temp_results[$key]['clan'] = mb_trim($temp_results[$key]['clan'], null, 'UTF-8');
+                            if ($temp_results[$key]['race'] === '----') {
+                                $temp_results[$key]['race'] = null;
+                                $temp_results[$key]['comment'] = 'No race';
                             }
-                            if ($tempResults[$key]['clan'] === '----') {
-                                $tempResults[$key]['clan'] = null;
-                                if ($tempResults[$key]['comment'] === 'No race') {
-                                    $tempResults[$key]['comment'] .= ' and clan';
+                            if ($temp_results[$key]['clan'] === '----') {
+                                $temp_results[$key]['clan'] = null;
+                                if ($temp_results[$key]['comment'] === 'No race') {
+                                    $temp_results[$key]['comment'] .= ' and clan';
                                 } else {
-                                    $tempResults[$key]['comment'] = 'No clan';
+                                    $temp_results[$key]['comment'] = 'No clan';
                                 }
                             }
-                            $tempResults[$key]['nameday'] = str_replace('32st', '32nd', $tempResults[$key]['nameday']);
-                            if (!empty($tempresult['uppertitle'])) {
-                                $tempResults[$key]['title'] = $tempresult['uppertitle'];
-                            } elseif (!empty($tempresult['undertitle'])) {
-                                $tempResults[$key]['title'] = $tempresult['undertitle'];
+                            $temp_results[$key]['nameday'] = str_replace('32st', '32nd', $temp_results[$key]['nameday']);
+                            if (!empty($temp_result['uppertitle'])) {
+                                $temp_results[$key]['title'] = $temp_result['uppertitle'];
+                            } elseif (!empty($temp_result['undertitle'])) {
+                                $temp_results[$key]['title'] = $temp_result['undertitle'];
                             } else {
-                                $tempResults[$key]['title'] = '';
+                                $temp_results[$key]['title'] = '';
                             }
                             #Gender to text
-                            $tempResults[$key]['gender'] = ($tempresult['gender'] === '♂' ? 'male' : 'female');
+                            $temp_results[$key]['gender'] = ($temp_result['gender'] === '♂' ? 'male' : 'female');
                             #Guardian
-                            if (empty($tempResults[$key]['guardian'])) {
-                                $tempResults[$key]['guardian']['name'] = match (mb_strtolower($this->language, 'UTF-8')) {
+                            if (empty($temp_results[$key]['guardian'])) {
+                                $temp_results[$key]['guardian']['name'] = match (mb_strtolower($this->language, 'UTF-8')) {
                                     'jp', 'ja' => 'ハルオーネ',
                                     'fr' => 'Halone, la Conquérante',
                                     'de' => 'Halone - Die Furie',
                                     default => 'Halone, the Fury',
                                 };
-                                $tempResults[$key]['guardian']['icon'] = 'https://img.finalfantasyxiv.com/lds/h/5/qmgVmQ1o6skxdK4hDEbIV5NETA.png';
-                                if (empty($tempResults[$key]['comment'])) {
-                                    $tempResults[$key]['comment'] = 'Defaulted guardian';
+                                $temp_results[$key]['guardian']['icon'] = 'https://img.finalfantasyxiv.com/lds/h/5/qmgVmQ1o6skxdK4hDEbIV5NETA.png';
+                                if (empty($temp_results[$key]['comment'])) {
+                                    $temp_results[$key]['comment'] = 'Defaulted guardian';
                                 } else {
-                                    $tempResults[$key]['comment'] .= ' and guardian';
+                                    $temp_results[$key]['comment'] .= ' and guardian';
                                 }
                             } else {
-                                $tempResults[$key]['guardian'] = [
-                                    'name' => $tempresult['guardian'],
-                                    'icon' => $tempresult['guardianicon'],
+                                $temp_results[$key]['guardian'] = [
+                                    'name' => $temp_result['guardian'],
+                                    'icon' => $temp_result['guardianicon'],
                                 ];
                             }
                             #City
-                            $tempResults[$key]['city'] = [
-                                'name' => $tempresult['city'],
-                                'icon' => $tempresult['cityIcon'],
+                            $temp_results[$key]['city'] = [
+                                'name' => $temp_result['city'],
+                                'icon' => $temp_result['city_icon'],
                             ];
                             #Grand Company
-                            if (!empty($tempresult['gc_name'])) {
-                                $tempResults[$key]['grand_company'] = $this->grandcompany($tempresult);
+                            if (!empty($temp_result['gc_name'])) {
+                                $temp_results[$key]['grand_company'] = $this->grandcompany($temp_result);
                             }
                             #Free Company
-                            if (!empty($tempresult['fc_id'])) {
-                                $tempResults[$key]['free_company'] = $this->freecompany($tempresult);
+                            if (!empty($temp_result['fc_id'])) {
+                                $temp_results[$key]['free_company'] = $this->freecompany($temp_result);
                             }
                             #PvP Team
-                            if (!empty($tempresult['pvpid'])) {
-                                $tempResults[$key]['pvp'] = [
-                                    'id' => $tempresult['pvpid'],
-                                    'name' => $tempresult['pvpname'],
+                            if (!empty($temp_result['pvpid'])) {
+                                $temp_results[$key]['pvp'] = [
+                                    'id' => $temp_result['pvpid'],
+                                    'name' => $temp_result['pvpname'],
                                 ];
-                                $tempResults[$key]['pvp']['crest'] = $this->crest($tempresult, 'pvpcrest');
+                                $temp_results[$key]['pvp']['crest'] = $this->crest($temp_result, 'pvpcrest');
                             }
                             #Bio
-                            $tempresult['bio'] = mb_trim($tempresult['bio'], encoding: 'UTF-8');
-                            if ($tempresult['bio'] === '-') {
-                                $tempresult['bio'] = '';
+                            $temp_result['bio'] = mb_trim($temp_result['bio'], null, 'UTF-8');
+                            if ($temp_result['bio'] === '-') {
+                                $temp_result['bio'] = '';
                             }
-                            if (!empty($tempresult['bio'])) {
-                                $tempResults[$key]['bio'] = $tempresult['bio'];
+                            if (!empty($temp_result['bio'])) {
+                                $temp_results[$key]['bio'] = $temp_result['bio'];
                             } else {
-                                $tempResults[$key]['bio'] = '';
+                                $temp_results[$key]['bio'] = '';
                             }
-                            $tempResults[$key]['attributes'] = $this->attributes();
+                            $temp_results[$key]['attributes'] = $this->attributes();
                             #Minions and mounts now show only icon on Lodestone, thus it's not really practically to grab them
-                            #$tempResults[$key]['mounts'] = $this->collectibles('mounts');
-                            #$tempResults[$key]['minions'] = $this->collectibles('minions');
-                            $tempResults[$key]['gear'] = $this->items();
+                            #$temp_results[$key]['mounts'] = $this->collectibles('mounts');
+                            #$temp_results[$key]['minions'] = $this->collectibles('minions');
+                            $temp_results[$key]['gear'] = $this->items();
                         }
                         break;
-                    case 'CharacterJobs':
-                        $tempresult['id'] = $this->converters->classToJob($tempresult['name']);
-                        $tempresult['expcur'] = preg_replace('/\D/', '', $tempresult['expcur'] ?? '');
-                        $tempresult['expmax'] = preg_replace('/\D/', '', $tempresult['expmax'] ?? '');
-                        $tempResults[$key] = $this->jobDetails($tempresult);
+                    case 'character_jobs':
+                        $temp_result['id'] = $this->converters->classToJob($temp_result['name']);
+                        $temp_result['expcur'] = preg_replace('/\D/', '', $temp_result['expcur'] ?? '');
+                        $temp_result['expmax'] = preg_replace('/\D/', '', $temp_result['expmax'] ?? '');
+                        $temp_results[$key] = $this->jobDetails($temp_result);
                         break;
                 }
                 
                 #Unset stuff for cleaner look. Since it does not trigger warnings if variable is missing, no need to "switch" it
-                unset($tempResults[$key]['crest1'], $tempResults[$key]['crest2'], $tempResults[$key]['crest3'], $tempResults[$key]['fccrestimg1'], $tempResults[$key]['fccrestimg2'], $tempResults[$key]['fccrestimg3'], $tempResults[$key]['gc_name'], $tempResults[$key]['gcrank'], $tempResults[$key]['gcrankicon'], $tempResults[$key]['fc_id'], $tempResults[$key]['fcname'], $tempResults[$key]['lsRankIcon'], $tempResults[$key]['jobicon'], $tempResults[$key]['jobform'], $tempResults[$key]['estate_greeting'], $tempResults[$key]['estate_address'], $tempResults[$key]['estate_name'], $tempResults[$key]['cityIcon'], $tempResults[$key]['guardianicon'], $tempResults[$key]['gcicon'], $tempResults[$key]['uppertitle'], $tempResults[$key]['undertitle'], $tempResults[$key]['pvpid'], $tempResults[$key]['pvpname'], $tempResults[$key]['pvpcrest1'], $tempResults[$key]['pvpcrest2'], $tempResults[$key]['pvpcrest3'], $tempResults[$key]['rank1'], $tempResults[$key]['rank2'], $tempResults[$key]['id'], $tempResults[$key]['column1'], $tempResults[$key]['column2'], $tempResults[$key]['column3'], $tempResults[$key]['star1'], $tempResults[$key]['star2'], $tempResults[$key]['star3'], $tempResults[$key]['extraicon']);
+                unset($temp_results[$key]['crest1'], $temp_results[$key]['crest2'], $temp_results[$key]['crest3'], $temp_results[$key]['fccrestimg1'], $temp_results[$key]['fccrestimg2'], $temp_results[$key]['fccrestimg3'], $temp_results[$key]['gc_name'], $temp_results[$key]['gcrank'], $temp_results[$key]['gc_rank_icon'], $temp_results[$key]['fc_id'], $temp_results[$key]['fcname'], $temp_results[$key]['ls_rank_icon'], $temp_results[$key]['jobicon'], $temp_results[$key]['jobform'], $temp_results[$key]['estate_greeting'], $temp_results[$key]['estate_address'], $temp_results[$key]['estate_name'], $temp_results[$key]['city_icon'], $temp_results[$key]['guardianicon'], $temp_results[$key]['gcicon'], $temp_results[$key]['uppertitle'], $temp_results[$key]['undertitle'], $temp_results[$key]['pvpid'], $temp_results[$key]['pvpname'], $temp_results[$key]['pvpcrest1'], $temp_results[$key]['pvpcrest2'], $temp_results[$key]['pvpcrest3'], $temp_results[$key]['rank1'], $temp_results[$key]['rank2'], $temp_results[$key]['id'], $temp_results[$key]['column1'], $temp_results[$key]['column2'], $temp_results[$key]['column3'], $temp_results[$key]['star1'], $temp_results[$key]['star2'], $temp_results[$key]['star3'], $temp_results[$key]['extraicon']);
                 
                 #Adding to results
-                $this->addToResults($resultkey, $resultsubkey, $tempResults[$key], (empty($tempresult['id']) ? null : $tempresult['id']));
+                $this->addToResults($resultkey, $resultsubkey, $temp_results[$key], (empty($temp_result['id']) ? null : $temp_result['id']));
             }
             
-            #Worlds sort
+            #Sort worlds
             if ($this->type === 'worlds') {
                 ksort($this->result[$resultkey]);
             }
-        } catch (\Throwable $e) {
-            $this->errorRegister($e->getMessage(), 'parse', $started);
+        } catch (\Throwable $exception) {
+            $this->errorRegister($exception->getMessage(), 'parse', $started);
             return $this;
         }
         #Benchmarking
@@ -554,16 +554,16 @@ trait Parsers
             $this->benchUpdate($duration);
         }
         
-        #Doing achievements details last to get proper order of timings for benchmarking
-        if ($this->type === 'Achievements' && $this->typeSettings['details']) {
-            foreach ($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey] as $key => $ach) {
-                $this->getCharacterAchievements($this->typeSettings['id'], $key, 1, false, true);
+        #Processing achievements' details last to get proper order of timings for benchmarking
+        if ($this->type === 'achievements' && $this->type_settings['details']) {
+            foreach ($this->result[$resultkey][$this->type_settings['id']][$resultsubkey] as $key => $ach) {
+                $this->getCharacterAchievements($this->type_settings['id'], $key, 1, false, true);
             }
         }
-        if ($this->type === 'Achievements' && $this->typeSettings['allachievements']) {
-            $this->typeSettings['allachievements'] = false;
-            for ($i = 1; $i <= 13; $i++) {
-                $this->getCharacterAchievements($this->typeSettings['id'], false, (string)$i, false, $this->typeSettings['details'], $this->typeSettings['only_owned']);
+        if ($this->type === 'achievements' && $this->type_settings['allachievements']) {
+            $this->type_settings['allachievements'] = false;
+            for ($iteration = 1; $iteration <= 13; $iteration++) {
+                $this->getCharacterAchievements($this->type_settings['id'], false, (string)$iteration, false, $this->type_settings['details'], $this->type_settings['only_owned']);
             }
         }
         $this->allpagesproc($resultkey);
@@ -583,53 +583,53 @@ trait Parsers
     protected function addToResults(string $resultkey, string $resultsubkey, array|int $result, string|int|null $id = null): void
     {
         switch ($this->type) {
-            case 'searchPvPTeam':
-            case 'searchLinkshell':
-            case 'searchFreeCompany':
-            case 'searchCharacter':
+            case 'search_pvp_team':
+            case 'search_linkshell':
+            case 'search_free_company':
+            case 'search_character':
                 if ($result !== 404) {
                     $this->result[$resultkey][$id] = $result;
                 }
                 break;
-            case 'FreeCompany':
-            case 'Character':
-                $this->result[$resultkey][$this->typeSettings['id']] = $result;
+            case 'free_company':
+            case 'character':
+                $this->result[$resultkey][$this->type_settings['id']] = $result;
                 break;
-            case 'CharacterJobs':
-            case 'CharacterFriends':
-            case 'CharacterFollowing':
-            case 'FreeCompanyMembers':
-            case 'LinkshellMembers':
+            case 'character_jobs':
+            case 'character_friends':
+            case 'character_following':
+            case 'free_company_members':
+            case 'linkshell_members':
                 if ($result === 404) {
-                    if (!isset($this->result[$resultkey]) || (!\is_scalar($this->result[$resultkey][$this->typeSettings['id']]) && !is_array($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey]))) {
-                        $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey] = $result;
+                    if (!isset($this->result[$resultkey]) || (!is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
+                        $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = $result;
                     }
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey][$id] = $result;
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
                 break;
-            case 'PvPTeamMembers':
+            case 'pvp_team_members':
                 if ($result === 404) {
-                    $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey] = $result;
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = $result;
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey][$id] = $result;
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
                 break;
-            case 'Achievements':
-                if ($result !== 404 && ($this->typeSettings['only_owned'] === false || ($this->typeSettings['only_owned'] === true && is_array($result) && $result['time'] !== NULL))) {
-                    $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey][$id] = $result;
+            case 'achievements':
+                if ($result !== 404 && ($this->type_settings['only_owned'] === false || ($this->type_settings['only_owned'] === true && is_array($result) && $result['time'] !== NULL))) {
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
                 break;
-            case 'AchievementDetails':
-                if ($result !== 404 || empty($this->result[$resultkey][$this->typeSettings['id']][$resultsubkey][$this->typeSettings['achievement_id']])) {
-                    $this->result[$resultkey][$this->typeSettings['id']][$resultsubkey][$this->typeSettings['achievement_id']] = $result;
+            case 'achievement_details':
+                if ($result !== 404 || empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']])) {
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']] = $result;
                 }
                 break;
-            case 'Database':
+            case 'database':
                 $this->result[$resultkey][$resultsubkey][$id] = $result;
                 break;
-            case 'AchievementFromDB':
-                $this->result[$resultkey]['achievement'][$this->typeSettings['id']] = $result;
+            case 'achievement_from_db':
+                $this->result[$resultkey]['achievement'][$this->type_settings['id']] = $result;
                 break;
             case 'banners':
             case 'topics':
@@ -646,7 +646,7 @@ trait Parsers
                 if ($result !== 404 && is_array($result)) {
                     $this->result[$resultkey][$result['data_center']] = [];
                     preg_match_all(Regex::WORLDS, $result['servers'], $servers, PREG_SET_ORDER);
-                    if ($this->typeSettings['worldDetails']) {
+                    if ($this->type_settings['world_details']) {
                         foreach ($servers as $server) {
                             $this->result[$resultkey][$result['data_center']][$server['server']] = [
                                 'Online' => $server['maintenance'] === '1',
@@ -658,41 +658,38 @@ trait Parsers
                             ];
                         }
                     } else {
-                        #$this->result[$resultkey][$result['data_center']][$server['server']]] = $server['status'];
-                        foreach ($servers as $server) {
-                            $this->result[$resultkey][$result['data_center']][$server['server']] = $server['status'];
-                        }
+                        $this->result[$resultkey][$result['data_center']] = array_column($servers, 'status', 'server');
                     }
                     ksort($this->result[$resultkey][$result['data_center']]);
                 }
                 break;
             case 'feast':
                 if ($result === 404) {
-                    $this->result[$resultkey][$this->typeSettings['season']] = $result;
+                    $this->result[$resultkey][$this->type_settings['season']] = $result;
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['season']][$id] = $result;
+                    $this->result[$resultkey][$this->type_settings['season']][$id] = $result;
                 }
                 break;
             case 'frontline':
-            case 'GrandCompanyRanking':
-            case 'FreeCompanyRanking':
+            case 'grand_company_ranking':
+            case 'free_company_ranking':
                 if ($result === 404) {
-                    $this->result[$resultkey][$resultsubkey][$this->typeSettings['week']] = $result;
+                    $this->result[$resultkey][$resultsubkey][$this->type_settings['week']] = $result;
                 } else {
-                    $this->result[$resultkey][$resultsubkey][$this->typeSettings['week']][$id] = $result;
+                    $this->result[$resultkey][$resultsubkey][$this->type_settings['week']][$id] = $result;
                 }
                 break;
-            case 'deepdungeon':
-                if ($this->typeSettings['solo_party'] === 'solo') {
+            case 'deep_dungeon':
+                if ($this->type_settings['solo_party'] === 'solo') {
                     if ($result === 404) {
-                        $this->result[$resultkey][$this->typeSettings['dungeon']][$this->typeSettings['solo_party']][$this->typeSettings['class']] = $result;
+                        $this->result[$resultkey][$this->type_settings['dungeon']][$this->type_settings['solo_party']][$this->type_settings['class']] = $result;
                     } else {
-                        $this->result[$resultkey][$this->typeSettings['dungeon']][$this->typeSettings['solo_party']][$this->typeSettings['class']][$id] = $result;
+                        $this->result[$resultkey][$this->type_settings['dungeon']][$this->type_settings['solo_party']][$this->type_settings['class']][$id] = $result;
                     }
                 } elseif ($result === 404) {
-                    $this->result[$resultkey][$this->typeSettings['dungeon']][$this->typeSettings['solo_party']] = $result;
+                    $this->result[$resultkey][$this->type_settings['dungeon']][$this->type_settings['solo_party']] = $result;
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['dungeon']][$this->typeSettings['solo_party']][$id] = $result;
+                    $this->result[$resultkey][$this->type_settings['dungeon']][$this->type_settings['solo_party']][$id] = $result;
                 }
                 break;
         }
@@ -700,50 +697,51 @@ trait Parsers
     
     /**
      * Function to check if we need to grab all pages and there are still pages left
-     * @param string $resultkey
+     *
+     * @param string $result_key
      *
      * @return bool
      */
-    protected function allpagesproc(string $resultkey): bool
+    protected function allpagesproc(string $result_key): bool
     {
-        if ($this->allPages === true && in_array($this->type, [
-                'searchCharacter',
-                'CharacterFriends',
-                'CharacterFollowing',
-                'FreeCompanyMembers',
-                'LinkshellMembers',
-                'searchFreeCompany',
-                'searchLinkshell',
-                'searchPvPTeam',
+        if ($this->all_pages && in_array($this->type, [
+                'search_character',
+                'character_friends',
+                'character_following',
+                'free_company_members',
+                'linkshell_members',
+                'search_free_company',
+                'search_linkshell',
+                'search_pvp_team',
                 'topics',
                 'notices',
                 'maintenance',
                 'updates',
                 'status',
-                'GrandCompanyRanking',
-                'FreeCompanyRanking',
-                'Database',
+                'grand_company_ranking',
+                'free_company_ranking',
+                'database',
             ])) {
             switch ($this->type) {
-                case 'CharacterFriends':
-                case 'CharacterFollowing':
-                case 'FreeCompanyMembers':
-                case 'LinkshellMembers':
-                    $current_page = $this->result[$resultkey][$this->typeSettings['id']]['pageCurrent'];
-                    $total_page = $this->result[$resultkey][$this->typeSettings['id']]['pageTotal'];
+                case 'character_friends':
+                case 'character_following':
+                case 'free_company_members':
+                case 'linkshell_members':
+                    $current_page = $this->result[$result_key][$this->type_settings['id']]['page_current'];
+                    $total_page = $this->result[$result_key][$this->type_settings['id']]['page_total'];
                     break;
-                case 'GrandCompanyRanking':
-                case 'FreeCompanyRanking':
-                    $current_page = $this->result[$resultkey][$this->typeSettings['week']]['pageCurrent'];
-                    $total_page = $this->result[$resultkey][$this->typeSettings['week']]['pageTotal'];
+                case 'grand_company_ranking':
+                case 'free_company_ranking':
+                    $current_page = $this->result[$result_key][$this->type_settings['week']]['page_current'];
+                    $total_page = $this->result[$result_key][$this->type_settings['week']]['page_total'];
                     break;
-                case 'Database':
-                    $current_page = $this->result[$resultkey][$this->typeSettings['type']]['pageCurrent'];
-                    $total_page = $this->result[$resultkey][$this->typeSettings['type']]['pageTotal'];
+                case 'database':
+                    $current_page = $this->result[$result_key][$this->type_settings['type']]['page_current'];
+                    $total_page = $this->result[$result_key][$this->type_settings['type']]['page_total'];
                     break;
                 default:
-                    $current_page = $this->result[$resultkey]['pageCurrent'];
-                    $total_page = $this->result[$resultkey]['pageTotal'];
+                    $current_page = $this->result[$result_key]['page_current'];
+                    $total_page = $this->result[$result_key]['page_total'];
                     break;
             }
             if ($current_page === $total_page) {
@@ -751,47 +749,47 @@ trait Parsers
             }
             $current_page++;
             ini_set('max_execution_time', '6000');
-            $this->allPages = false;
+            $this->all_pages = false;
             switch ($this->type) {
-                case 'CharacterFriends':
-                case 'CharacterFollowing':
-                case 'FreeCompanyMembers':
-                case 'LinkshellMembers':
+                case 'character_friends':
+                case 'character_following':
+                case 'free_company_members':
+                case 'linkshell_members':
                     $function_to_call = 'get'.$this->type;
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->$function_to_call($this->typeSettings['id'], $i);
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->$function_to_call($this->type_settings['id'], $iteration);
                     }
                     break;
-                case 'GrandCompanyRanking':
-                case 'FreeCompanyRanking':
+                case 'grand_company_ranking':
+                case 'free_company_ranking':
                     $function_to_call = 'get'.$this->type;
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->$function_to_call($this->typeSettings['week_month'], $this->typeSettings['week'], $this->typeSettings['worldname'], $this->typeSettings['gcid'], $i);
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->$function_to_call($this->type_settings['week_month'], $this->type_settings['week'], $this->type_settings['worldname'], $this->type_settings['gcid'], $iteration);
                     }
                     break;
-                case 'searchCharacter':
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->searchCharacter($this->typeSettings['name'], $this->typeSettings['server'], $this->typeSettings['classjob'], $this->typeSettings['race_tribe'], $this->typeSettings['gcid'], $this->typeSettings['blog_lang'], $this->typeSettings['order'], $i);
+                case 'search_character':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->searchCharacter($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['classjob'], $this->type_settings['race_tribe'], $this->type_settings['gcid'], $this->type_settings['blog_lang'], $this->type_settings['order'], $iteration);
                     }
                     break;
-                case 'searchFreeCompany':
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->searchFreeCompany($this->typeSettings['name'], $this->typeSettings['server'], $this->typeSettings['character_count'], $this->typeSettings['activities'], $this->typeSettings['roles'], $this->typeSettings['activetime'], $this->typeSettings['join'], $this->typeSettings['house'], $this->typeSettings['gcid'], $this->typeSettings['order'], $i);
+                case 'search_free_company':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->searchFreeCompany($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['character_count'], $this->type_settings['activities'], $this->type_settings['roles'], $this->type_settings['activetime'], $this->type_settings['join'], $this->type_settings['house'], $this->type_settings['gcid'], $this->type_settings['order'], $iteration);
                     }
                     break;
-                case 'searchLinkshell':
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->searchLinkshell($this->typeSettings['name'], $this->typeSettings['server'], $this->typeSettings['character_count'], $this->typeSettings['order'], $i);
+                case 'search_linkshell':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->searchLinkshell($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['character_count'], $this->type_settings['order'], $iteration);
                     }
                     break;
-                case 'searchPvPTeam':
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->searchPvPTeam($this->typeSettings['name'], $this->typeSettings['server'], $this->typeSettings['order'], $i);
+                case 'search_pvp_team':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->searchPvPTeam($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['order'], $iteration);
                     }
                     break;
-                case 'Database':
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->searchDatabase($this->typeSettings['type'], $this->typeSettings['category'], $this->typeSettings['subcatecory'], $this->typeSettings['search'], $i);
+                case 'database':
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->searchDatabase($this->type_settings['type'], $this->type_settings['category'], $this->type_settings['subcatecory'], $this->type_settings['search'], $iteration);
                     }
                     break;
                 case 'topics':
@@ -800,8 +798,8 @@ trait Parsers
                 case 'updates':
                 case 'status':
                     $function_to_call = 'getLodestone'.mb_ucfirst($this->type, 'UTF-8');
-                    for ($i = $current_page; $i <= $total_page; $i++) {
-                        $this->$function_to_call($i);
+                    for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
+                        $this->$function_to_call($iteration);
                     }
                     break;
             }
@@ -821,78 +819,78 @@ trait Parsers
     {
         foreach ($pages as $page => $data) {
             foreach ($data as $key => $value) {
-                if (\is_string($value)) {
+                if (is_string($value)) {
                     $pages[$page][$key] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5);
                 }
             }
         }
         switch ($this->type) {
-            case 'CharacterFriends':
-            case 'CharacterFollowing':
-            case 'FreeCompanyMembers':
-            case 'LinkshellMembers':
-            case 'PvPTeamMembers':
-                if (!empty($pages[0]['linkshellCommunityId'])) {
-                    $this->result[$resultkey][$this->typeSettings['id']]['community_id'] = $pages[0]['linkshellCommunityId'];
+            case 'character_friends':
+            case 'character_following':
+            case 'free_company_members':
+            case 'linkshell_members':
+            case 'pvp_team_members':
+                if (!empty($pages[0]['linkshell_community_id'])) {
+                    $this->result[$resultkey][$this->type_settings['id']]['community_id'] = $pages[0]['linkshell_community_id'];
                 }
-                if (!empty($pages[0]['pvpTeamCommunityId'])) {
-                    $this->result[$resultkey][$this->typeSettings['id']]['community_id'] = $pages[0]['pvpTeamCommunityId'];
+                if (!empty($pages[0]['pvp_team_community_id'])) {
+                    $this->result[$resultkey][$this->type_settings['id']]['community_id'] = $pages[0]['pvp_team_community_id'];
                 }
-                if (isset($pages[0]['pageCurrent']) && is_numeric($pages[0]['pageCurrent'])) {
-                    $this->result[$resultkey][$this->typeSettings['id']]['pageCurrent'] = $pages[0]['pageCurrent'];
+                if (isset($pages[0]['page_current']) && is_numeric($pages[0]['page_current'])) {
+                    $this->result[$resultkey][$this->type_settings['id']]['page_current'] = $pages[0]['page_current'];
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['id']]['pageCurrent'] = 1;
+                    $this->result[$resultkey][$this->type_settings['id']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['pageTotal']) && is_numeric($pages[0]['pageTotal'])) {
-                    $this->result[$resultkey][$this->typeSettings['id']]['pageTotal'] = $pages[0]['pageTotal'];
+                if (isset($pages[0]['page_total']) && is_numeric($pages[0]['page_total'])) {
+                    $this->result[$resultkey][$this->type_settings['id']]['page_total'] = $pages[0]['page_total'];
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['id']]['pageTotal'] = $this->result[$resultkey][$this->typeSettings['id']]['pageCurrent'];
+                    $this->result[$resultkey][$this->type_settings['id']]['page_total'] = $this->result[$resultkey][$this->type_settings['id']]['page_current'];
                 }
                 if (isset($pages[0]['total']) && is_numeric($pages[0]['total'])) {
-                    $this->result[$resultkey][$this->typeSettings['id']]['membersCount'] = $pages[0]['total'];
+                    $this->result[$resultkey][$this->type_settings['id']]['members_count'] = $pages[0]['total'];
                 }
                 break;
-            case 'GrandCompanyRanking':
-            case 'FreeCompanyRanking':
-                if (isset($pages[0]['pageCurrent']) && is_numeric($pages[0]['pageCurrent'])) {
-                    $this->result[$resultkey][$this->typeSettings['week']]['pageCurrent'] = $pages[0]['pageCurrent'];
+            case 'grand_company_ranking':
+            case 'free_company_ranking':
+                if (isset($pages[0]['page_current']) && is_numeric($pages[0]['page_current'])) {
+                    $this->result[$resultkey][$this->type_settings['week']]['page_current'] = $pages[0]['page_current'];
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['week']]['pageCurrent'] = 1;
+                    $this->result[$resultkey][$this->type_settings['week']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['pageTotal']) && is_numeric($pages[0]['pageTotal'])) {
-                    $this->result[$resultkey][$this->typeSettings['week']]['pageTotal'] = $pages[0]['pageTotal'];
+                if (isset($pages[0]['page_total']) && is_numeric($pages[0]['page_total'])) {
+                    $this->result[$resultkey][$this->type_settings['week']]['page_total'] = $pages[0]['page_total'];
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['week']]['pageTotal'] = $this->result[$resultkey][$this->typeSettings['week']]['pageCurrent'];
+                    $this->result[$resultkey][$this->type_settings['week']]['page_total'] = $this->result[$resultkey][$this->type_settings['week']]['page_current'];
                 }
                 if (isset($pages[0]['total']) && is_numeric($pages[0]['total'])) {
-                    $this->result[$resultkey][$this->typeSettings['week']]['total'] = $pages[0]['total'];
+                    $this->result[$resultkey][$this->type_settings['week']]['total'] = $pages[0]['total'];
                 }
                 break;
-            case 'Database':
-                if (isset($pages[0]['pageCurrent']) && is_numeric($pages[0]['pageCurrent'])) {
-                    $this->result[$resultkey][$this->typeSettings['type']]['pageCurrent'] = $pages[0]['pageCurrent'];
+            case 'database':
+                if (isset($pages[0]['page_current']) && is_numeric($pages[0]['page_current'])) {
+                    $this->result[$resultkey][$this->type_settings['type']]['page_current'] = $pages[0]['page_current'];
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['type']]['pageCurrent'] = 1;
+                    $this->result[$resultkey][$this->type_settings['type']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['pageTotal']) && is_numeric($pages[0]['pageTotal'])) {
-                    $this->result[$resultkey][$this->typeSettings['type']]['pageTotal'] = $pages[0]['pageTotal'];
+                if (isset($pages[0]['page_total']) && is_numeric($pages[0]['page_total'])) {
+                    $this->result[$resultkey][$this->type_settings['type']]['page_total'] = $pages[0]['page_total'];
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['type']]['pageTotal'] = $this->result[$resultkey][$this->typeSettings['type']]['pageCurrent'];
+                    $this->result[$resultkey][$this->type_settings['type']]['page_total'] = $this->result[$resultkey][$this->type_settings['type']]['page_current'];
                 }
                 if (isset($pages[0]['total']) && is_numeric($pages[0]['total'])) {
-                    $this->result[$resultkey][$this->typeSettings['type']]['total'] = $pages[0]['total'];
+                    $this->result[$resultkey][$this->type_settings['type']]['total'] = $pages[0]['total'];
                 }
                 break;
             default:
-                if (isset($pages[0]['pageCurrent']) && is_numeric($pages[0]['pageCurrent'])) {
-                    $this->result[$resultkey]['pageCurrent'] = $pages[0]['pageCurrent'];
+                if (isset($pages[0]['page_current']) && is_numeric($pages[0]['page_current'])) {
+                    $this->result[$resultkey]['page_current'] = $pages[0]['page_current'];
                 } else {
-                    $this->result[$resultkey]['pageCurrent'] = 1;
+                    $this->result[$resultkey]['page_current'] = 1;
                 }
-                if (isset($pages[0]['pageTotal']) && is_numeric($pages[0]['pageTotal'])) {
-                    $this->result[$resultkey]['pageTotal'] = $pages[0]['pageTotal'];
+                if (isset($pages[0]['page_total']) && is_numeric($pages[0]['page_total'])) {
+                    $this->result[$resultkey]['page_total'] = $pages[0]['page_total'];
                 } else {
-                    $this->result[$resultkey]['pageTotal'] = $this->result[$resultkey]['pageCurrent'];
+                    $this->result[$resultkey]['page_total'] = $this->result[$resultkey]['page_current'];
                 }
                 if (isset($pages[0]['total']) && is_numeric($pages[0]['total'])) {
                     $this->result[$resultkey]['total'] = $pages[0]['total'];
@@ -900,33 +898,33 @@ trait Parsers
                 break;
         }
         #Linkshell members specific
-        if (!empty($pages[0]['linkshellname'])) {
-            $this->result[$resultkey][$this->typeSettings['id']]['name'] = mb_trim($pages[0]['linkshellname'], encoding: 'UTF-8');
-            if (!empty($pages[0]['linkshellserver'])) {
-                if (preg_match('/[a-zA-Z0-9]{40}/mi', $this->typeSettings['id'])) {
-                    $this->result[$resultkey][$this->typeSettings['id']]['data_center'] = $pages[0]['linkshellserver'];
+        if (!empty($pages[0]['linkshell_name'])) {
+            $this->result[$resultkey][$this->type_settings['id']]['name'] = mb_trim($pages[0]['linkshell_name'], null, 'UTF-8');
+            if (!empty($pages[0]['linkshell_server'])) {
+                if (preg_match('/[a-zA-Z0-9]{40}/mi', $this->type_settings['id'])) {
+                    $this->result[$resultkey][$this->type_settings['id']]['data_center'] = $pages[0]['linkshell_server'];
                 } else {
-                    $this->result[$resultkey][$this->typeSettings['id']]['server'] = $pages[0]['linkshellserver'];
+                    $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
                 }
             }
             if (!empty($pages[0]['linkshellformed'])) {
-                $this->result[$resultkey][$this->typeSettings['id']]['formed'] = $pages[0]['linkshellformed'];
+                $this->result[$resultkey][$this->type_settings['id']]['formed'] = $pages[0]['linkshellformed'];
             }
             if (!empty($pages[0]['emptygroup'])) {
-                $this->result[$resultkey][$this->typeSettings['id']]['pageCurrent'] = 0;
-                $this->result[$resultkey][$this->typeSettings['id']]['pageTotal'] = 0;
+                $this->result[$resultkey][$this->type_settings['id']]['page_current'] = 0;
+                $this->result[$resultkey][$this->type_settings['id']]['page_total'] = 0;
             }
         }
         #PvpTeam members specific
         if (!empty($pages[0]['pvpname'])) {
-            $this->result[$resultkey][$this->typeSettings['id']]['name'] = $pages[0]['pvpname'];
+            $this->result[$resultkey][$this->type_settings['id']]['name'] = $pages[0]['pvpname'];
             if (!empty($pages[0]['server'])) {
-                $this->result[$resultkey][$this->typeSettings['id']]['data_center'] = $pages[0]['server'];
+                $this->result[$resultkey][$this->type_settings['id']]['data_center'] = $pages[0]['server'];
             }
             if (!empty($pages[0]['formed'])) {
-                $this->result[$resultkey][$this->typeSettings['id']]['formed'] = $pages[0]['formed'];
+                $this->result[$resultkey][$this->type_settings['id']]['formed'] = $pages[0]['formed'];
             }
-            $this->result[$resultkey][$this->typeSettings['id']]['crest'] = $this->crest($pages[0], 'pvpcrest');
+            $this->result[$resultkey][$this->type_settings['id']]['crest'] = $this->crest($pages[0], 'pvpcrest');
         }
         return $this;
     }
@@ -974,8 +972,8 @@ trait Parsers
         if (!empty($tempresult['gcrank'])) {
             $gc['rank'] = $tempresult['gcrank'];
         }
-        if (!empty($tempresult['gcrankicon'])) {
-            $gc['icon'] = $tempresult['gcrankicon'];
+        if (!empty($tempresult['gc_rank_icon'])) {
+            $gc['icon'] = $tempresult['gc_rank_icon'];
         }
         return $gc;
     }
@@ -1001,16 +999,16 @@ trait Parsers
      */
     protected function jobs(): array
     {
-        $tempJobs = [];
+        $temp_jobs = [];
         if (!$this->regexfail(preg_match_all(Regex::CHARACTER_JOBS, $this->html, $jobs, PREG_SET_ORDER), preg_last_error(), 'CHARACTER_JOBS')) {
             return [];
         }
         foreach ($jobs as $job) {
             $job['expcur'] = preg_replace('/\D/', '', $job['expcur']);
             $job['expmax'] = preg_replace('/\D/', '', $job['expmax']);
-            $tempJobs[$this->converters->classToJob($job['name'])] = $this->jobDetails($job);
+            $temp_jobs[$this->converters->classToJob($job['name'])] = $this->jobDetails($job);
         }
-        return $tempJobs;
+        return $temp_jobs;
     }
     
     /**
@@ -1036,18 +1034,18 @@ trait Parsers
      */
     protected function attributes(): array
     {
-        $tempAttrs = [];
+        $temp_attrs = [];
         if (!$this->regexfail(preg_match_all(Regex::CHARACTER_ATTRIBUTES, $this->html, $attributes, PREG_SET_ORDER), preg_last_error(), 'CHARACTER_ATTRIBUTES')) {
             return [];
         }
         foreach ($attributes as $attribute) {
             if (empty($attribute['name'])) {
-                $tempAttrs[$attribute['name2']] = $attribute['value2'];
+                $temp_attrs[$attribute['name2']] = $attribute['value2'];
             } else {
-                $tempAttrs[$attribute['name']] = $attribute['value'];
+                $temp_attrs[$attribute['name']] = $attribute['value'];
             }
         }
-        return $tempAttrs;
+        return $temp_attrs;
     }
     
     /**
@@ -1058,7 +1056,7 @@ trait Parsers
      */
     protected function collectibles(string $type): array
     {
-        $colls = [];
+        $collectables = [];
         if ($type === 'mounts') {
             preg_match_all(Regex::CHARACTER_MOUNTS, $this->html, $results, PREG_SET_ORDER);
         } elseif ($type === 'minions') {
@@ -1066,11 +1064,9 @@ trait Parsers
         }
         if (!empty($results[0][0])) {
             preg_match_all(Regex::COLLECTIBLE, $results[0][0], $results, PREG_SET_ORDER);
-            foreach ($results as $result) {
-                $colls[$result[1]] = $result[2];
-            }
+            $collectables = array_column($results, 2, 1);
         }
-        return $colls;
+        return $collectables;
     }
     
     /**
@@ -1079,95 +1075,95 @@ trait Parsers
      */
     protected function items(): array
     {
-        if (!$this->regexfail(preg_match_all(Regex::CHARACTER_GEAR, $this->html, $tempresults, PREG_SET_ORDER), preg_last_error(), 'CHARACTER_GEAR')) {
+        if (!$this->regexfail(preg_match_all(Regex::CHARACTER_GEAR, $this->html, $temp_results, PREG_SET_ORDER), preg_last_error(), 'CHARACTER_GEAR')) {
             return [];
         }
         #Remove non-named groups
-        foreach ($tempresults as $key => $tempresult) {
-            foreach ($tempresult as $key2 => $details) {
+        foreach ($temp_results as $key => $temp_result) {
+            foreach ($temp_result as $key2 => $details) {
                 if (is_numeric($key2) || empty($details)) {
-                    unset($tempresults[$key][(int)$key2]);
+                    unset($temp_results[$key][(int)$key2]);
                 }
             }
-            $tempresults[$key]['armoireable'] = $this->converters->imageToBool($tempresult['armoireable']);
-            $tempresults[$key]['hq'] = !empty($tempresult['hq']);
-            $tempresults[$key]['unique'] = !empty($tempresult['unique']);
+            $temp_results[$key]['armoireable'] = $this->converters->imageToBool($temp_result['armoireable']);
+            $temp_results[$key]['hq'] = !empty($temp_result['hq']);
+            $temp_results[$key]['unique'] = !empty($temp_result['unique']);
             #Requirements
-            $tempresults[$key]['requirements'] = [
-                'level' => $tempresult['level'],
-                'classes' => (in_array($tempresult['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス']) ? $tempresult['classes'] : explode(' ', $tempresult['classes'])),
+            $temp_results[$key]['requirements'] = [
+                'level' => $temp_result['level'],
+                'classes' => (in_array($temp_result['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス']) ? $temp_result['classes'] : explode(' ', $temp_result['classes'])),
             ];
             #Attributes
-            for ($i = 1; $i <= 15; $i++) {
-                if (!empty($tempresult['attrname'.$i])) {
-                    $tempresults[$key]['attributes'][$tempresult['attrname'.$i]] = $tempresult['attrvalue'.$i];
-                    unset($tempresults[$key]['attrname'.$i], $tempresults[$key]['attrvalue'.$i]);
+            for ($iteration = 1; $iteration <= 15; $iteration++) {
+                if (!empty($temp_result['attrname'.$iteration])) {
+                    $temp_results[$key]['attributes'][$temp_result['attrname'.$iteration]] = $temp_result['attrvalue'.$iteration];
+                    unset($temp_results[$key]['attrname'.$iteration], $temp_results[$key]['attrvalue'.$iteration]);
                 }
             }
             #Materia
-            if (!empty($tempresult['materianame1']) || !empty($tempresult['materianame2']) || !empty($tempresult['materianame3']) || !empty($tempresult['materianame4']) || !empty($tempresult['materianame5'])) {
-                $tempresults[$key]['materia'] = [];
-                for ($i = 1; $i <= 5; $i++) {
-                    if (!empty($tempresult['materianame'.$i])) {
-                        $tempresults[$key]['materia'] = [
-                            'name' => $tempresult['materianame'.$i],
-                            'attribute' => $tempresult['materiaattr'.$i],
-                            'bonus' => $tempresult['materiaval'.$i],
+            if (!empty($temp_result['materianame1']) || !empty($temp_result['materianame2']) || !empty($temp_result['materianame3']) || !empty($temp_result['materianame4']) || !empty($temp_result['materianame5'])) {
+                $temp_results[$key]['materia'] = [];
+                for ($iteration = 1; $iteration <= 5; $iteration++) {
+                    if (!empty($temp_result['materianame'.$iteration])) {
+                        $temp_results[$key]['materia'] = [
+                            'name' => $temp_result['materianame'.$iteration],
+                            'attribute' => $temp_result['materiaattr'.$iteration],
+                            'bonus' => $temp_result['materiaval'.$iteration],
                         ];
-                        unset($tempresults[$key]['materianame'.$i], $tempresults[$key]['materiaattr'.$i], $tempresults[$key]['materiaval'.$i]);
+                        unset($temp_results[$key]['materianame'.$iteration], $temp_results[$key]['materiaattr'.$iteration], $temp_results[$key]['materiaval'.$iteration]);
                     }
                 }
             }
             #Crafting
-            if (!empty($tempresult['repair'])) {
-                $tempresults[$key]['crafting']['class'] = $tempresult['repair'];
-                $tempresults[$key]['crafting']['materials'] = $tempresult['materials'];
-                if (empty($tempresult['desynthesizable'])) {
-                    $tempresults[$key]['crafting']['desynth'] = false;
+            if (!empty($temp_result['repair'])) {
+                $temp_results[$key]['crafting']['class'] = $temp_result['repair'];
+                $temp_results[$key]['crafting']['materials'] = $temp_result['materials'];
+                if (empty($temp_result['desynthesizable'])) {
+                    $temp_results[$key]['crafting']['desynth'] = false;
                 } else {
-                    $tempresults[$key]['crafting']['desynth'] = $tempresult['desynthesizable'];
+                    $temp_results[$key]['crafting']['desynth'] = $temp_result['desynthesizable'];
                 }
-                if (empty($tempresult['melding'])) {
-                    $tempresults[$key]['crafting']['melding'] = false;
+                if (empty($temp_result['melding'])) {
+                    $temp_results[$key]['crafting']['melding'] = false;
                 } else {
-                    $tempresults[$key]['crafting']['melding'] = $tempresult['melding'];
-                    $tempresults[$key]['crafting']['advancedmelding'] = empty($tempresult['advancedmelding']);
+                    $temp_results[$key]['crafting']['melding'] = $temp_result['melding'];
+                    $temp_results[$key]['crafting']['advancedmelding'] = empty($temp_result['advancedmelding']);
                 }
-                $tempresults[$key]['crafting']['convertible'] = $this->converters->imageToBool($tempresult['convertible']);
+                $temp_results[$key]['crafting']['convertible'] = $this->converters->imageToBool($temp_result['convertible']);
             }
             #Trading
-            if (empty($tempresult['price'])) {
-                $tempresults[$key]['trading']['price'] = NULL;
+            if (empty($temp_result['price'])) {
+                $temp_results[$key]['trading']['price'] = NULL;
             } else {
-                $tempresults[$key]['trading']['price'] = $tempresult['price'];
+                $temp_results[$key]['trading']['price'] = $temp_result['price'];
             }
-            $tempresults[$key]['trading']['sellable'] = empty($tempresult['unsellable']);
-            $tempresults[$key]['trading']['marketable'] = empty($tempresult['marketprohibited']);
-            $tempresults[$key]['trading']['tradeable'] = empty($tempresult['untradeable']);
+            $temp_results[$key]['trading']['sellable'] = empty($temp_result['unsellable']);
+            $temp_results[$key]['trading']['marketable'] = empty($temp_result['marketprohibited']);
+            $temp_results[$key]['trading']['tradeable'] = empty($temp_result['untradeable']);
             #Link to shop, if present
-            if (empty($tempresult['shop'])) {
-                $tempresults[$key]['trading']['shop'] = NULL;
+            if (empty($temp_result['shop'])) {
+                $temp_results[$key]['trading']['shop'] = NULL;
             } else {
-                $tempresults[$key]['trading']['shop'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$tempresult['shop'];
+                $temp_results[$key]['trading']['shop'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$temp_result['shop'];
             }
             #Customization
-            $tempresults[$key]['customization'] = [
-                'crestable' => $this->converters->imageToBool($tempresult['crestable']),
-                'glamourable' => $this->converters->imageToBool($tempresult['glamourable']),
-                'projectable' => $this->converters->imageToBool($tempresult['projectable']),
-                'dyeable' => $this->converters->imageToBool($tempresult['dyeable']),
+            $temp_results[$key]['customization'] = [
+                'crestable' => $this->converters->imageToBool($temp_result['crestable']),
+                'glamourable' => $this->converters->imageToBool($temp_result['glamourable']),
+                'projectable' => $this->converters->imageToBool($temp_result['projectable']),
+                'dyeable' => $this->converters->imageToBool($temp_result['dyeable']),
             ];
             #Glamour
-            if (!empty($tempresult['glamourname'])) {
-                $tempresults[$key]['customization']['glamour'] = [
-                    'id' => $tempresult['glamourid'],
-                    'name' => $tempresult['glamourname'],
-                    'icon' => $tempresult['glamouricon'],
+            if (!empty($temp_result['glamourname'])) {
+                $temp_results[$key]['customization']['glamour'] = [
+                    'id' => $temp_result['glamourid'],
+                    'name' => $temp_result['glamourname'],
+                    'icon' => $temp_result['glamouricon'],
                 ];
             }
-            unset($tempresults[$key]['level'], $tempresults[$key]['classes'], $tempresults[$key]['price'], $tempresults[$key]['unsellable'], $tempresults[$key]['marketprohibited'], $tempresults[$key]['repair'], $tempresults[$key]['materials'], $tempresults[$key]['desynthesizable'], $tempresults[$key]['melding'], $tempresults[$key]['advancedmelding'], $tempresults[$key]['convertible'], $tempresults[$key]['glamourname'], $tempresults[$key]['glamourid'], $tempresults[$key]['glamouricon'], $tempresults[$key]['crestable'], $tempresults[$key]['glamourable'], $tempresults[$key]['projectable'], $tempresults[$key]['dyeable'], $tempresults[$key]['untradeable'], $tempresults[$key]['shop']);
+            unset($temp_results[$key]['level'], $temp_results[$key]['classes'], $temp_results[$key]['price'], $temp_results[$key]['unsellable'], $temp_results[$key]['marketprohibited'], $temp_results[$key]['repair'], $temp_results[$key]['materials'], $temp_results[$key]['desynthesizable'], $temp_results[$key]['melding'], $temp_results[$key]['advancedmelding'], $temp_results[$key]['convertible'], $temp_results[$key]['glamourname'], $temp_results[$key]['glamourid'], $temp_results[$key]['glamouricon'], $temp_results[$key]['crestable'], $temp_results[$key]['glamourable'], $temp_results[$key]['projectable'], $temp_results[$key]['dyeable'], $temp_results[$key]['untradeable'], $temp_results[$key]['shop']);
         }
-        return $tempresults;
+        return $temp_results;
     }
     
     /**
@@ -1225,8 +1221,8 @@ trait Parsers
      */
     protected function errorRegister(string $errormessage, string $type = 'parse', int $started = 0): void
     {
-        $this->lasterror = ['type' => $this->type, 'id' => ($this->typeSettings['id'] ?? NULL), 'error' => $errormessage, 'url' => $this->url];
-        $this->errors[] = $this->lasterror;
+        $this->last_error = ['type' => $this->type, 'id' => ($this->type_settings['id'] ?? NULL), 'error' => $errormessage, 'url' => $this->url];
+        $this->errors[] = $this->last_error;
         if ($this->benchmark) {
             if ($started === 0) {
                 $duration = 0;
@@ -1235,7 +1231,7 @@ trait Parsers
                 $duration = $finished - $started;
             }
             if ($type === 'http') {
-                $this->result['benchmark']['httptime'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+                $this->result['benchmark']['http_time'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
                 $duration = 0;
             }
             $this->benchUpdate($duration);
@@ -1250,9 +1246,9 @@ trait Parsers
      */
     protected function benchUpdate(int $duration): void
     {
-        $this->result['benchmark']['parsetime'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+        $this->result['benchmark']['parse_time'][] = date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
         $this->result['benchmark']['memory'] = $this->converters->memory(memory_get_usage(true));
-        $this->result['benchmark']['memorypeak'] = $this->converters->memory(memory_get_peak_usage(true));
+        $this->result['benchmark']['memory_peak'] = $this->converters->memory(memory_get_peak_usage(true));
     }
     
     /**
@@ -1263,9 +1259,9 @@ trait Parsers
     {
         array_pop($this->errors);
         if (empty($this->errors)) {
-            $this->lasterror = NULL;
+            $this->last_error = NULL;
         } else {
-            $this->lasterror = end($this->errors);
+            $this->last_error = end($this->errors);
         }
     }
 }

@@ -25,13 +25,13 @@ class Lodestone
     protected bool $benchmark = false;
     protected string $url = '';
     protected string $type = '';
-    protected array $typeSettings = [];
+    protected array $type_settings = [];
     protected string $html = '';
-    protected bool $allPages = false;
+    private bool $all_pages = false;
     protected ?object $converters = null;
     protected array $result = [];
     protected array $errors = [];
-    protected ?array $lasterror = NULL;
+    protected ?array $last_error = NULL;
     
     #[Pure] public function __construct()
     {
@@ -94,7 +94,7 @@ class Lodestone
         if ($close) {
             curl_close(HttpRequest::$curl_handle);
         }
-        return $this->lasterror;
+        return $this->last_error;
     }
     
     /**
@@ -129,8 +129,8 @@ class Lodestone
     public function getCharacter(string|int $id): self
     {
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_URL, $id);
-        $this->type = 'Character';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'character';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -143,8 +143,8 @@ class Lodestone
     public function getCharacterJobs(string|int $id): self
     {
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_JOBS_URL, $id);
-        $this->type = 'CharacterJobs';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'character_jobs';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -159,8 +159,8 @@ class Lodestone
     {
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_FRIENDS_URL, $id, $page);
-        $this->type = 'CharacterFriends';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'character_friends';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -175,8 +175,8 @@ class Lodestone
     {
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_FOLLOWING_URL, $id, $page);
-        $this->type = 'CharacterFollowing';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'character_following';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -196,29 +196,29 @@ class Lodestone
         if ((int)$kind < 1) {
             $category = false;
             $kind = 1;
-            $this->typeSettings['allachievements'] = true;
+            $this->type_settings['allachievements'] = true;
         } else {
-            $this->typeSettings['allachievements'] = false;
+            $this->type_settings['allachievements'] = false;
         }
         if ($only_owned) {
-            $this->typeSettings['only_owned'] = true;
+            $this->type_settings['only_owned'] = true;
         } else {
-            $this->typeSettings['only_owned'] = false;
+            $this->type_settings['only_owned'] = false;
         }
         if ($achievement_id !== false) {
-            $this->type = 'AchievementDetails';
+            $this->type = 'achievement_details';
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_DET_URL, $id, $achievement_id);
         } else {
-            $this->type = 'Achievements';
+            $this->type = 'achievements';
             if ($category) {
                 $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_CAT_URL, $id, (string)$kind);
             } else {
                 $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_URL, $id, (string)$kind);
             }
         }
-        $this->typeSettings['id'] = $id;
-        $this->typeSettings['details'] = $details;
-        $this->typeSettings['achievement_id'] = $achievement_id;
+        $this->type_settings['id'] = $id;
+        $this->type_settings['details'] = $details;
+        $this->type_settings['achievement_id'] = $achievement_id;
         return $this->parse();
     }
     
@@ -231,9 +231,9 @@ class Lodestone
     public function getAchievementFromDB(string $db_id): self
     {
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_DB_URL, $db_id);
-        $this->type = 'AchievementFromDB';
-        $this->typeSettings['type'] = 'achievement';
-        $this->typeSettings['id'] = $db_id;
+        $this->type = 'achievement_from_db';
+        $this->type_settings['type'] = 'achievement';
+        $this->type_settings['id'] = $db_id;
         return $this->parse();
     }
     
@@ -249,8 +249,8 @@ class Lodestone
     public function getFreeCompany(string|int $id): self
     {
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FREECOMPANY_URL, $id);
-        $this->type = 'FreeCompany';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'free_company';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -265,8 +265,8 @@ class Lodestone
     {
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FREECOMPANY_MEMBERS_URL, $id, $page);
-        $this->type = 'FreeCompanyMembers';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'free_company_members';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -285,8 +285,8 @@ class Lodestone
         } else {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_MEMBERS_URL, $id, $page);
         }
-        $this->type = 'LinkshellMembers';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'linkshell_members';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -299,8 +299,8 @@ class Lodestone
     public function getPvPTeam(string $id): self
     {
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_PVPTEAM_MEMBERS_URL, $id);
-        $this->type = 'PvPTeamMembers';
-        $this->typeSettings['id'] = $id;
+        $this->type = 'pvp_team_members';
+        $this->type_settings['id'] = $id;
         return $this->parse();
     }
     
@@ -309,15 +309,16 @@ class Lodestone
     #############
     /**
      * Search Lodestone database
-     * @param string $type        Type of entity to search for, taken from `https://eu.finalfantasyxiv.com/lodestone/playguide/db/$type`
-     * @param int    $category    Category of entities to search for, taken from `https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=$category`
-     * @param int    $subCategory Subcategory of entities to search for, taken from `https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=2&category3=$subcategory`
-     * @param string $search      Optional text to search for
-     * @param int    $page        Page number to scan
+     *
+     * @param string $type         Type of entity to search for, taken from `https://eu.finalfantasyxiv.com/lodestone/playguide/db/$type`
+     * @param int    $category     Category of entities to search for, taken from `https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=$category`
+     * @param int    $sub_category Subcategory of entities to search for, taken from `https://eu.finalfantasyxiv.com/lodestone/playguide/db/achievement/?category2=2&category3=$subcategory`
+     * @param string $search       Optional text to search for
+     * @param int    $page         Page number to scan
      *
      * @return self
      */
-    public function searchDatabase(#[ExpectedValues(['item', 'duty', 'quest', 'recipe', 'gathering', 'achievement', 'shop', 'text_command'])] string $type, int $category = 0, int $subCategory = 0, string $search = '', int $page = 1): self
+    public function searchDatabase(#[ExpectedValues(['item', 'duty', 'quest', 'recipe', 'gathering', 'achievement', 'shop', 'text_command'])] string $type, int $category = 0, int $sub_category = 0, string $search = '', int $page = 1): self
     {
         #Ensure we have lowercase for consistency
         $type = mb_strtolower($type, 'UTF-8');
@@ -329,24 +330,25 @@ class Lodestone
             'db_search_category' => $type,
             'category2' => $category,
             #Duty has been updated at some point and category3 was replaced with ex_version
-            ($type === 'duty' ? 'ex_version' : 'category3') => $subCategory,
+            ($type === 'duty' ? 'ex_version' : 'category3') => $sub_category,
             'q' => str_ireplace(' ', '+', $search),
             'page' => $page,
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_DATABASE_URL, $type, $query);
-        $this->type = 'Database';
-        $this->typeSettings['type'] = $type;
-        $this->typeSettings['category'] = $category;
-        $this->typeSettings['subCategory'] = $subCategory;
-        $this->typeSettings['search'] = $search;
+        $this->type = 'database';
+        $this->type_settings['type'] = $type;
+        $this->type_settings['category'] = $category;
+        $this->type_settings['sub_category'] = $sub_category;
+        $this->type_settings['search'] = $search;
         return $this->parse();
     }
     
     /**
      * Search for a characters
+     *
      * @param string           $name       Optional character name
      * @param string           $server     Optional server name
-     * @param string           $classJob   Optional class/job
+     * @param string           $class_job  Optional class/job
      * @param string           $race_tribe Optional race/clan
      * @param array|string|int $gc_id      Optional Grand Company (or list of them)
      * @param string|array     $blog_lang  Optional character language(s)
@@ -355,7 +357,7 @@ class Lodestone
      *
      * @return self
      */
-    public function searchCharacter(string $name = '', string $server = '', string $classJob = '', string $race_tribe = '', array|string|int $gc_id = '', string|array $blog_lang = '', string $order = '', int $page = 1): self
+    public function searchCharacter(string $name = '', string $server = '', string $class_job = '', string $race_tribe = '', array|string|int $gc_id = '', string|array $blog_lang = '', string $order = '', int $page = 1): self
     {
         $page = $this->pageCheck($page);
         $gc_id = $this->gcIdCheck($gc_id);
@@ -371,7 +373,7 @@ class Lodestone
         $query = str_replace(['&blog_lang=&', '&gcId=&'], '&', $this->queryBuilder([
             'q' => str_ireplace(' ', '+', $name),
             'worldname' => $server,
-            'classJob' => $this->converters->getSearchClassId($classJob),
+            'class_job' => $this->converters->getSearchClassId($class_job),
             'race_tribe' => $this->converters->getSearchClanId($race_tribe),
             'gcId' => (is_array($gc_id) ? implode('&gcId=', $gc_id) : $gc_id),
             'blog_lang' => (is_array($blog_lang) ? implode('&blog_lang=', $blog_lang) : $blog_lang),
@@ -379,25 +381,26 @@ class Lodestone
             'page' => $page,
         ]));
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_SEARCH_URL, $query);
-        $this->type = 'searchCharacter';
-        $this->typeSettings['name'] = $name;
-        $this->typeSettings['server'] = $server;
-        $this->typeSettings['classJob'] = $classJob;
-        $this->typeSettings['race_tribe'] = $race_tribe;
-        $this->typeSettings['gc_id'] = $gc_id;
-        $this->typeSettings['blog_lang'] = $blog_lang;
-        $this->typeSettings['order'] = $order;
+        $this->type = 'search_character';
+        $this->type_settings['name'] = $name;
+        $this->type_settings['server'] = $server;
+        $this->type_settings['class_job'] = $class_job;
+        $this->type_settings['race_tribe'] = $race_tribe;
+        $this->type_settings['gc_id'] = $gc_id;
+        $this->type_settings['blog_lang'] = $blog_lang;
+        $this->type_settings['order'] = $order;
         return $this->parse();
     }
     
     /**
      * Search for a free company
+     *
      * @param string           $name            Optional free company name
      * @param string           $server          Optional server name
      * @param int              $character_count Optional members count
      * @param string|array     $activities      Optional activity (or list of), that company participates in
      * @param string|array     $roles           Optional role(s), that company is looking for
-     * @param string           $activeTime      Optional time, when company is active
+     * @param string           $active_time     Optional time, when company is active
      * @param string           $join            Optional recruitment status
      * @param string           $house           Optional filter by estate availability
      * @param array|string|int $gc_id           Optional grand company ID (or list of)
@@ -406,7 +409,7 @@ class Lodestone
      *
      * @return self
      */
-    public function searchFreeCompany(string $name = '', string $server = '', int $character_count = 0, string|array $activities = '', string|array $roles = '', string $activeTime = '', string $join = '', string $house = '', array|string|int $gc_id = '', string $order = '', int $page = 1): self
+    public function searchFreeCompany(string $name = '', string $server = '', int $character_count = 0, string|array $activities = '', string|array $roles = '', string $active_time = '', string $join = '', string $house = '', array|string|int $gc_id = '', string $order = '', int $page = 1): self
     {
         $page = $this->pageCheck($page);
         $gc_id = $this->gcIdCheck($gc_id);
@@ -434,7 +437,7 @@ class Lodestone
             'character_count' => $this->converters->membersCount($character_count),
             'activities' => (is_array($activities) ? implode('&activities=', $activities) : $activities),
             'roles' => (is_array($roles) ? implode('&roles=', $roles) : $roles),
-            'activeTime' => $this->converters->getSearchActiveTimeId($activeTime),
+            'active_time' => $this->converters->getSearchActiveTimeId($active_time),
             'join' => $this->converters->getSearchJoinId($join),
             'house' => $this->converters->getSearchHouseId($house),
             'gcId' => (is_array($gc_id) ? implode('&gcId=', $gc_id) : $gc_id),
@@ -442,17 +445,17 @@ class Lodestone
             'page' => $page,
         ]));
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FREECOMPANY_SEARCH_URL, $query);
-        $this->type = 'searchFreeCompany';
-        $this->typeSettings['name'] = $name;
-        $this->typeSettings['server'] = $server;
-        $this->typeSettings['character_count'] = $character_count;
-        $this->typeSettings['activities'] = $activities;
-        $this->typeSettings['roles'] = $roles;
-        $this->typeSettings['activeTime'] = $activeTime;
-        $this->typeSettings['join'] = $join;
-        $this->typeSettings['house'] = $house;
-        $this->typeSettings['gc_id'] = $gc_id;
-        $this->typeSettings['order'] = $order;
+        $this->type = 'search_free_company';
+        $this->type_settings['name'] = $name;
+        $this->type_settings['server'] = $server;
+        $this->type_settings['character_count'] = $character_count;
+        $this->type_settings['activities'] = $activities;
+        $this->type_settings['roles'] = $roles;
+        $this->type_settings['active_time'] = $active_time;
+        $this->type_settings['join'] = $join;
+        $this->type_settings['house'] = $house;
+        $this->type_settings['gc_id'] = $gc_id;
+        $this->type_settings['order'] = $order;
         return $this->parse();
     }
     
@@ -482,11 +485,11 @@ class Lodestone
         } else {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_SEARCH_URL, $query);
         }
-        $this->type = 'searchLinkshell';
-        $this->typeSettings['name'] = $name;
-        $this->typeSettings['server'] = $server;
-        $this->typeSettings['character_count'] = $character_count;
-        $this->typeSettings['order'] = $order;
+        $this->type = 'search_linkshell';
+        $this->type_settings['name'] = $name;
+        $this->type_settings['server'] = $server;
+        $this->type_settings['character_count'] = $character_count;
+        $this->type_settings['order'] = $order;
         return $this->parse();
     }
     
@@ -509,10 +512,10 @@ class Lodestone
             'page' => $page,
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_PVPTEAM_SEARCH_URL, $query);
-        $this->type = 'searchPvPTeam';
-        $this->typeSettings['name'] = $name;
-        $this->typeSettings['server'] = $server;
-        $this->typeSettings['order'] = $order;
+        $this->type = 'search_pvp_team';
+        $this->type_settings['name'] = $name;
+        $this->type_settings['server'] = $server;
+        $this->type_settings['order'] = $order;
         return $this->parse();
     }
     
@@ -521,37 +524,38 @@ class Lodestone
     #############
     /**
      * Get Feast ranking
+     *
      * @param int    $season    Season number
-     * @param string $dcGroup   Server/data center name
+     * @param string $dc_group  Server/data center name
      * @param string $rank_type Type of rank to filter
      *
      * @return self
      */
-    public function getFeast(int $season = 1, string $dcGroup = '', string $rank_type = 'all'): self
+    public function getFeast(int $season = 1, string $dc_group = '', string $rank_type = 'all'): self
     {
         if ($season <= 0) {
             $season = 1;
         }
         $query = $this->queryBuilder([
-            'dcGroup' => $dcGroup,
+            'dcGroup' => $dc_group,
             'rank_type' => $this->converters->getFeastRankId($rank_type),
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FEAST, (string)$season, $query);
         $this->type = 'feast';
-        $this->typeSettings['season'] = $season;
+        $this->type_settings['season'] = $season;
         return $this->parse();
     }
     
     /**
      * Get Deep Dungeon rankings
      * @param int|string $id         Deep Dungeon ID
-     * @param string     $dcGroup    Server/data center name
+     * @param string     $dc_group   Server/data center name
      * @param string     $solo_party Solo or party ranking
      * @param string     $subtype    Job filter in case of solo ranking
      *
      * @return self
      */
-    public function getDeepDungeon(int|string $id = 1, string $dcGroup = '', string $solo_party = 'party', string $subtype = 'PLD'): self
+    public function getDeepDungeon(int|string $id = 1, string $dc_group = '', string $solo_party = 'party', string $subtype = 'PLD'): self
     {
         if ((int)$id <= 1) {
             $id = '';
@@ -563,7 +567,7 @@ class Lodestone
             $solo_party = 'party';
         }
         $query = $this->queryBuilder([
-            'dcGroup' => $dcGroup,
+            'dcGroup' => $dc_group,
             'solo_party' => $solo_party,
             'subtype' => $this->converters->getDeepDungeonClassId($subtype),
         ]);
@@ -574,10 +578,10 @@ class Lodestone
         if (empty($subtype)) {
             $subtype = $this->converters->getDeepDungeonClassId('PLD');
         }
-        $this->type = 'deepdungeon';
-        $this->typeSettings['dungeon'] = $id;
-        $this->typeSettings['solo_party'] = $solo_party;
-        $this->typeSettings['class'] = $subtype;
+        $this->type = 'deep_dungeon';
+        $this->type_settings['dungeon'] = $id;
+        $this->type_settings['solo_party'] = $solo_party;
+        $this->type_settings['class'] = $subtype;
         return $this->parse();
     }
     
@@ -585,8 +589,8 @@ class Lodestone
      * Get Frontline rankings
      * @param string $week_month Weekly or monthly rankings.
      * @param int    $week       Week number in `YYYYNN` format or month number in `YYYYMM` format.
-     * @param string $dcGroup    Optional data center name.
-     * @param string $worldname  Optional server name.
+     * @param string $dc_group   Optional data center name.
+     * @param string $world_name Optional server name.
      * @param int    $pvp_rank   Optional minimum PvP rank.
      * @param int    $match      Optional minimum number of matches.
      * @param string $gc_id      Optional Grand Company to filter.
@@ -594,7 +598,7 @@ class Lodestone
      *
      * @return self
      */
-    public function getFrontline(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $dcGroup = '', string $worldname = '', int $pvp_rank = 0, int $match = 0, string $gc_id = '', #[ExpectedValues(['win', 'rate', 'match'])] string $sort = 'win'): self
+    public function getFrontline(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $dc_group = '', string $world_name = '', int $pvp_rank = 0, int $match = 0, string $gc_id = '', #[ExpectedValues(['win', 'rate', 'match'])] string $sort = 'win'): self
     {
         if (!in_array($week_month, ['weekly', 'monthly'])) {
             $week_month = 'weekly';
@@ -612,16 +616,16 @@ class Lodestone
         $query = $this->queryBuilder([
             'filter' => 1,
             'sort' => $sort,
-            'dcGroup' => $dcGroup,
-            'worldname' => $worldname,
+            'dcGroup' => $dc_group,
+            'worldname' => $world_name,
             'pvp_rank' => $this->converters->pvpRank($pvp_rank),
             'match' => $this->converters->matchesCount($match),
             'gcId' => $this->converters->getSearchGCId($gc_id),
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FRONTLINE, $week_month, $week, $query);
         $this->type = 'frontline';
-        $this->typeSettings['week'] = $week;
-        $this->typeSettings['week_month'] = $week_month;
+        $this->type_settings['week'] = $week;
+        $this->type_settings['week_month'] = $week_month;
         return $this->parse();
     }
     
@@ -629,30 +633,30 @@ class Lodestone
      * Get Grand Company rankings
      * @param string $week_month Weekly or monthly rankings
      * @param int    $week       Week number
-     * @param string $worldname  Optional server name
+     * @param string $world_name Optional server name
      * @param string $gc_id      Optional Grand Company to filter
      * @param int    $page       Page number to scan
      *
      * @return self
      */
-    public function getGrandCompanyRanking(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $worldname = '', string $gc_id = '', int $page = 1): self
+    public function getGrandCompanyRanking(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $world_name = '', string $gc_id = '', int $page = 1): self
     {
-        return $this->companyRankingHelper($week_month, $week, $worldname, $gc_id, $page, true);
+        return $this->companyRankingHelper($week_month, $week, $world_name, $gc_id, $page, true);
     }
     
     /**
      * Get Free Company rankings
      * @param string $week_month Weekly or monthly rankings
      * @param int    $week       Week number
-     * @param string $worldname  Optional server name
+     * @param string $world_name  Optional server name
      * @param string $gc_id      Optional Grand Company to filter
      * @param int    $page       Page number to scan
      *
      * @return self
      */
-    public function getFreeCompanyRanking(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $worldname = '', string $gc_id = '', int $page = 1): self
+    public function getFreeCompanyRanking(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $world_name = '', string $gc_id = '', int $page = 1): self
     {
-        return $this->companyRankingHelper($week_month, $week, $worldname, $gc_id, $page);
+        return $this->companyRankingHelper($week_month, $week, $world_name, $gc_id, $page);
     }
     
     /**
@@ -660,14 +664,14 @@ class Lodestone
      *
      * @param string $week_month Weekly or monthly rankings
      * @param int    $week       Week number
-     * @param string $worldname  Optional server name
+     * @param string $world_name  Optional server name
      * @param string $gc_id      Optional Grand Company to filter
      * @param int    $page       Page number to scan
      * @param bool   $gc         Whether this is a Grand Company ranking
      *
      * @return self
      */
-    private function companyRankingHelper(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $worldname = '', string $gc_id = '', int $page = 1, bool $gc = false): self
+    private function companyRankingHelper(#[ExpectedValues(['weekly', 'monthly'])] string $week_month = 'weekly', int $week = 0, string $world_name = '', string $gc_id = '', int $page = 1, bool $gc = false): self
     {
         $page = $this->pageCheck($page);
         if (!in_array($week_month, ['weekly', 'monthly'])) {
@@ -682,21 +686,21 @@ class Lodestone
         }
         $query = $this->queryBuilder([
             'filter' => 1,
-            'worldname' => $worldname,
+            'worldname' => $world_name,
             'gcId' => $this->converters->getSearchGCId($gc_id),
             'page' => $page,
         ]);
         if ($gc) {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_GCRANKING, $week_month, $week, $query);
-            $this->type = 'GrandCompanyRanking';
+            $this->type = 'grand_company_ranking';
         } else {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FCRANKING, $week_month, $week, $query);
-            $this->type = 'FreeCompanyRanking';
+            $this->type = 'free_company_ranking';
         }
-        $this->typeSettings['week'] = $week;
-        $this->typeSettings['week_month'] = $week_month;
-        $this->typeSettings['worldname'] = $worldname;
-        $this->typeSettings['gc_id'] = $gc_id;
+        $this->type_settings['week'] = $week;
+        $this->type_settings['week_month'] = $week_month;
+        $this->type_settings['worldname'] = $world_name;
+        $this->type_settings['gc_id'] = $gc_id;
         return $this->parse();
     }
     
@@ -797,15 +801,15 @@ class Lodestone
     
     /**
      * Get status of servers
-     * @param bool $worldDetails Whether to show detailed status of worlds or not
+     * @param bool $world_details Whether to show detailed status of worlds or not
      *
      * @return self
      */
-    public function getWorldStatus(bool $worldDetails = false): self
+    public function getWorldStatus(bool $world_details = false): self
     {
         $this->url = sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_WORLD_STATUS;
         $this->type = 'worlds';
-        $this->typeSettings['worldDetails'] = $worldDetails;
+        $this->type_settings['world_details'] = $world_details;
         return $this->parse();
     }
     
@@ -813,7 +817,7 @@ class Lodestone
     #Logic to accumulate filters and add them as parameters to URL
     #############
     /**
-     * Helper function to generate GET query for other functions
+     * Helper function to generate a GET query for other functions
      * @param array $params
      *
      * @return string
@@ -840,7 +844,7 @@ class Lodestone
     {
         if ($page === 0) {
             $page = 1;
-            $this->allPages = true;
+            $this->all_pages = true;
         }
         return $page;
     }

@@ -6,7 +6,7 @@ namespace Simbiat\FFXIV;
 use function in_array;
 
 /**
- * Class to generate test report for Lodestone Parser
+ * Class to generate a test report for Lodestone Parser
  */
 class LodestoneTest
 {
@@ -25,110 +25,110 @@ class LodestoneTest
                 pre {height: 5pc; max-width: 600px; overflow-y: scroll;}
             </style>
             <table><th>Type of test</th><th>Result</th><th>Page time, hh:mm:ss.ms</th><th>Parse time, hh:mm:ss.ms</th><th>Errors</th><th>Output</th>';
-        $this->Lodestone = (new Lodestone())->setLanguage($language)->setUseragent('Simbiat Software UAT')->setBenchmark(true);
+        $this->lodestone = new Lodestone()->setLanguage($language)->setUserAgent('Simbiat Software UAT')->setBenchmark(true);
         
         #Checking characters
-        $this->Lodestone->getCharacter('6691027');
-        $this->tableLine('Character (regular)', $this->Lodestone->getResult(false)['characters']['6691027']);
-        $this->Lodestone->getCharacter('21915843');
-        $this->tableLine('Character (empty)', $this->Lodestone->getResult(false)['characters']['21915843']);
-        $this->Lodestone->getCharacter('21471245');
-        $this->tableLine('Character (with PvP)', $this->Lodestone->getResult(false)['characters']['21471245']);
-        $this->Lodestone->getCharacterJobs('6691027');
-        $this->tableLine('Character jobs', $this->Lodestone->getResult(false)['characters']['6691027']['jobs']);
-        $this->Lodestone->getCharacterFriends('6691027');
-        $this->tableLine('Character friends', $this->Lodestone->getResult(false)['characters']['6691027']['friends']);
-        $this->Lodestone->getCharacterFollowing('6691027')->getResult(false);
-        $this->tableLine('Character following', $this->Lodestone->getResult(false)['characters']['6691027']['following']);
-        $this->Lodestone->getCharacterAchievements('6691027', false, 39, true, true);
-        $this->tableLine('Achievements', $this->Lodestone->getResult(false)['characters']['6691027']['achievements']);
+        $this->lodestone = $this->lodestone->getCharacter('6691027');
+        $this->tableLine('Character (regular)', $this->lodestone->getResult(false)['characters']['6691027']);
+        $this->lodestone = $this->lodestone->getCharacter('21915843');
+        $this->tableLine('Character (empty)', $this->lodestone->getResult(false)['characters']['21915843']);
+        $this->lodestone = $this->lodestone->getCharacter('21471245');
+        $this->tableLine('Character (with PvP)', $this->lodestone->getResult(false)['characters']['21471245']);
+        $this->lodestone = $this->lodestone->getCharacterJobs('6691027');
+        $this->tableLine('Character jobs', $this->lodestone->getResult(false)['characters']['6691027']['jobs']);
+        $this->lodestone = $this->lodestone->getCharacterFriends('6691027');
+        $this->tableLine('Character friends', $this->lodestone->getResult(false)['characters']['6691027']['friends']);
+        $this->lodestone = $this->lodestone->getCharacterFollowing('6691027');
+        $this->tableLine('Character following', $this->lodestone->getResult(false)['characters']['6691027']['following']);
+        $this->lodestone = $this->lodestone->getCharacterAchievements('6691027', false, 39, true, true);
+        $this->tableLine('Achievements', $this->lodestone->getResult(false)['characters']['6691027']['achievements']);
         
         #Checking groups
-        $this->Lodestone->getFreeCompany('9234631035923213559');
-        $this->tableLine('Free company (regular)', $this->Lodestone->getResult(false)['freecompanies']['9234631035923213559']);
-        $this->Lodestone->getFreeCompanyMembers('9234631035923202551', 0);
-        $this->tableLine('Free company members', $this->Lodestone->getResult(false)['freecompanies']['9234631035923202551']['members']);
-        $this->Lodestone->getFreeCompany('9234631035923243608');
-        $this->tableLine('Free company (no estate, ranking and greeting)', $this->Lodestone->getResult(false)['freecompanies']['9234631035923243608']);
-        $this->Lodestone->getFreeCompany('9234631035923203676');
-        $this->tableLine('Free company (no plot, focus and recruitment)', $this->Lodestone->getResult(false)['freecompanies']['9234631035923203676']);
-        $this->Lodestone->getLinkshellMembers('19984723346535274');
-        $this->tableLine('Linkshell', $this->Lodestone->getResult(false)['linkshells']['19984723346535274']);
-        $this->Lodestone->getPvPTeam('d1ce24446f4fbf6e0eabd31334feef2bc16966d1');
-        $this->tableLine('PvP team', $this->Lodestone->getResult(false)['pvpteams']['d1ce24446f4fbf6e0eabd31334feef2bc16966d1']);
+        $this->lodestone = $this->lodestone->getFreeCompany('9234631035923213559');
+        $this->tableLine('Free company (regular)', $this->lodestone->getResult(false)['freecompanies']['9234631035923213559']);
+        $this->lodestone = $this->lodestone->getFreeCompanyMembers('9234631035923202551', 0);
+        $this->tableLine('Free company members', $this->lodestone->getResult(false)['freecompanies']['9234631035923202551']['members']);
+        $this->lodestone = $this->lodestone->getFreeCompany('9234631035923243608');
+        $this->tableLine('Free company (no estate, ranking and greeting)', $this->lodestone->getResult(false)['freecompanies']['9234631035923243608']);
+        $this->lodestone = $this->lodestone->getFreeCompany('9234631035923203676');
+        $this->tableLine('Free company (no plot, focus and recruitment)', $this->lodestone->getResult(false)['freecompanies']['9234631035923203676']);
+        $this->lodestone = $this->lodestone->getLinkshellMembers('19984723346535274');
+        $this->tableLine('Linkshell', $this->lodestone->getResult(false)['linkshells']['19984723346535274']);
+        $this->lodestone = $this->lodestone->getPvPTeam('d1ce24446f4fbf6e0eabd31334feef2bc16966d1');
+        $this->tableLine('PvP team', $this->lodestone->getResult(false)['pvpteams']['d1ce24446f4fbf6e0eabd31334feef2bc16966d1']);
         
         #Checking searches
-        $this->Lodestone->searchCharacter();
-        $this->tableLine('Character search', $this->Lodestone->getResult(false)['characters']);
-        $this->Lodestone->searchFreeCompany();
-        $this->tableLine('Free company search', $this->Lodestone->getResult(false)['freecompanies']);
-        $this->Lodestone->searchLinkshell();
-        $this->tableLine('Linkshell search', $this->Lodestone->getResult(false)['linkshells']);
-        $this->Lodestone->searchPvPTeam();
-        $this->tableLine('PvP teams search', $this->Lodestone->getResult(false)['pvpteams']);
+        $this->lodestone = $this->lodestone->searchCharacter();
+        $this->tableLine('Character search', $this->lodestone->getResult(false)['characters']);
+        $this->lodestone = $this->lodestone->searchFreeCompany();
+        $this->tableLine('Free company search', $this->lodestone->getResult(false)['freecompanies']);
+        $this->lodestone = $this->lodestone->searchLinkshell();
+        $this->tableLine('Linkshell search', $this->lodestone->getResult(false)['linkshells']);
+        $this->lodestone = $this->lodestone->searchPvPTeam();
+        $this->tableLine('PvP teams search', $this->lodestone->getResult(false)['pvpteams']);
         
         #Checking specials
-        $this->Lodestone->getLodestoneBanners();
-        $this->tableLine('Banners', $this->Lodestone->getResult(false)['banners']);
-        $this->Lodestone->getLodestoneNews();
-        $this->tableLine('News', $this->Lodestone->getResult(false)['news']);
-        $this->Lodestone->getLodestoneTopics();
-        $this->tableLine('Topics', $this->Lodestone->getResult(false)['topics']);
-        $this->Lodestone->getLodestoneNotices();
-        $this->tableLine('Notices', $this->Lodestone->getResult(false)['notices']);
-        $this->Lodestone->getLodestoneMaintenance();
-        $this->tableLine('Maintenance', $this->Lodestone->getResult(false)['maintenance']);
-        $this->Lodestone->getLodestoneUpdates();
-        $this->tableLine('Updates', $this->Lodestone->getResult(false)['updates']);
-        $this->Lodestone->getLodestoneStatus();
-        $this->tableLine('Status', $this->Lodestone->getResult(false)['status']);
-        $this->Lodestone->getWorldStatus();
-        $this->tableLine('Worlds', $this->Lodestone->getResult(false)['worlds']);
+        $this->lodestone = $this->lodestone->getLodestoneBanners();
+        $this->tableLine('Banners', $this->lodestone->getResult(false)['banners']);
+        $this->lodestone = $this->lodestone->getLodestoneNews();
+        $this->tableLine('News', $this->lodestone->getResult(false)['news']);
+        $this->lodestone = $this->lodestone->getLodestoneTopics();
+        $this->tableLine('Topics', $this->lodestone->getResult(false)['topics']);
+        $this->lodestone = $this->lodestone->getLodestoneNotices();
+        $this->tableLine('Notices', $this->lodestone->getResult(false)['notices']);
+        $this->lodestone = $this->lodestone->getLodestoneMaintenance();
+        $this->tableLine('Maintenance', $this->lodestone->getResult(false)['maintenance']);
+        $this->lodestone = $this->lodestone->getLodestoneUpdates();
+        $this->tableLine('Updates', $this->lodestone->getResult(false)['updates']);
+        $this->lodestone = $this->lodestone->getLodestoneStatus();
+        $this->tableLine('Status', $this->lodestone->getResult(false)['status']);
+        $this->lodestone = $this->lodestone->getWorldStatus();
+        $this->tableLine('Worlds', $this->lodestone->getResult(false)['worlds']);
         
         #Checking rankings
-        $this->Lodestone->getFeast();
-        $this->tableLine('Feast (older format)', $this->Lodestone->getResult(false)['feast'][1]);
-        $this->Lodestone->getFeast(8);
-        $this->tableLine('Feast (current format)', $this->Lodestone->getResult(false)['feast'][8]);
-        $this->Lodestone->getDeepDungeon(1, '', 'solo', 'BRD');
-        $this->tableLine('Palace of the Dead, BRD', $this->Lodestone->getResult(false)['deepdungeon'][1]['solo']['BRD']);
-        $this->Lodestone->getDeepDungeon(2, '', '', '');
-        $this->tableLine('Heaven-on-High, party', $this->Lodestone->getResult(false)['deepdungeon'][2]['party']);
-        $this->Lodestone->getFrontline();
-        $this->tableLine('Frontline', $this->Lodestone->getResult(false)['frontline']['weekly'][0]);
-        $this->Lodestone->getGrandCompanyRanking('weekly', 0, 'Cerberus');
-        $this->tableLine('Grand Company Ranking', $this->Lodestone->getResult(false)['GrandCompanyRanking']['weekly'][0]);
-        $this->Lodestone->getFreeCompanyRanking('weekly', 0, 'Cerberus');
-        $this->tableLine('Free Company Ranking', $this->Lodestone->getResult(false)['FreeCompanyRanking']['weekly'][0]);
+        $this->lodestone = $this->lodestone->getFeast();
+        $this->tableLine('Feast (older format)', $this->lodestone->getResult(false)['feast'][1]);
+        $this->lodestone = $this->lodestone->getFeast(8);
+        $this->tableLine('Feast (current format)', $this->lodestone->getResult(false)['feast'][8]);
+        $this->lodestone = $this->lodestone->getDeepDungeon(1, '', 'solo', 'BRD');
+        $this->tableLine('Palace of the Dead, BRD', $this->lodestone->getResult(false)['deep_dungeon'][1]['solo']['BRD']);
+        $this->lodestone = $this->lodestone->getDeepDungeon(2, '', '', '');
+        $this->tableLine('Heaven-on-High, party', $this->lodestone->getResult(false)['deep_dungeon'][2]['party']);
+        $this->lodestone = $this->lodestone->getFrontline();
+        $this->tableLine('Frontline', $this->lodestone->getResult(false)['frontline']['weekly'][0]);
+        $this->lodestone = $this->lodestone->getGrandCompanyRanking('weekly', 0, 'Cerberus');
+        $this->tableLine('Grand Company Ranking', $this->lodestone->getResult(false)['grand_company_ranking']['weekly'][0]);
+        $this->lodestone = $this->lodestone->getFreeCompanyRanking('weekly', 0, 'Cerberus');
+        $this->tableLine('Free Company Ranking', $this->lodestone->getResult(false)['free_company_ranking']['weekly'][0]);
         
         #Checking database
-        $this->Lodestone->searchDatabase('achievement', 1);
-        $this->tableLine('Play guide: achievements', $this->Lodestone->getResult(false)['database']['achievement']);
-        $this->Lodestone->searchDatabase('quest', 1);
-        $this->tableLine('Play guide: quests', $this->Lodestone->getResult(false)['database']['quest']);
-        $this->Lodestone->searchDatabase('duty', 2);
-        $this->tableLine('Play guide: duties', $this->Lodestone->getResult(false)['database']['duty']);
-        $this->Lodestone->searchDatabase('item', 1);
-        $this->tableLine('Play guide: items', $this->Lodestone->getResult(false)['database']['item']);
-        $this->Lodestone->searchDatabase('recipe', 1);
-        $this->tableLine('Play guide: recipes', $this->Lodestone->getResult(false)['database']['recipe']);
-        $this->Lodestone->searchDatabase('gathering', 1);
-        $this->tableLine('Play guide: gathering', $this->Lodestone->getResult(false)['database']['gathering']);
-        $this->Lodestone->searchDatabase('shop', 1);
-        $this->tableLine('Play guide: shops', $this->Lodestone->getResult(false)['database']['shop']);
-        $this->Lodestone->searchDatabase('text_command', 1);
-        $this->tableLine('Play guide: text commands', $this->Lodestone->getResult(false)['database']['text_command']);
+        $this->lodestone = $this->lodestone->searchDatabase('achievement', 1);
+        $this->tableLine('Play guide: achievements', $this->lodestone->getResult(false)['database']['achievement']);
+        $this->lodestone = $this->lodestone->searchDatabase('quest', 1);
+        $this->tableLine('Play guide: quests', $this->lodestone->getResult(false)['database']['quest']);
+        $this->lodestone = $this->lodestone->searchDatabase('duty', 2);
+        $this->tableLine('Play guide: duties', $this->lodestone->getResult(false)['database']['duty']);
+        $this->lodestone = $this->lodestone->searchDatabase('item', 1);
+        $this->tableLine('Play guide: items', $this->lodestone->getResult(false)['database']['item']);
+        $this->lodestone = $this->lodestone->searchDatabase('recipe', 1);
+        $this->tableLine('Play guide: recipes', $this->lodestone->getResult(false)['database']['recipe']);
+        $this->lodestone = $this->lodestone->searchDatabase('gathering', 1);
+        $this->tableLine('Play guide: gathering', $this->lodestone->getResult(false)['database']['gathering']);
+        $this->lodestone = $this->lodestone->searchDatabase('shop', 1);
+        $this->tableLine('Play guide: shops', $this->lodestone->getResult(false)['database']['shop']);
+        $this->lodestone = $this->lodestone->searchDatabase('text_command', 1);
+        $this->tableLine('Play guide: text commands', $this->lodestone->getResult(false)['database']['text_command']);
         
         #Checking Errors
-        $this->Lodestone->getFreeCompany('1');
-        $this->tableLine('Non-existent free company', $this->Lodestone->getResult(false)['freecompanies']['1'], true);
-        $this->Lodestone->getLinkshellMembers('1');
-        $this->tableLine('Non-existent linkshell', $this->Lodestone->getResult(false)['linkshells']['1'], true);
-        $this->Lodestone->getCharacter('9234631035923213559');
-        $this->tableLine('Non-existent character', $this->Lodestone->getResult(false)['characters']['9234631035923213559'], true);
-        $this->Lodestone->getCharacterAchievements('4339591', false, 39, false, true);
-        $this->tableLine('Character with private achievements', $this->Lodestone->getResult()['characters']['4339591']['achievements'], true);
-        unset($this->Lodestone);
+        $this->lodestone = $this->lodestone->getFreeCompany('1');
+        $this->tableLine('Non-existent free company', $this->lodestone->getResult(false)['freecompanies']['1'], true);
+        $this->lodestone = $this->lodestone->getLinkshellMembers('1');
+        $this->tableLine('Non-existent linkshell', $this->lodestone->getResult(false)['linkshells']['1'], true);
+        $this->lodestone = $this->lodestone->getCharacter('9234631035923213559');
+        $this->tableLine('Non-existent character', $this->lodestone->getResult(false)['characters']['9234631035923213559'], true);
+        $this->lodestone = $this->lodestone->getCharacterAchievements('4339591', false, 39, false, true);
+        $this->tableLine('Character with private achievements', $this->lodestone->getResult()['characters']['4339591']['achievements'], true);
+        unset($this->lodestone);
         echo '</table>';
     }
     
@@ -144,14 +144,14 @@ class LodestoneTest
     {
         echo '<tr>
                     <td><b>'.$type.'</b></td>
-                    <td>'.(!empty($this->Lodestone->getErrors()) && $reverse === false ? '<span style="color: red; font-weight: bold;">error</span>' : '<span style="color: lightgreen; font-weight: bold;">success</span>').'</td>
-                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->Lodestone->getResult(false)['benchmark']['httptime']) : $this->Lodestone->getResult(false)['benchmark']['httptime'][0]).'</td>
-                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->Lodestone->getResult(false)['benchmark']['parsetime']) : $this->Lodestone->getResult(false)['benchmark']['parsetime'][0]).'</td>
-                    <td>'.(empty($this->Lodestone->getErrors()) ? '' : '<pre>'.var_export($this->Lodestone->getErrors(), true).'</pre>').'</td>
+                    <td>'.(!empty($this->lodestone->getErrors()) && !$reverse ? '<span style="color: red; font-weight: bold;">error</span>' : '<span style="color: lightgreen; font-weight: bold;">success</span>').'</td>
+                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->lodestone->getResult(false)['benchmark']['http_time']) : $this->lodestone->getResult(false)['benchmark']['http_time'][0]).'</td>
+                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->lodestone->getResult(false)['benchmark']['parse_time']) : $this->lodestone->getResult(false)['benchmark']['parse_time'][0]).'</td>
+                    <td>'.(empty($this->lodestone->getErrors()) ? '' : '<pre>'.var_export($this->lodestone->getErrors(), true).'</pre>').'</td>
                     <td>'.(empty($what) ? '' : '<pre>'.var_export($what, true).'</pre>').'</td>
                 </tr>';
-        $this->Lodestone->resetResult();
-        $this->Lodestone->resetErrors();
+        $this->lodestone->resetResult();
+        $this->lodestone->resetErrors();
         ob_flush();
         flush();
     }

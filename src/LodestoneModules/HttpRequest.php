@@ -62,38 +62,38 @@ class HttpRequest
         curl_setopt(self::$curl_handle, CURLOPT_URL, $url);
         // handle response
         $response = curl_exec(self::$curl_handle);
-        $curlerror = curl_error(self::$curl_handle);
-        $hlength = curl_getinfo(self::$curl_handle, CURLINFO_HEADER_SIZE);
-        $httpCode = curl_getinfo(self::$curl_handle, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error(self::$curl_handle);
+        $header_length = curl_getinfo(self::$curl_handle, CURLINFO_HEADER_SIZE);
+        $http_code = curl_getinfo(self::$curl_handle, CURLINFO_HTTP_CODE);
         if ($response === false) {
-            throw new \RuntimeException($curlerror, $httpCode);
+            throw new \RuntimeException($curl_error, $http_code);
         }
-        $data = mb_substr($response, $hlength, null, 'UTF-8');
+        $data = mb_substr($response, $header_length, null, 'UTF-8');
         
         // specific conditions to return code on
-        $httpCode = (int)$httpCode;
-        if ($httpCode === 404) {
-            throw new \RuntimeException('Requested page was not found, '.$httpCode, $httpCode);
+        $http_code = (int)$http_code;
+        if ($http_code === 404) {
+            throw new \RuntimeException('Requested page was not found, '.$http_code, $http_code);
         }
-        if ($httpCode === 503) {
-            throw new \RuntimeException('Lodestone not available, '.$httpCode, $httpCode);
+        if ($http_code === 503) {
+            throw new \RuntimeException('Lodestone not available, '.$http_code, $http_code);
         }
-        if ($httpCode === 403) {
-            #Get message from Lodestone
+        if ($http_code === 403) {
+            #Get the message from Lodestone
             $message = preg_replace('/(.*<h1 class="error__heading">)([^<]+)(<\/h1>\s*<p class="error__text">)([^<]+)(<\/p>.*)/muis', '$2: $4', $data ?? '');
-            throw new \RuntimeException((empty($message) ? 'No access, possibly private entity' : $message).', '.$httpCode, $httpCode);
+            throw new \RuntimeException((empty($message) ? 'No access, possibly private entity' : $message).', '.$http_code, $http_code);
         }
-        if ($httpCode === 0) {
-            throw new \RuntimeException($curlerror, $httpCode);
+        if ($http_code === 0) {
+            throw new \RuntimeException($curl_error, $http_code);
         }
-        if ($httpCode < 200 || $httpCode > 308) {
-            if ($httpCode === 429 || preg_match('/The server is experiencing unusually heavy traffic/ui', $data ?? '') === 1) {
-                throw new \RuntimeException('Lodestone has throttled the request, '.$httpCode, $httpCode);
+        if ($http_code < 200 || $http_code > 308) {
+            if ($http_code === 429 || preg_match('/The server is experiencing unusually heavy traffic/ui', $data ?? '') === 1) {
+                throw new \RuntimeException('Lodestone has throttled the request, '.$http_code, $http_code);
             }
             file_put_contents(__DIR__.'/html.txt', $data ?? '');
-            #Get message from Lodestone
+            #Get the message from Lodestone
             $message = preg_replace('/(.*?<h1 class="(error|maintenance)__heading">)([^<]+)(<\/h1>\s*<p class="(error|maintenance)__text">)([^<]+)(<\/p>.*)/muis', '$3: $6', $data ?? '');
-            throw new \RuntimeException((empty($message) ? 'Requested page is not available' : $message).', '.$httpCode, $httpCode);
+            throw new \RuntimeException((empty($message) ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
         }
         
         

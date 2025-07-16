@@ -171,7 +171,7 @@ class Converters
     }
     
     /**
-     * Get Free Company activity time ID  (for filter) based on value provided
+     * Get Free Company activity time ID (for filter) based on value provided
      * @param string $active
      *
      * @return string
@@ -187,7 +187,7 @@ class Converters
     }
     
     /**
-     * Get matches count ID (for filter) based on value provided
+     * Get ID of number of matches (for filter) based on value provided
      * @param int $count
      *
      * @return string
@@ -195,15 +195,15 @@ class Converters
     public function matchesCount(int $count): string
     {
         if ($count >= 1 && $count <= 29) {
-            $countNew = '1';
+            $count_new = '1';
         } elseif ($count >= 30 && $count <= 49) {
-            $countNew = '2';
+            $count_new = '2';
         } elseif ($count >= 50) {
-            $countNew = '3';
+            $count_new = '3';
         } else {
-            $countNew = '';
+            $count_new = '';
         }
-        return $countNew;
+        return $count_new;
     }
     
     /**
@@ -215,28 +215,28 @@ class Converters
     public function pvpRank(int $count): string
     {
         if ($count >= 1 && $count <= 10) {
-            $countNew = '1';
+            $count_new = '1';
         } elseif ($count >= 11 && $count <= 20) {
-            $countNew = '2';
+            $count_new = '2';
         } elseif ($count >= 21 && $count <= 30) {
-            $countNew = '3';
+            $count_new = '3';
         } elseif ($count >= 31) {
-            $countNew = '4';
+            $count_new = '4';
         } else {
-            $countNew = '';
+            $count_new = '';
         }
-        return $countNew;
+        return $count_new;
     }
     
     /**
-     * Get members count ID (for filter) based on value provided
+     * Get ID for number of members (for filter) based on value provided
      * @param int|string $count
      *
      * @return string
      */
     public function membersCount(int|string $count): string
     {
-        if (\is_int($count)) {
+        if (is_int($count)) {
             if ($count >= 1 && $count <= 10) {
                 $count = '1-10';
             } elseif ($count >= 11 && $count <= 30) {
