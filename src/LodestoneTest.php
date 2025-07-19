@@ -18,8 +18,8 @@ class LodestoneTest
      */
     public function __construct(string $language = 'na')
     {
-        ini_set('max_execution_time', '6000');
-        ob_clean();
+        \ini_set('max_execution_time', '6000');
+        \ob_clean();
         echo '<style>
                 table, th, td, tr {border: 1px solid black; border-collapse: collapse;}
                 pre {height: 5pc; max-width: 600px; overflow-y: scroll;}
@@ -145,14 +145,14 @@ class LodestoneTest
         echo '<tr>
                     <td><b>'.$type.'</b></td>
                     <td>'.(!empty($this->lodestone->getErrors()) && !$reverse ? '<span style="color: red; font-weight: bold;">error</span>' : '<span style="color: lightgreen; font-weight: bold;">success</span>').'</td>
-                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->lodestone->getResult(false)['benchmark']['http_time']) : $this->lodestone->getResult(false)['benchmark']['http_time'][0]).'</td>
-                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? implode('<br>', $this->lodestone->getResult(false)['benchmark']['parse_time']) : $this->lodestone->getResult(false)['benchmark']['parse_time'][0]).'</td>
-                    <td>'.(empty($this->lodestone->getErrors()) ? '' : '<pre>'.var_export($this->lodestone->getErrors(), true).'</pre>').'</td>
-                    <td>'.(empty($what) ? '' : '<pre>'.var_export($what, true).'</pre>').'</td>
+                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? \implode('<br>', $this->lodestone->getResult(false)['benchmark']['http_time']) : $this->lodestone->getResult(false)['benchmark']['http_time'][0]).'</td>
+                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? \implode('<br>', $this->lodestone->getResult(false)['benchmark']['parse_time']) : $this->lodestone->getResult(false)['benchmark']['parse_time'][0]).'</td>
+                    <td>'.(empty($this->lodestone->getErrors()) ? '' : '<pre>'.\var_export($this->lodestone->getErrors(), true).'</pre>').'</td>
+                    <td>'.(empty($what) ? '' : '<pre>'.\var_export($what, true).'</pre>').'</td>
                 </tr>';
         $this->lodestone->resetResult();
         $this->lodestone->resetErrors();
-        ob_flush();
-        flush();
+        \ob_flush();
+        \flush();
     }
 }

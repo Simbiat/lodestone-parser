@@ -236,7 +236,7 @@ class Converters
      */
     public function membersCount(int|string $count): string
     {
-        if (is_int($count)) {
+        if (\is_int($count)) {
             if ($count >= 1 && $count <= 10) {
                 $count = '1-10';
             } elseif ($count >= 11 && $count <= 30) {
@@ -674,6 +674,6 @@ class Converters
     public function memory($bytes): string
     {
         $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
-        return round($bytes / (1024 ** ($i = (int)floor(log($bytes, 1024)))), 2).' '.$unit[$i];
+        return \round($bytes / (1024 ** ($i = (int)\floor(\log($bytes, 1024)))), 2).' '.$unit[$i];
     }
 }

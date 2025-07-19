@@ -45,7 +45,7 @@ class Lodestone
     {
         #Force close cURL handler
         if (!empty(HttpRequest::$curl_handle)) {
-            curl_close(HttpRequest::$curl_handle);
+            \curl_close(HttpRequest::$curl_handle);
         }
     }
     
@@ -62,7 +62,7 @@ class Lodestone
     {
         #Close cURL handler
         if ($close) {
-            curl_close(HttpRequest::$curl_handle);
+            \curl_close(HttpRequest::$curl_handle);
         }
         return $this->result;
     }
@@ -77,7 +77,7 @@ class Lodestone
     {
         #Close cURL handler
         if ($close) {
-            curl_close(HttpRequest::$curl_handle);
+            \curl_close(HttpRequest::$curl_handle);
         }
         return $this->errors;
     }
@@ -92,7 +92,7 @@ class Lodestone
     {
         #Close cURL handler
         if ($close) {
-            curl_close(HttpRequest::$curl_handle);
+            \curl_close(HttpRequest::$curl_handle);
         }
         return $this->last_error;
     }
@@ -280,7 +280,7 @@ class Lodestone
     public function getLinkshellMembers(string|int $id, int $page = 1): self
     {
         $page = $this->pageCheck($page);
-        if (preg_match('/[a-zA-Z0-9]{40}/mi', $id)) {
+        if (\preg_match('/[a-zA-Z0-9]{40}/mi', $id)) {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL, $id, $page);
         } else {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_MEMBERS_URL, $id, $page);
@@ -331,7 +331,7 @@ class Lodestone
             'category2' => $category,
             #Duty has been updated at some point and category3 was replaced with ex_version
             ($type === 'duty' ? 'ex_version' : 'category3') => $sub_category,
-            'q' => str_ireplace(' ', '+', $search),
+            'q' => \str_ireplace(' ', '+', $search),
             'page' => $page,
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_DATABASE_URL, $type, $query);
@@ -370,13 +370,13 @@ class Lodestone
         } else {
             $blog_lang = '';
         }
-        $query = str_replace(['&blog_lang=&', '&gcId=&'], '&', $this->queryBuilder([
-            'q' => str_ireplace(' ', '+', $name),
+        $query = \str_replace(['&blog_lang=&', '&gcId=&'], '&', $this->queryBuilder([
+            'q' => \str_ireplace(' ', '+', $name),
             'worldname' => $server,
             'class_job' => $this->converters->getSearchClassId($class_job),
             'race_tribe' => $this->converters->getSearchClanId($race_tribe),
-            'gcId' => (is_array($gc_id) ? implode('&gcId=', $gc_id) : $gc_id),
-            'blog_lang' => (is_array($blog_lang) ? implode('&blog_lang=', $blog_lang) : $blog_lang),
+            'gcId' => (is_array($gc_id) ? \implode('&gcId=', $gc_id) : $gc_id),
+            'blog_lang' => (is_array($blog_lang) ? \implode('&blog_lang=', $blog_lang) : $blog_lang),
             'order' => $this->converters->getSearchOrderId($order),
             'page' => $page,
         ]));
@@ -431,16 +431,16 @@ class Lodestone
         } else {
             $roles = '';
         }
-        $query = str_replace(['&activities=&', '&roles=&', '&gcId=&'], '&', $this->queryBuilder([
-            'q' => str_ireplace(' ', '+', $name),
+        $query = \str_replace(['&activities=&', '&roles=&', '&gcId=&'], '&', $this->queryBuilder([
+            'q' => \str_ireplace(' ', '+', $name),
             'worldname' => $server,
             'character_count' => $this->converters->membersCount($character_count),
-            'activities' => (is_array($activities) ? implode('&activities=', $activities) : $activities),
-            'roles' => (is_array($roles) ? implode('&roles=', $roles) : $roles),
+            'activities' => (is_array($activities) ? \implode('&activities=', $activities) : $activities),
+            'roles' => (is_array($roles) ? \implode('&roles=', $roles) : $roles),
             'active_time' => $this->converters->getSearchActiveTimeId($active_time),
             'join' => $this->converters->getSearchJoinId($join),
             'house' => $this->converters->getSearchHouseId($house),
-            'gcId' => (is_array($gc_id) ? implode('&gcId=', $gc_id) : $gc_id),
+            'gcId' => (is_array($gc_id) ? \implode('&gcId=', $gc_id) : $gc_id),
             'order' => $this->converters->getSearchOrderId($order),
             'page' => $page,
         ]));
@@ -474,7 +474,7 @@ class Lodestone
     {
         $page = $this->pageCheck($page);
         $query = $this->queryBuilder([
-            'q' => str_ireplace(' ', '+', $name),
+            'q' => \str_ireplace(' ', '+', $name),
             'worldname' => $server,
             'character_count' => $this->converters->membersCount($character_count),
             'order' => $this->converters->getSearchOrderId($order),
@@ -506,7 +506,7 @@ class Lodestone
     {
         $page = $this->pageCheck($page);
         $query = $this->queryBuilder([
-            'q' => str_ireplace(' ', '+', $name),
+            'q' => \str_ireplace(' ', '+', $name),
             'worldname' => $server,
             'order' => $this->converters->getSearchOrderId($order),
             'page' => $page,
@@ -607,10 +607,10 @@ class Lodestone
             $sort = 'win';
         }
         if ($week_month === 'weekly') {
-            if (!preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
+            if (!\preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
                 $week = 0;
             }
-        } elseif (!preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
+        } elseif (!\preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
             $week = 0;
         }
         $query = $this->queryBuilder([
@@ -678,10 +678,10 @@ class Lodestone
             $week_month = 'weekly';
         }
         if ($week_month === 'weekly') {
-            if (!preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
+            if (!\preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
                 $week = 0;
             }
-        } elseif (!preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
+        } elseif (!\preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
             $week = 0;
         }
         $query = $this->queryBuilder([
@@ -831,7 +831,7 @@ class Lodestone
             }
             $query[] = $param.'='.$value;
         }
-        return '?'.implode('&', $query);
+        return '?'.\implode('&', $query);
     }
     
     /**
