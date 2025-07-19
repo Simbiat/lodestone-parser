@@ -16,7 +16,7 @@ trait Parsers
      */
     protected function parse(): self
     {
-        $started = \\hrtime(true);
+        $started = \hrtime(true);
         #Set array key for results
         $resultkey = match ($this->type) {
             'search_character', 'character', 'character_jobs', 'character_friends', 'character_following', 'achievements', 'achievement_details' => 'characters',
@@ -49,11 +49,11 @@ trait Parsers
             return $this;
         }
         if ($this->benchmark) {
-            $finished = \\hrtime(true);
+            $finished = \hrtime(true);
             $duration = $finished - $started;
-            $this->result['benchmark']['http_time'][] = \\date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+            $this->result['benchmark']['http_time'][] = \date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
         }
-        $started = \\hrtime(true);
+        $started = \hrtime(true);
         try {
             $this->last_error = NULL;
             #Parsing of pages
@@ -73,19 +73,19 @@ trait Parsers
                 'updates',
                 'status',
             ])) {
-                if (!$this->regexfail(\\preg_match_all(Regex::PAGECOUNT, $this->html, $pages, \\PREG_SET_ORDER), \\preg_last_error(), 'PAGECOUNT')) {
+                if (!$this->regexfail(\preg_match_all(Regex::PAGECOUNT, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'PAGECOUNT')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
             }
             if (in_array($this->type, ['grand_company_ranking', 'free_company_ranking'])) {
-                if (!$this->regexfail(\\preg_match_all(Regex::PAGECOUNT2, $this->html, $pages, \\PREG_SET_ORDER), \\preg_last_error(), 'PAGECOUNT2')) {
+                if (!$this->regexfail(\preg_match_all(Regex::PAGECOUNT2, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'PAGECOUNT2')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
             }
             if ($this->type === 'database') {
-                if (!$this->regexfail(\\preg_match_all(Regex::DBPAGECOUNT, $this->html, $pages, \\PREG_SET_ORDER), \\preg_last_error(), 'DBPAGECOUNT')) {
+                if (!$this->regexfail(\preg_match_all(Regex::DBPAGECOUNT, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'DBPAGECOUNT')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
@@ -93,7 +93,7 @@ trait Parsers
             
             #Banners special precut
             if ($this->type === 'banners') {
-                if (!$this->regexfail(\\preg_match(Regex::BANNERS, $this->html, $banners), \\preg_last_error(), 'BANNERS')) {
+                if (!$this->regexfail(\preg_match(Regex::BANNERS, $this->html, $banners), \preg_last_error(), 'BANNERS')) {
                     return $this;
                 }
                 $this->html = $banners[0];
@@ -106,7 +106,7 @@ trait Parsers
                 'updates',
                 'status',
             ])) {
-                if (!$this->regexfail(\\preg_match_all(Regex::NOTICES, $this->html, $notices, \\PREG_SET_ORDER), \\preg_last_error(), 'NOTICES')) {
+                if (!$this->regexfail(\preg_match_all(Regex::NOTICES, $this->html, $notices, \PREG_SET_ORDER), \preg_last_error(), 'NOTICES')) {
                     return $this;
                 }
                 $this->html = $notices[0][0];
@@ -141,7 +141,7 @@ trait Parsers
             #file_put_contents(__DIR__.'/regex.txt', $regex);
             #file_put_contents(__DIR__.'/html.txt', $this->html);
             
-            if (!$this->regexfail(\\preg_match_all($regex, $this->html, $temp_results, \\PREG_SET_ORDER), \\preg_last_error(), 'main regex')) {
+            if (!$this->regexfail(\preg_match_all($regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
                     'search_character',
                     'character_friends',
@@ -172,29 +172,29 @@ trait Parsers
                 #Remove non-named groups before rearranging results to avoid overwrites
                 foreach ($temp_results as $key => $temp_result) {
                     foreach ($temp_result as $key2 => $details) {
-                        if (\\is_numeric($key2) || empty($details)) {
+                        if (\is_numeric($key2) || empty($details)) {
                             #No idea why EA thinks $key2 is float, when it's either string or int. Probably gets confused by is_numeric check
                             /** @noinspection OffsetOperationsInspection */
                             unset($temp_results[$key][$key2]);
                         }
                     }
                 }
-                $temp_results = [\\array_merge($temp_results[0], $temp_results[1], $temp_results[2] ?? [])];
+                $temp_results = [\array_merge($temp_results[0], $temp_results[1], $temp_results[2] ?? [])];
             }
             
             foreach ($temp_results as $key => $temp_result) {
                 #Remove unnamed groups and empty values
                 foreach ($temp_result as $key2 => $value) {
-                    if (\\is_numeric($key2) || empty($value)) {
+                    if (\is_numeric($key2) || empty($value)) {
                         unset($temp_results[$key][$key2], $temp_result[$key2]);
                     }
                 }
                 #Decode HTML entities
                 foreach ($temp_result as $key2 => $value) {
                     #Decode in the data inside loop
-                    $temp_result[$key2] = \\html_entity_decode($value, \\ENT_QUOTES | \\ENT_HTML5);
+                    $temp_result[$key2] = \html_entity_decode($value, \ENT_QUOTES | \ENT_HTML5);
                     #Decode in original data (for consistency)
-                    $temp_results[$key][$key2] = \\html_entity_decode($value, \\ENT_QUOTES | \\ENT_HTML5);
+                    $temp_results[$key][$key2] = \html_entity_decode($value, \ENT_QUOTES | \ENT_HTML5);
                 }
                 
                 #Specific processing
@@ -361,7 +361,7 @@ trait Parsers
                         }
                         break;
                     case 'database':
-                        $temp_results[$key]['name'] = \\str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['name'], null, 'UTF-8'));
+                        $temp_results[$key]['name'] = \str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['name'], null, 'UTF-8'));
                         switch ($this->type_settings['type']) {
                             case 'achievement':
                                 $temp_results[$key]['reward'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
@@ -412,7 +412,7 @@ trait Parsers
                                 $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
                                 break;
                             case 'shop':
-                                $temp_results[$key]['area'] = \\preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', \\str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['column1'], null, 'UTF-8')));
+                                $temp_results[$key]['area'] = \preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', \str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['column1'], null, 'UTF-8')));
                                 break;
                             case 'text_command':
                                 if (in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'])) {
@@ -439,7 +439,7 @@ trait Parsers
                         #This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
                         $temp_results[$key]['private'] = !empty($temp_results[$key]['private']);
                         #Portrait
-                        $temp_results[$key]['portrait'] = \\str_replace('c0.jpg', 'l0.jpg', $temp_result['avatar']);
+                        $temp_results[$key]['portrait'] = \str_replace('c0.jpg', 'l0.jpg', $temp_result['avatar']);
                         #Since release of Dawntrail, if profile is private you won't get any of the fields below
                         if ($temp_results[$key]['private'] === false) {
                             $temp_results[$key]['race'] = mb_trim($temp_results[$key]['race'], null, 'UTF-8');
@@ -456,7 +456,7 @@ trait Parsers
                                     $temp_results[$key]['comment'] = 'No clan';
                                 }
                             }
-                            $temp_results[$key]['nameday'] = \\str_replace('32st', '32nd', $temp_results[$key]['nameday']);
+                            $temp_results[$key]['nameday'] = \str_replace('32st', '32nd', $temp_results[$key]['nameday']);
                             if (!empty($temp_result['uppertitle'])) {
                                 $temp_results[$key]['title'] = $temp_result['uppertitle'];
                             } elseif (!empty($temp_result['undertitle'])) {
@@ -526,8 +526,8 @@ trait Parsers
                         break;
                     case 'character_jobs':
                         $temp_result['id'] = $this->converters->classToJob($temp_result['name']);
-                        $temp_result['expcur'] = \\preg_replace('/\D/', '', $temp_result['expcur'] ?? '');
-                        $temp_result['expmax'] = \\preg_replace('/\D/', '', $temp_result['expmax'] ?? '');
+                        $temp_result['expcur'] = \preg_replace('/\D/', '', $temp_result['expcur'] ?? '');
+                        $temp_result['expmax'] = \preg_replace('/\D/', '', $temp_result['expmax'] ?? '');
                         $temp_results[$key] = $this->jobDetails($temp_result);
                         break;
                 }
@@ -541,7 +541,7 @@ trait Parsers
             
             #Sort worlds
             if ($this->type === 'worlds') {
-                \\ksort($this->result[$resultkey]);
+                \ksort($this->result[$resultkey]);
             }
         } catch (\Throwable $exception) {
             $this->errorRegister($exception->getMessage(), 'parse', $started);
@@ -549,7 +549,7 @@ trait Parsers
         }
         #Benchmarking
         if ($this->benchmark) {
-            $finished = \\hrtime(true);
+            $finished = \hrtime(true);
             $duration = $finished - $started;
             $this->benchUpdate($duration);
         }
@@ -601,7 +601,7 @@ trait Parsers
             case 'free_company_members':
             case 'linkshell_members':
                 if ($result === 404) {
-                    if (!isset($this->result[$resultkey]) || (!\\is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
+                    if (!isset($this->result[$resultkey]) || (!\is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
                         $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = $result;
                     }
                 } else {
@@ -645,7 +645,7 @@ trait Parsers
             case 'worlds':
                 if ($result !== 404 && is_array($result)) {
                     $this->result[$resultkey][$result['data_center']] = [];
-                    \\preg_match_all(Regex::WORLDS, $result['servers'], $servers, \\PREG_SET_ORDER);
+                    \preg_match_all(Regex::WORLDS, $result['servers'], $servers, \PREG_SET_ORDER);
                     if ($this->type_settings['world_details']) {
                         foreach ($servers as $server) {
                             $this->result[$resultkey][$result['data_center']][$server['server']] = [
@@ -658,9 +658,9 @@ trait Parsers
                             ];
                         }
                     } else {
-                        $this->result[$resultkey][$result['data_center']] = \\array_column($servers, 'status', 'server');
+                        $this->result[$resultkey][$result['data_center']] = \array_column($servers, 'status', 'server');
                     }
-                    \\ksort($this->result[$resultkey][$result['data_center']]);
+                    \ksort($this->result[$resultkey][$result['data_center']]);
                 }
                 break;
             case 'feast':
@@ -748,7 +748,7 @@ trait Parsers
                 return false;
             }
             $current_page++;
-            \\ini_set('max_execution_time', '6000');
+            \ini_set('max_execution_time', '6000');
             $this->all_pages = false;
             switch ($this->type) {
                 case 'character_friends':
@@ -833,8 +833,8 @@ trait Parsers
     {
         foreach ($pages as $page => $data) {
             foreach ($data as $key => $value) {
-                if (\\is_string($value)) {
-                    $pages[$page][$key] = \\html_entity_decode($value, \\ENT_QUOTES | \\ENT_HTML5);
+                if (\is_string($value)) {
+                    $pages[$page][$key] = \html_entity_decode($value, \ENT_QUOTES | \ENT_HTML5);
                 }
             }
         }
@@ -850,63 +850,63 @@ trait Parsers
                 if (!empty($pages[0]['pvp_team_community_id'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['community_id'] = $pages[0]['pvp_team_community_id'];
                 }
-                if (isset($pages[0]['page_current']) && \\is_numeric($pages[0]['page_current'])) {
+                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \\is_numeric($pages[0]['page_total'])) {
+                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']]['page_total'] = $this->result[$resultkey][$this->type_settings['id']]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \\is_numeric($pages[0]['total'])) {
+                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['members_count'] = $pages[0]['total'];
                 }
                 break;
             case 'grand_company_ranking':
             case 'free_company_ranking':
-                if (isset($pages[0]['page_current']) && \\is_numeric($pages[0]['page_current'])) {
+                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
                     $this->result[$resultkey][$this->type_settings['week']]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['week']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \\is_numeric($pages[0]['page_total'])) {
+                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
                     $this->result[$resultkey][$this->type_settings['week']]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['week']]['page_total'] = $this->result[$resultkey][$this->type_settings['week']]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \\is_numeric($pages[0]['total'])) {
+                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
                     $this->result[$resultkey][$this->type_settings['week']]['total'] = $pages[0]['total'];
                 }
                 break;
             case 'database':
-                if (isset($pages[0]['page_current']) && \\is_numeric($pages[0]['page_current'])) {
+                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
                     $this->result[$resultkey][$this->type_settings['type']]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['type']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \\is_numeric($pages[0]['page_total'])) {
+                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
                     $this->result[$resultkey][$this->type_settings['type']]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['type']]['page_total'] = $this->result[$resultkey][$this->type_settings['type']]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \\is_numeric($pages[0]['total'])) {
+                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
                     $this->result[$resultkey][$this->type_settings['type']]['total'] = $pages[0]['total'];
                 }
                 break;
             default:
-                if (isset($pages[0]['page_current']) && \\is_numeric($pages[0]['page_current'])) {
+                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
                     $this->result[$resultkey]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \\is_numeric($pages[0]['page_total'])) {
+                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
                     $this->result[$resultkey]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey]['page_total'] = $this->result[$resultkey]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \\is_numeric($pages[0]['total'])) {
+                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
                     $this->result[$resultkey]['total'] = $pages[0]['total'];
                 }
                 break;
@@ -915,7 +915,7 @@ trait Parsers
         if (!empty($pages[0]['linkshell_name'])) {
             $this->result[$resultkey][$this->type_settings['id']]['name'] = mb_trim($pages[0]['linkshell_name'], null, 'UTF-8');
             if (!empty($pages[0]['linkshell_server'])) {
-                if (\\preg_match('/[a-zA-Z0-9]{40}/mi', $this->type_settings['id'])) {
+                if (\preg_match('/[a-zA-Z0-9]{40}/mi', $this->type_settings['id'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['data_center'] = $pages[0]['linkshell_server'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
@@ -952,12 +952,12 @@ trait Parsers
      */
     protected function crest(array $tempresult, string $keybase): array
     {
-        $crest[] = \\str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'1']);
+        $crest[] = \str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'1']);
         if (!empty($tempresult[$keybase.'2'])) {
-            $crest[] = \\str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'2']);
+            $crest[] = \str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'2']);
         }
         if (!empty($tempresult[$keybase.'3'])) {
-            $crest[] = \\str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'3']);
+            $crest[] = \str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'3']);
         }
         foreach ($crest as $key => $value) {
             #Lodestone now serves one of the default emblems using non-standard URL sometimes, so we change it to a standard one
@@ -1014,12 +1014,12 @@ trait Parsers
     protected function jobs(): array
     {
         $temp_jobs = [];
-        if (!$this->regexfail(\\preg_match_all(Regex::CHARACTER_JOBS, $this->html, $jobs, \\PREG_SET_ORDER), \\preg_last_error(), 'CHARACTER_JOBS')) {
+        if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_JOBS, $this->html, $jobs, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_JOBS')) {
             return [];
         }
         foreach ($jobs as $job) {
-            $job['expcur'] = \\preg_replace('/\D/', '', $job['expcur']);
-            $job['expmax'] = \\preg_replace('/\D/', '', $job['expmax']);
+            $job['expcur'] = \preg_replace('/\D/', '', $job['expcur']);
+            $job['expmax'] = \preg_replace('/\D/', '', $job['expmax']);
             $temp_jobs[$this->converters->classToJob($job['name'])] = $this->jobDetails($job);
         }
         return $temp_jobs;
@@ -1034,10 +1034,10 @@ trait Parsers
     protected function jobDetails(array $job): array
     {
         return [
-            'level' => (\\is_numeric($job['level']) ? (int)$job['level'] : 0),
+            'level' => (\is_numeric($job['level']) ? (int)$job['level'] : 0),
             'specialist' => !empty($job['specialist']),
-            'expcur' => (\\is_numeric($job['expcur']) ? (int)$job['expcur'] : 0),
-            'expmax' => (\\is_numeric($job['expmax']) ? (int)$job['expmax'] : 0),
+            'expcur' => (\is_numeric($job['expcur']) ? (int)$job['expcur'] : 0),
+            'expmax' => (\is_numeric($job['expmax']) ? (int)$job['expmax'] : 0),
             'icon' => $job['icon'],
         ];
     }
@@ -1049,7 +1049,7 @@ trait Parsers
     protected function attributes(): array
     {
         $temp_attrs = [];
-        if (!$this->regexfail(\\preg_match_all(Regex::CHARACTER_ATTRIBUTES, $this->html, $attributes, \\PREG_SET_ORDER), \\preg_last_error(), 'CHARACTER_ATTRIBUTES')) {
+        if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_ATTRIBUTES, $this->html, $attributes, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_ATTRIBUTES')) {
             return [];
         }
         foreach ($attributes as $attribute) {
@@ -1072,13 +1072,13 @@ trait Parsers
     {
         $collectables = [];
         if ($type === 'mounts') {
-            \\preg_match_all(Regex::CHARACTER_MOUNTS, $this->html, $results, \\PREG_SET_ORDER);
+            \preg_match_all(Regex::CHARACTER_MOUNTS, $this->html, $results, \PREG_SET_ORDER);
         } elseif ($type === 'minions') {
-            \\preg_match_all(Regex::CHARACTER_MINIONS, $this->html, $results, \\PREG_SET_ORDER);
+            \preg_match_all(Regex::CHARACTER_MINIONS, $this->html, $results, \PREG_SET_ORDER);
         }
         if (!empty($results[0][0])) {
-            \\preg_match_all(Regex::COLLECTIBLE, $results[0][0], $results, \\PREG_SET_ORDER);
-            $collectables = \\array_column($results, 2, 1);
+            \preg_match_all(Regex::COLLECTIBLE, $results[0][0], $results, \PREG_SET_ORDER);
+            $collectables = \array_column($results, 2, 1);
         }
         return $collectables;
     }
@@ -1089,13 +1089,13 @@ trait Parsers
      */
     protected function items(): array
     {
-        if (!$this->regexfail(\\preg_match_all(Regex::CHARACTER_GEAR, $this->html, $temp_results, \\PREG_SET_ORDER), \\preg_last_error(), 'CHARACTER_GEAR')) {
+        if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_GEAR, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_GEAR')) {
             return [];
         }
         #Remove non-named groups
         foreach ($temp_results as $key => $temp_result) {
             foreach ($temp_result as $key2 => $details) {
-                if (\\is_numeric($key2) || empty($details)) {
+                if (\is_numeric($key2) || empty($details)) {
                     unset($temp_results[$key][(int)$key2]);
                 }
             }
@@ -1105,7 +1105,7 @@ trait Parsers
             #Requirements
             $temp_results[$key]['requirements'] = [
                 'level' => $temp_result['level'],
-                'classes' => (in_array($temp_result['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス']) ? $temp_result['classes'] : \\explode(' ', $temp_result['classes'])),
+                'classes' => (in_array($temp_result['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス']) ? $temp_result['classes'] : \explode(' ', $temp_result['classes'])),
             ];
             #Attributes
             for ($iteration = 1; $iteration <= 15; $iteration++) {
@@ -1241,11 +1241,11 @@ trait Parsers
             if ($started === 0) {
                 $duration = 0;
             } else {
-                $finished = \\hrtime(true);
+                $finished = \hrtime(true);
                 $duration = $finished - $started;
             }
             if ($type === 'http') {
-                $this->result['benchmark']['http_time'][] = \\date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+                $this->result['benchmark']['http_time'][] = \date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
                 $duration = 0;
             }
             $this->benchUpdate($duration);
@@ -1260,9 +1260,9 @@ trait Parsers
      */
     protected function benchUpdate(int $duration): void
     {
-        $this->result['benchmark']['parse_time'][] = \\date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
-        $this->result['benchmark']['memory'] = $this->converters->memory(\\memory_get_usage(true));
-        $this->result['benchmark']['memory_peak'] = $this->converters->memory(\\memory_get_peak_usage(true));
+        $this->result['benchmark']['parse_time'][] = \date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+        $this->result['benchmark']['memory'] = $this->converters->memory(\memory_get_usage(true));
+        $this->result['benchmark']['memory_peak'] = $this->converters->memory(\memory_get_peak_usage(true));
     }
     
     /**
@@ -1271,11 +1271,11 @@ trait Parsers
      */
     protected function errorUnregister(): void
     {
-        \\array_pop($this->errors);
+        \array_pop($this->errors);
         if (empty($this->errors)) {
             $this->last_error = NULL;
         } else {
-            $this->last_error = \\end($this->errors);
+            $this->last_error = \end($this->errors);
         }
     }
 }
