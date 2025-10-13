@@ -25,7 +25,7 @@ class LodestoneTest
                 pre {height: 5pc; max-width: 600px; overflow-y: scroll;}
             </style>
             <table><th>Type of test</th><th>Result</th><th>Page time, hh:mm:ss.ms</th><th>Parse time, hh:mm:ss.ms</th><th>Errors</th><th>Output</th>';
-        $this->lodestone = new Lodestone()->setLanguage($language)->setUserAgent('Simbiat Software UAT')->setBenchmark(true);
+        $this->lodestone = new Lodestone()->setLanguage($language)->setUserAgent('Lodestone PHP Parser')->setBenchmark(true);
         
         #Checking characters
         $this->lodestone = $this->lodestone->getCharacter('6691027');

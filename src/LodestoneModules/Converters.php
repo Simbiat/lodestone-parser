@@ -18,9 +18,11 @@ class Converters
     
     /**
      * Convert image of the Free Company rank to rank ID
+     *
      * @param string $image
      *
      * @return string
+     * @noinspection SpellCheckingInspection
      */
     public function fcRankId(string $image): string
     {
@@ -98,7 +100,7 @@ class Converters
     }
     
     /**
-     * Get role ID  (for filter) based on value provided
+     * Get role ID (for filter) based on value provided
      * @param string $role
      *
      * @return string

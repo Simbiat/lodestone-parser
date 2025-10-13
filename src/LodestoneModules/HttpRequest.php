@@ -23,7 +23,7 @@ class HttpRequest
         \CURLOPT_FOLLOWLOCATION => true,
         \CURLOPT_MAXREDIRS => 3,
         \CURLOPT_HTTPHEADER => ['Content-type: text/html; charset=utf-8', 'Accept-Language: en'],
-        \CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.84',
+        \CURLOPT_USERAGENT => 'Lodestone PHP Parser (https://github.com/Simbiat/lodestone-parser)',
         \CURLOPT_ENCODING => '',
         \CURLOPT_SSL_VERIFYPEER => true,
     ];
