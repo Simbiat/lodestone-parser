@@ -439,6 +439,9 @@ trait Parsers
                         #This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
                         $temp_results[$key]['private'] = !empty($temp_results[$key]['private']);
                         #Portrait
+                        if (!\array_key_exists('avatar', $temp_results[$key])) {
+                            throw new \UnexpectedValueException('No avatar key for character '.$this->type_settings['id']);
+                        }
                         $temp_results[$key]['portrait'] = \str_replace('c0.jpg', 'l0.jpg', $temp_result['avatar']);
                         #Since release of Dawntrail, if profile is private you won't get any of the fields below
                         if ($temp_results[$key]['private'] === false) {
