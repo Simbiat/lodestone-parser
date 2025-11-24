@@ -43,13 +43,14 @@ trait Parsers
             $this->html = new HttpRequest($this->user_agent)->get($this->url);
         } catch (\Throwable $exception) {
             $this->errorRegister($exception->getMessage(), 'http', $started);
+            #Throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
+            if (\preg_match('/Lodestone has throttled the request/ui', $exception->getMessage()) === 1) {
+                throw $exception;
+            }
             if ($exception->getCode() === 404) {
                 $this->addToResults($resultkey, $resultsubkey, 404);
             } elseif ($this->type === 'character' && $exception->getCode() === 403) {
                 $this->addToResults($resultkey, $resultsubkey, ['private' => true]);
-            } elseif (\preg_match('/The server is experiencing unusually heavy traffic/ui', $exception->getMessage()) === 1) {
-                #Throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
-                throw $exception;
             }
             return $this;
         }
