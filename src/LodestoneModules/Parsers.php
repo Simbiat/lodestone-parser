@@ -12,7 +12,9 @@ trait Parsers
 {
     /**
      * Parse Lodestone HTML
+     *
      * @return \Simbiat\FFXIV\LodestoneModules\Parsers|\Simbiat\FFXIV\Lodestone
+     * @throws \Throwable
      */
     protected function parse(): self
     {
@@ -45,6 +47,9 @@ trait Parsers
                 $this->addToResults($resultkey, $resultsubkey, 404);
             } elseif ($this->type === 'character' && $exception->getCode() === 403) {
                 $this->addToResults($resultkey, $resultsubkey, ['private' => true]);
+            } elseif (\preg_match('/The server is experiencing unusually heavy traffic/ui', $exception->getMessage()) === 1) {
+                #Throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
+                throw $exception;
             }
             return $this;
         }
