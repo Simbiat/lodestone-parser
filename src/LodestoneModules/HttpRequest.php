@@ -66,6 +66,10 @@ class HttpRequest
         $header_length = \curl_getinfo(self::$curl_handle, \CURLINFO_HEADER_SIZE);
         $http_code = \curl_getinfo(self::$curl_handle, \CURLINFO_HTTP_CODE);
         if ($response === false) {
+            #While this may not be a true 503 and can be an issue on client side, we treat it as Lodestone being 503
+            if (\preg_match('/Operation timed out after/ui', $curl_error)) {
+                throw new \RuntimeException('Lodestone not available, 503', 503);
+            }
             throw new \RuntimeException($curl_error, $http_code);
         }
         $data = mb_substr($response, $header_length, null, 'UTF-8');
