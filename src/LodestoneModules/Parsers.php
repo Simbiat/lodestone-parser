@@ -45,8 +45,10 @@ trait Parsers
             $this->errorRegister($exception->getMessage(), 'http', $started);
             if ($exception->getCode() === 404) {
                 $this->addToResults($resultkey, $resultsubkey, 404);
-            } elseif ($this->type === 'character' && $exception->getCode() === 403) {
-                $this->addToResults($resultkey, $resultsubkey, ['private' => true]);
+            } elseif ($exception->getCode() === 403) {
+                if ($this->type === 'character') {
+                    $this->addToResults($resultkey, $resultsubkey, ['private' => true]);
+                }
             } else {
                 #Any network errors or throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
                 throw $exception;

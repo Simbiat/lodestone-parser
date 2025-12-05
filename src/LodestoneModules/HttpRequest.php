@@ -85,6 +85,10 @@ class HttpRequest
         if ($http_code === 403) {
             #Get the message from Lodestone
             $message = \preg_replace('/(.*<h1 class="error__heading">)([^<]+)(<\/h1>\s*<p class="error__text">)([^<]+)(<\/p>.*)/muis', '$2: $4', $data ?? '');
+            #If message is same as original data, then it's not a full error page, but a partially blocked page due to privacy settings, so we get the text differently
+            if ($message === ($data ?? '')) {
+                $message = \preg_replace('/(.*<p class="parts__zero">)([^<]+)(\.?<\/p>.*)/muis', '$2', $data ?? '');
+            }
             throw new \RuntimeException((empty($message) ? 'No access, possibly private entity' : $message).', '.$http_code, $http_code);
         }
         if ($http_code === 0) {
