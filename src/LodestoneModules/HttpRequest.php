@@ -60,7 +60,7 @@ class HttpRequest
         $url = \str_ireplace(' ', '+', $url);
         
         \curl_setopt(self::$curl_handle, \CURLOPT_URL, $url);
-        // handle response
+        #Handle response
         $response = \curl_exec(self::$curl_handle);
         $curl_error = \curl_error(self::$curl_handle);
         $header_length = \curl_getinfo(self::$curl_handle, \CURLINFO_HEADER_SIZE);
@@ -74,12 +74,13 @@ class HttpRequest
         }
         $data = mb_substr($response, $header_length, null, 'UTF-8');
         
-        // specific conditions to return code on
+        #Specific conditions to return code on
         $http_code = (int)$http_code;
         if ($http_code === 404) {
             throw new \RuntimeException('Requested page was not found, '.$http_code, $http_code);
         }
-        if ($http_code === 503) {
+        #While different 5xx errors can mean different things, ultimately they mean server-side issue, thus that Lodestone is not available for us
+        if ($http_code >= 500) {
             throw new \RuntimeException('Lodestone not available, '.$http_code, $http_code);
         }
         if ($http_code === 403) {
@@ -103,9 +104,7 @@ class HttpRequest
             $message = \preg_replace('/(.*?<h1 class="(error|maintenance)__heading">)([^<]+)(<\/h1>\s*<p class="(error|maintenance)__text">)([^<]+)(<\/p>.*)/muis', '$3: $6', $data ?? '');
             throw new \RuntimeException((empty($message) ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
         }
-        
-        
-        // check that data is not empty
+        #Check that data is not empty
         if (empty($data)) {
             throw new \RuntimeException('Requested page is empty');
         }
