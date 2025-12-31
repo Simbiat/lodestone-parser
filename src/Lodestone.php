@@ -38,62 +38,36 @@ class Lodestone
         $this->converters = new Converters();
     }
     
-    /**
-     * Class destructor
-     */
-    public function __destruct()
-    {
-        #Force close cURL handler
-        if (!empty(HttpRequest::$curl_handle)) {
-            \curl_close(HttpRequest::$curl_handle);
-        }
-    }
-    
     #############
     #Accessor functions
     #############
     /**
      * Get results of accumulated from other function
-     * @param bool $close Whether to close the cURL after getting results
      *
      * @return array
      */
-    public function getResult(bool $close = true): array
+    public function getResult(): array
     {
-        #Close cURL handler
-        if ($close) {
-            \curl_close(HttpRequest::$curl_handle);
-        }
         return $this->result;
     }
     
     /**
      * Get list of all errors
-     * @param bool $close Whether to close the cURL after getting errors
      *
      * @return array
      */
-    public function getErrors(bool $close = false): array
+    public function getErrors(): array
     {
-        #Close cURL handler
-        if ($close) {
-            \curl_close(HttpRequest::$curl_handle);
-        }
         return $this->errors;
     }
     
     /**
      * Get last error
-     * @param bool $close Whether to close the cURL after getting errors
      *
      * @return array|null
      */
-    public function getLastError(bool $close = false): ?array
+    public function getLastError(): ?array
     {
-        #Close cURL handler
-        if ($close) {
-            \curl_close(HttpRequest::$curl_handle);
-        }
         return $this->last_error;
     }
     
