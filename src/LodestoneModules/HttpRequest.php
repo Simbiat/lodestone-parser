@@ -47,9 +47,7 @@ class HttpRequest
             if (self::$curl_handle === false) {
                 throw new \RuntimeException('Failed to initiate cURL handle');
             }
-            if (!\curl_setopt(self::$curl_handle, \CURLOPT_SHARE, $share)) {
-                throw new \RuntimeException('Failed to set cURL share reference');
-            }
+            self::$curl_options[\CURLOPT_SHARE] = $share;
             if (!\curl_setopt_array(self::$curl_handle, self::$curl_options)) {
                 throw new \RuntimeException('Failed to set cURL handle options');
             }
