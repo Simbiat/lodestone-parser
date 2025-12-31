@@ -36,14 +36,19 @@ class HttpRequest
      */
     public function __construct(string $user_agent = '')
     {
-        if (!empty($user_agent)) {
+        if (\preg_match('/^\s*$/u', $user_agent) === 0) {
             self::$curl_options[\CURLOPT_USERAGENT] = $user_agent;
         }
         #Check if the handle already created
-        if (empty(self::$curl_handle)) {
+        if (self::$curl_handle === null || self::$curl_handle === false) {
+            #Create or retrieve a persistent cURL share handle to share data to help speed up connections
+            $share = \curl_share_init_persistent([\CURL_LOCK_DATA_DNS, \CURL_LOCK_DATA_SSL_SESSION, \CURL_LOCK_DATA_CONNECT, \CURL_LOCK_DATA_PSL]);
             self::$curl_handle = \curl_init();
             if (self::$curl_handle === false) {
                 throw new \RuntimeException('Failed to initiate cURL handle');
+            }
+            if (\curl_setopt(self::$curl_handle, \CURLOPT_SHARE, $share)) {
+                throw new \RuntimeException('Failed to set cURL share reference');
             }
             if (!\curl_setopt_array(self::$curl_handle, self::$curl_options)) {
                 throw new \RuntimeException('Failed to set cURL handle options');
@@ -90,7 +95,7 @@ class HttpRequest
             if ($message === ($data ?? '')) {
                 $message = \preg_replace('/(.*<p class="parts__zero">)([^<]+)(\.?<\/p>.*)/muis', '$2', $data ?? '');
             }
-            throw new \RuntimeException((empty($message) ? 'No access, possibly private entity' : $message).', '.$http_code, $http_code);
+            throw new \RuntimeException((\preg_match('/^\s*$/u', $message) === 0 ? 'No access, possibly private entity' : $message).', '.$http_code, $http_code);
         }
         if ($http_code === 0) {
             throw new \RuntimeException($curl_error, $http_code);
@@ -102,10 +107,10 @@ class HttpRequest
             \file_put_contents(__DIR__.'/html.txt', $data ?? '');
             #Get the message from Lodestone
             $message = \preg_replace('/(.*?<h1 class="(error|maintenance)__heading">)([^<]+)(<\/h1>\s*<p class="(error|maintenance)__text">)([^<]+)(<\/p>.*)/muis', '$3: $6', $data ?? '');
-            throw new \RuntimeException((empty($message) ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
+            throw new \RuntimeException((\preg_match('/^\s*$/u', $message) === 0 ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
         }
         #Check that data is not empty
-        if (empty($data)) {
+        if (\preg_match('/^\s*$/u', $data) !== 0) {
             throw new \RuntimeException('Requested page is empty');
         }
         
