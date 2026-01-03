@@ -46,8 +46,8 @@ trait Parsers
             if ($exception->getCode() === 404) {
                 $this->addToResults($resultkey, $resultsubkey, 404);
             } elseif ($exception->getCode() === 403) {
-                if ($this->type === 'character') {
-                    $this->addToResults($resultkey, $resultsubkey, ['private' => true]);
+                if (in_array($this->type, ['character', 'achievements', 'achievement_details', 'character_friends', 'character_following'], true)) {
+                    $this->addToResults($resultkey, $resultsubkey, 403);
                 }
             } else {
                 #Any network errors or throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
@@ -606,15 +606,21 @@ trait Parsers
                 break;
             case 'free_company':
             case 'character':
-                $this->result[$resultkey][$this->type_settings['id']] = $result;
+                if ($result === 403) {
+                    $this->result[$resultkey][$this->type_settings['id']] = ['private' => true];
+                } else {
+                    $this->result[$resultkey][$this->type_settings['id']] = $result;
+                }
                 break;
             case 'character_jobs':
             case 'character_friends':
             case 'character_following':
             case 'free_company_members':
             case 'linkshell_members':
-                if ($result === 404) {
-                    if (!isset($this->result[$resultkey]) || (!\is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
+                if ($result === 403 && in_array($this->type, ['character_friends', 'character_following'], true)) {
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
+                } elseif ($result === 404) {
+                    if (!\array_key_exists($resultkey, $this->result) || (!\is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
                         $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = $result;
                     }
                 } else {
@@ -629,12 +635,16 @@ trait Parsers
                 }
                 break;
             case 'achievements':
-                if ($result !== 404 && ($this->type_settings['only_owned'] === false || ($this->type_settings['only_owned'] === true && is_array($result) && $result['time'] !== NULL))) {
+                if ($result === 403) {
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
+                } elseif ($result !== 404 && ($this->type_settings['only_owned'] === false || ($this->type_settings['only_owned'] === true && is_array($result) && $result['time'] !== null))) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
                 break;
             case 'achievement_details':
-                if ($result !== 404 || empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']])) {
+                if ($result === 403) {
+                    $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
+                } elseif ($result !== 404 || empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']])) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']] = $result;
                 }
                 break;
