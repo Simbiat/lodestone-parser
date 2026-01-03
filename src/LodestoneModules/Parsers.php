@@ -362,7 +362,7 @@ trait Parsers
                         if (empty($temp_result['points'])) {
                             $temp_results[$key]['points'] = 0;
                         }
-                        if (empty($temp_result['subcategory'])) {
+                        if (empty($temp_result['subcategory']) && !empty($temp_result['category'])) {
                             if ($temp_result['category'] === 'Quests') {
                                 $temp_results[$key]['subcategory'] = 'Seasonal Events';
                             } elseif ($temp_result['category'] === 'PvP') {
