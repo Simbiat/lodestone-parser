@@ -145,8 +145,8 @@ trait Parsers
             };
             
             #Uncomment for debugging purposes
-            file_put_contents(__DIR__.'/regex.txt', $regex);
-            file_put_contents(__DIR__.'/html.txt', $this->html);
+            #\file_put_contents(__DIR__.'/regex.txt', $regex);
+            #\file_put_contents(__DIR__.'/html.txt', $this->html);
             
             if (!$this->regexfail(\preg_match_all($regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
