@@ -145,8 +145,8 @@ trait Parsers
             };
             
             #Uncomment for debugging purposes
-            #file_put_contents(__DIR__.'/regex.txt', $regex);
-            #file_put_contents(__DIR__.'/html.txt', $this->html);
+            file_put_contents(__DIR__.'/regex.txt', $regex);
+            file_put_contents(__DIR__.'/html.txt', $this->html);
             
             if (!$this->regexfail(\preg_match_all($regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
@@ -333,38 +333,41 @@ trait Parsers
                         }
                         break;
                     case 'achievements':
-                        $temp_results[$key]['title'] = !empty($temp_result['title']);
-                        $temp_results[$key]['item'] = !empty($temp_result['item']);
-                        if (empty($temp_result['time'])) {
-                            $temp_results[$key]['time'] = NULL;
-                        }
-                        if (empty($temp_result['points'])) {
-                            $temp_results[$key]['points'] = 0;
-                        }
-                        break;
                     case 'achievement_details':
                     case 'achievement_from_db':
-                        if (empty($temp_result['title'])) {
-                            $temp_results[$key]['title'] = NULL;
+                        if ($this->type === 'achievements') {
+                            $temp_results[$key]['title'] = !empty($temp_result['title']);
+                            $temp_results[$key]['item'] = !empty($temp_result['item']);
                         } else {
-                            $temp_result['title'] = mb_trim($temp_result['title'], null, 'UTF-8');
-                        }
-                        if (empty($temp_result['item'])) {
-                            $temp_results[$key]['item'] = NULL;
-                        }
-                        if (!empty($temp_result['item_name'])) {
-                            $temp_results[$key]['item'] = [
-                                'id' => $temp_result['item_id'],
-                                'name' => $temp_result['item_name'],
-                                'icon' => $temp_result['item_icon'],
-                            ];
-                            unset($temp_results[$key]['item_id'], $temp_results[$key]['item_name'], $temp_results[$key]['item_icon']);
+                            if (empty($temp_result['title'])) {
+                                $temp_results[$key]['title'] = null;
+                            } else {
+                                $temp_result['title'] = mb_trim($temp_result['title'], null, 'UTF-8');
+                            }
+                            if (empty($temp_result['item'])) {
+                                $temp_results[$key]['item'] = null;
+                            }
+                            if (!empty($temp_result['item_name'])) {
+                                $temp_results[$key]['item'] = [
+                                    'id' => $temp_result['item_id'],
+                                    'name' => $temp_result['item_name'],
+                                    'icon' => $temp_result['item_icon'],
+                                ];
+                                unset($temp_results[$key]['item_id'], $temp_results[$key]['item_name'], $temp_results[$key]['item_icon']);
+                            }
                         }
                         if (empty($temp_result['time'])) {
                             $temp_results[$key]['time'] = NULL;
                         }
                         if (empty($temp_result['points'])) {
                             $temp_results[$key]['points'] = 0;
+                        }
+                        if (empty($temp_result['subcategory'])) {
+                            if ($temp_result['category'] === 'Quests') {
+                                $temp_results[$key]['subcategory'] = 'Seasonal Events';
+                            } elseif ($temp_result['category'] === 'PvP') {
+                                $temp_results[$key]['subcategory'] = 'Ranking';
+                            }
                         }
                         break;
                     case 'database':
