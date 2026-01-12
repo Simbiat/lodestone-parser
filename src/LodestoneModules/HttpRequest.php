@@ -70,7 +70,7 @@ class HttpRequest
         $http_code = \curl_getinfo(self::$curl_handle, \CURLINFO_HTTP_CODE);
         if ($response === false) {
             #While this may not be a true 503 and can be an issue on client side, we treat it as Lodestone being 503
-            if (\preg_match('/(Operation timed out after|Could not resolve host)/ui', $curl_error)) {
+            if (\preg_match('/(Operation timed out after|Could not resolve host|Resolving timed out after)/ui', $curl_error)) {
                 throw new \RuntimeException('Lodestone not available, 503', 503);
             }
             throw new \RuntimeException($curl_error, $http_code);
