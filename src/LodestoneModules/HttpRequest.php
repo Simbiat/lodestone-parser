@@ -28,7 +28,7 @@ class HttpRequest
         \CURLOPT_SSL_VERIFYPEER => true,
     ];
     
-    public static \CurlHandle|null|false $curl_handle = null;
+    private(set) static \CurlHandle|null|false $curl_handle = null;
     
     /**
      * Main constructor
