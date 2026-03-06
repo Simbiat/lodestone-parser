@@ -55,7 +55,7 @@ class HttpRequest
     }
     
     /**
-     * Get content from page
+     * Get content from a page
      * @throws \Exception
      */
     public function get(string $url): string
@@ -69,8 +69,8 @@ class HttpRequest
         $header_length = \curl_getinfo(self::$curl_handle, \CURLINFO_HEADER_SIZE);
         $http_code = \curl_getinfo(self::$curl_handle, \CURLINFO_HTTP_CODE);
         if ($response === false) {
-            #While this may not be a true 503 and can be an issue on client side, we treat it as Lodestone being 503
-            if (\preg_match('/(Operation timed out after|Could not resolve host|Resolving timed out after|Connection reset by peer|was not closed cleanly)/ui', $curl_error)) {
+            #While this may not be a true 503 and can be an issue on the client side, we treat it as Lodestone being 503
+            if (\preg_match('/(Operation timed out after|Could not resolve host|Resolving timed out after|Connection reset by peer|was not closed cleanly|Connection timed out)/ui', $curl_error)) {
                 throw new \RuntimeException('Lodestone not available, 503', 503);
             }
             throw new \RuntimeException($curl_error, $http_code);
@@ -89,7 +89,7 @@ class HttpRequest
         if ($http_code === 403) {
             #Get the message from Lodestone
             $message = \preg_replace('/(.*<h1 class="error__heading">)([^<]+)(<\/h1>\s*<p class="error__text">)([^<]+)(<\/p>.*)/muis', '$2: $4', $data ?? '');
-            #If message is same as original data, then it's not a full error page, but a partially blocked page due to privacy settings, so we get the text differently
+            #If the message is the same as original data, then it's not a full error page, but a partially blocked page due to privacy settings, so we get the text differently
             if ($message === ($data ?? '')) {
                 $message = \preg_replace('/(.*<p class="parts__zero">)([^<]+)(\.?<\/p>.*)/muis', '$2', $data ?? '');
             }
