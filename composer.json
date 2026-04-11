@@ -21,7 +21,8 @@
     "require": {
         "php": "^8.5",
         "ext-curl": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "simbiat/stringhelpers": "^2.0"
     },
     "replace": {
         "simbiat/lodestone-php": "*"

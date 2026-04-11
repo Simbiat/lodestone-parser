@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Simbiat\FFXIV\LodestoneModules;
 
+use Simbiat\StringHelpers\Sanitize;
+
 /**
  * Class to make HTTP requests
  */
@@ -36,7 +38,7 @@ class HttpRequest
      */
     public function __construct(string $user_agent = '')
     {
-        if (\preg_match('/^\s*$/u', $user_agent) === 0) {
+        if (!Sanitize::whiteString($user_agent)) {
             self::$curl_options[\CURLOPT_USERAGENT] = $user_agent;
         }
         #Check if the handle already created
@@ -93,7 +95,7 @@ class HttpRequest
             if ($message === ($data ?? '')) {
                 $message = \preg_replace('/(.*<p class="parts__zero">)([^<]+)(\.?<\/p>.*)/muis', '$2', $data ?? '');
             }
-            throw new \RuntimeException((\preg_match('/^\s*$/u', $message) === 0 ? 'No access, possibly private entity' : $message).', '.$http_code, $http_code);
+            throw new \RuntimeException((Sanitize::whiteString($message) ? 'No access, possibly private entity' : $message).', '.$http_code, $http_code);
         }
         if ($http_code === 0) {
             throw new \RuntimeException($curl_error, $http_code);
@@ -105,10 +107,10 @@ class HttpRequest
             \file_put_contents(__DIR__.'/html.txt', $data ?? '');
             #Get the message from Lodestone
             $message = \preg_replace('/(.*?<h1 class="(error|maintenance)__heading">)([^<]+)(<\/h1>\s*<p class="(error|maintenance)__text">)([^<]+)(<\/p>.*)/muis', '$3: $6', $data ?? '');
-            throw new \RuntimeException((\preg_match('/^\s*$/u', $message) === 0 ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
+            throw new \RuntimeException((Sanitize::whiteString($message) ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
         }
         #Check that data is not empty
-        if (\preg_match('/^\s*$/u', $data) !== 0) {
+        if (Sanitize::whiteString($data)) {
             throw new \RuntimeException('Requested page is empty');
         }
         
