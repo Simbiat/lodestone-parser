@@ -58,6 +58,7 @@ class HttpRequest
     
     /**
      * Get content from a page
+     * @internal
      * @throws \Exception
      */
     public function get(string $url): string

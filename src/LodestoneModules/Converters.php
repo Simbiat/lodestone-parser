@@ -670,7 +670,7 @@ class Converters
     /**
      * Convert memory size for benchmark
      * @param $bytes
-     *
+     * @internal
      * @return string
      */
     public function memory($bytes): string
