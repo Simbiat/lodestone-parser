@@ -447,6 +447,12 @@ class Converters
             'fsh' => '18',
             'gnb' => '37',
             'dnc' => '38',
+            'rpr' => '39',
+            'sge' => '40',
+            'vpr' => '41',
+            'pct' => '42',
+            'blu' => '36',
+            'bst' => '43',
             default => '',
         };
     }
@@ -479,6 +485,8 @@ class Converters
             'dnc' => 'baa255d6ec667f5a88920d8968e86a41261d8576',
             'rpr' => 'c3c6557ad8cc33a73a392f68e45926710496eb13',
             'sge' => '3516b2b3881af781dba74a70f7d3e5d01bb73434',
+            'vpr' => '237c4264c70a9e375b807463c58028e42b2f4aea',
+            'pct' => '7ce779d75ee646a58c0301bb1a4673d8214dc414',
             default => '',
         };
     }
