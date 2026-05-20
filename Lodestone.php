@@ -26,7 +26,14 @@ class Lodestone
     protected string $url = '';
     protected string $type = '';
     protected array $type_settings = [];
+    /**
+     * @var string Latest HTML grabbed by the parser
+     */
     protected string $html = '';
+    /**
+     * @var string Latest RegExp string used by the parser
+     */
+    protected string $regex = '';
     private bool $all_pages = false;
     protected ?object $converters = null;
     protected array $result = [];

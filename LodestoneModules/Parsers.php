@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Simbiat\FFXIV\LodestoneModules;
 
+use Simbiat\StringHelpers\Sanitize;
 use function in_array, is_array, sprintf;
 
 /**
@@ -79,13 +80,13 @@ trait Parsers
                 'maintenance',
                 'updates',
                 'status',
-            ])) {
+            ], true)) {
                 if (!$this->regexfail(\preg_match_all(Regex::PAGECOUNT, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'PAGECOUNT')) {
                     return $this;
                 }
                 $this->pages($pages, $resultkey);
             }
-            if (in_array($this->type, ['grand_company_ranking', 'free_company_ranking'])) {
+            if (in_array($this->type, ['grand_company_ranking', 'free_company_ranking'], true)) {
                 if (!$this->regexfail(\preg_match_all(Regex::PAGECOUNT2, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'PAGECOUNT2')) {
                     return $this;
                 }
@@ -112,7 +113,7 @@ trait Parsers
                 'maintenance',
                 'updates',
                 'status',
-            ])) {
+            ], true)) {
                 if (!$this->regexfail(\preg_match_all(Regex::NOTICES, $this->html, $notices, \PREG_SET_ORDER), \preg_last_error(), 'NOTICES')) {
                     return $this;
                 }
@@ -121,7 +122,7 @@ trait Parsers
             
             #Main (general) parser
             #Setting initial regex
-            $regex = match ($this->type) {
+            $this->regex = match ($this->type) {
                 'search_pvp_team' => Regex::PVPTEAMLIST,
                 'search_linkshell' => Regex::LINKSHELLLIST,
                 'search_free_company' => Regex::FREECOMPANYLIST,
@@ -145,10 +146,10 @@ trait Parsers
             };
             
             #Uncomment for debugging purposes
-            #\file_put_contents(__DIR__.'/regex.txt', $regex);
+            #\file_put_contents(__DIR__.'/regex.txt', $this->regex);
             #\file_put_contents(__DIR__.'/html.txt', $this->html);
             
-            if (!$this->regexfail(\preg_match_all($regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
+            if (!$this->regexfail(\preg_match_all($this->regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
                     'search_character',
                     'character_friends',
@@ -164,7 +165,7 @@ trait Parsers
                     'maintenance',
                     'updates',
                     'status',
-                ])) {
+                ], true)) {
                     if (!empty($this->type_settings['id']) && !empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]['total'])) {
                         return $this;
                     }
@@ -289,7 +290,7 @@ trait Parsers
                         if (!empty($temp_result['estate_address'])) {
                             $temp_results[$key]['estate']['address'] = $temp_result['estate_address'];
                         }
-                        if (!empty($temp_result['estate_greeting']) && !in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'])) {
+                        if (!empty($temp_result['estate_greeting']) && !in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'], true)) {
                             $temp_results[$key]['estate']['greeting'] = $temp_result['estate_greeting'];
                         }
                         #Grand companies reputation
@@ -425,17 +426,17 @@ trait Parsers
                                 $temp_results[$key]['area'] = \preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', \str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['column1'], null, 'UTF-8')));
                                 break;
                             case 'text_command':
-                                if (in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'])) {
+                                if (in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'], true)) {
                                     $temp_results[$key]['Windows'] = true;
                                 } else {
                                     $temp_results[$key]['Windows'] = false;
                                 }
-                                if (in_array($temp_results[$key]['column2'], ['Yes', '○', 'oui', '○'])) {
+                                if (in_array($temp_results[$key]['column2'], ['Yes', '○', 'oui', '○'], true)) {
                                     $temp_results[$key]['PS4'] = true;
                                 } else {
                                     $temp_results[$key]['PS4'] = false;
                                 }
-                                if (in_array($temp_results[$key]['column3'], ['Yes', '○', 'oui', '○'])) {
+                                if (in_array($temp_results[$key]['column3'], ['Yes', '○', 'oui', '○'], true)) {
                                     $temp_results[$key]['Mac'] = true;
                                 } else {
                                     $temp_results[$key]['Mac'] = false;
@@ -453,7 +454,7 @@ trait Parsers
                             throw new \UnexpectedValueException('No avatar key for character '.$this->type_settings['id']);
                         }
                         $temp_results[$key]['portrait'] = \str_replace('c0.jpg', 'l0.jpg', $temp_result['avatar']);
-                        #Since release of Dawntrail, if profile is private you won't get any of the fields below
+                        #Since the release of Dawntrail, if profile is private, you won't get any of the fields below
                         if ($temp_results[$key]['private'] === false) {
                             $temp_results[$key]['race'] = mb_trim($temp_results[$key]['race'], null, 'UTF-8');
                             $temp_results[$key]['clan'] = mb_trim($temp_results[$key]['clan'], null, 'UTF-8');
@@ -470,9 +471,9 @@ trait Parsers
                                 }
                             }
                             $temp_results[$key]['nameday'] = \str_replace('32st', '32nd', $temp_results[$key]['nameday']);
-                            if (!empty($temp_result['uppertitle'])) {
+                            if (\array_key_exists('uppertitle', $temp_result) && !Sanitize::whiteString($temp_result['uppertitle'])) {
                                 $temp_results[$key]['title'] = $temp_result['uppertitle'];
-                            } elseif (!empty($temp_result['undertitle'])) {
+                            } elseif (\array_key_exists('undertitle', $temp_result) && !Sanitize::whiteString($temp_result['undertitle'])) {
                                 $temp_results[$key]['title'] = $temp_result['undertitle'];
                             } else {
                                 $temp_results[$key]['title'] = '';
@@ -539,8 +540,8 @@ trait Parsers
                         break;
                     case 'character_jobs':
                         $temp_result['id'] = $this->converters->classToJob($temp_result['name']);
-                        $temp_result['expcur'] = \preg_replace('/\D/', '', $temp_result['expcur'] ?? '');
-                        $temp_result['expmax'] = \preg_replace('/\D/', '', $temp_result['expmax'] ?? '');
+                        $temp_result['expcur'] = \preg_replace('/\D/u', '', $temp_result['expcur'] ?? '');
+                        $temp_result['expmax'] = \preg_replace('/\D/u', '', $temp_result['expmax'] ?? '');
                         $temp_results[$key] = $this->jobDetails($temp_result);
                         break;
                 }
@@ -675,9 +676,9 @@ trait Parsers
                                 'Online' => $server['maintenance'] === '1',
                                 'Partial maintenance' => $server['maintenance'] === '2',
                                 'Full maintenance' => $server['maintenance'] === '3',
-                                'Preferred' => in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt']),
-                                'Congested' => in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet']),
-                                'New characters' => in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich']),
+                                'Preferred' => in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt'], true),
+                                'Congested' => in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet'], true),
+                                'New characters' => in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich'], true),
                             ];
                         }
                     } else {
@@ -744,7 +745,7 @@ trait Parsers
                 'grand_company_ranking',
                 'free_company_ranking',
                 'database',
-            ])) {
+            ], true)) {
             switch ($this->type) {
                 case 'character_friends':
                 case 'character_following':
@@ -938,7 +939,7 @@ trait Parsers
         if (!empty($pages[0]['linkshell_name'])) {
             $this->result[$resultkey][$this->type_settings['id']]['name'] = mb_trim($pages[0]['linkshell_name'], null, 'UTF-8');
             if (!empty($pages[0]['linkshell_server'])) {
-                if (\preg_match('/[a-zA-Z0-9]{40}/mi', $this->type_settings['id'])) {
+                if (\preg_match('/[a-zA-Z0-9]{40}/miu', $this->type_settings['id'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['data_center'] = $pages[0]['linkshell_server'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
@@ -1037,12 +1038,13 @@ trait Parsers
     protected function jobs(): array
     {
         $temp_jobs = [];
+        $this->regex = Regex::CHARACTER_JOBS;
         if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_JOBS, $this->html, $jobs, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_JOBS')) {
             return [];
         }
         foreach ($jobs as $job) {
-            $job['expcur'] = \preg_replace('/\D/', '', $job['expcur']);
-            $job['expmax'] = \preg_replace('/\D/', '', $job['expmax']);
+            $job['expcur'] = \preg_replace('/\D/u', '', $job['expcur']);
+            $job['expmax'] = \preg_replace('/\D/u', '', $job['expmax']);
             $temp_jobs[$this->converters->classToJob($job['name'])] = $this->jobDetails($job);
         }
         return $temp_jobs;
@@ -1072,6 +1074,7 @@ trait Parsers
     protected function attributes(): array
     {
         $temp_attrs = [];
+        $this->regex = Regex::CHARACTER_ATTRIBUTES;
         if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_ATTRIBUTES, $this->html, $attributes, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_ATTRIBUTES')) {
             return [];
         }
@@ -1112,6 +1115,7 @@ trait Parsers
      */
     protected function items(): array
     {
+        $this->regex = Regex::CHARACTER_GEAR;
         if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_GEAR, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_GEAR')) {
             return [];
         }
@@ -1122,13 +1126,17 @@ trait Parsers
                     unset($temp_results[$key][(int)$key2]);
                 }
             }
+            $temp_results[$key]['url'] = $temp_result['url'];
+            $temp_results[$key]['icon'] = $temp_result['icon'];
+            #Below no longer works, since only tooltip URLs are provided, which require extra parsing
+            /*
             $temp_results[$key]['armoireable'] = $this->converters->imageToBool($temp_result['armoireable']);
             $temp_results[$key]['hq'] = !empty($temp_result['hq']);
             $temp_results[$key]['unique'] = !empty($temp_result['unique']);
             #Requirements
             $temp_results[$key]['requirements'] = [
                 'level' => $temp_result['level'],
-                'classes' => (in_array($temp_result['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス']) ? $temp_result['classes'] : \explode(' ', $temp_result['classes'])),
+                'classes' => (in_array($temp_result['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス'], true) ? $temp_result['classes'] : \explode(' ', $temp_result['classes'])),
             ];
             #Attributes
             for ($iteration = 1; $iteration <= 15; $iteration++) {
@@ -1199,6 +1207,7 @@ trait Parsers
                 ];
             }
             unset($temp_results[$key]['level'], $temp_results[$key]['classes'], $temp_results[$key]['price'], $temp_results[$key]['unsellable'], $temp_results[$key]['marketprohibited'], $temp_results[$key]['repair'], $temp_results[$key]['materials'], $temp_results[$key]['desynthesizable'], $temp_results[$key]['melding'], $temp_results[$key]['advancedmelding'], $temp_results[$key]['convertible'], $temp_results[$key]['glamourname'], $temp_results[$key]['glamourid'], $temp_results[$key]['glamouricon'], $temp_results[$key]['crestable'], $temp_results[$key]['glamourable'], $temp_results[$key]['projectable'], $temp_results[$key]['dyeable'], $temp_results[$key]['untradeable'], $temp_results[$key]['shop']);
+            */
         }
         return $temp_results;
     }
@@ -1258,8 +1267,9 @@ trait Parsers
      */
     protected function errorRegister(string $errormessage, string $type = 'parse', int $started = 0): void
     {
-        $this->last_error = ['type' => $this->type, 'id' => ($this->type_settings['id'] ?? NULL), 'error' => $errormessage, 'url' => $this->url];
-        $this->errors[] = $this->last_error;
+        $error = ['type' => $this->type, 'id' => ($this->type_settings['id'] ?? NULL), 'error' => $errormessage, 'url' => $this->url];
+        $this->last_error = \array_merge($error, ['html' => $this->html, 'regex' => $this->regex]);
+        $this->errors[] = $error;
         if ($this->benchmark) {
             if ($started === 0) {
                 $duration = 0;
@@ -1289,13 +1299,13 @@ trait Parsers
     }
     
     /**
-     * Function to reset last error (in case false positive)
+     * Function to reset the last error (in case false positive)
      * @return void
      */
     protected function errorUnregister(): void
     {
         \array_pop($this->errors);
-        if (empty($this->errors)) {
+        if (\count($this->errors) === 0) {
             $this->last_error = NULL;
         } else {
             $this->last_error = \end($this->errors);
