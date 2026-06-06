@@ -236,11 +236,13 @@ trait Parsers
                             $temp_results[$key]['rank_icon'] = $temp_result['ls_rank_icon'];
                         }
                         #Specific for linkshell members
-                        if (empty($this->result['server']) && !empty($this->type_settings['id'])) {
-                            $this->result[$resultkey][$this->type_settings['id']]['server'] = $temp_result['server'];
-                        }
-                        if (!empty($pages[0]['linkshell_server']) && !empty($this->type_settings['id'])) {
-                            $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
+                        if ($this->type === 'linkshell_members') {
+                            if (empty($this->result['server']) && !empty($this->type_settings['id'])) {
+                                $this->result[$resultkey][$this->type_settings['id']]['server'] = $temp_result['server'];
+                            }
+                            if (!empty($pages[0]['linkshell_server']) && !empty($this->type_settings['id'])) {
+                                $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
+                            }
                         }
                         break;
                     case 'frontline':

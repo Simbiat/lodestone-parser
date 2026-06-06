@@ -261,7 +261,7 @@ class Lodestone
     public function getLinkshellMembers(string|int $id, int $page = 1): self
     {
         $page = $this->pageCheck($page);
-        if (\preg_match('/[a-zA-Z0-9]{40}/mi', $id)) {
+        if (\preg_match('/[a-zA-Z0-9]{40}/mui', (string)$id)) {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL, $id, $page);
         } else {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_MEMBERS_URL, $id, $page);
