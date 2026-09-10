@@ -98,7 +98,7 @@ trait Parsers
                 }
                 $this->pages($pages, $resultkey);
             }
-            
+
             #Banners special precut
             if ($this->type === 'banners') {
                 if (!$this->regexfail(\preg_match(Regex::BANNERS, $this->html, $banners), \preg_last_error(), 'BANNERS')) {
@@ -106,7 +106,7 @@ trait Parsers
                 }
                 $this->html = $banners[0];
             }
-            
+
             #Notices special precut for pinned items
             if (in_array($this->type, [
                 'notices',
@@ -119,7 +119,7 @@ trait Parsers
                 }
                 $this->html = $notices[0][0];
             }
-            
+
             #Main (general) parser
             #Setting initial regex
             $this->regex = match ($this->type) {
@@ -144,11 +144,11 @@ trait Parsers
                 'achievement_from_db' => Regex::ACHIEVEMENT_DB,
                 default => Regex::CHARACTERLIST,
             };
-            
+
             #Uncomment for debugging purposes
             #\file_put_contents(__DIR__.'/regex.txt', $this->regex);
             #\file_put_contents(__DIR__.'/html.txt', $this->html);
-            
+
             if (!$this->regexfail(\preg_match_all($this->regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
                     'search_character',
@@ -174,22 +174,21 @@ trait Parsers
                     return $this;
                 }
             }
-            
+
             #Character results update
             if ($this->type === 'character') {
                 #Remove non-named groups before rearranging results to avoid overwrites
                 foreach ($temp_results as $key => $temp_result) {
                     foreach ($temp_result as $key2 => $details) {
                         if (\is_numeric($key2) || empty($details)) {
-                            #No idea why EA thinks $key2 is float, when it's either string or int. Probably gets confused by is_numeric check
-                            /** @noinspection OffsetOperationsInspection */
+                            #No idea why EA thinks $key2 is float when it's either string or int. Probably gets confused by is_numeric check
                             unset($temp_results[$key][$key2]);
                         }
                     }
                 }
                 $temp_results = [\array_merge($temp_results[0], $temp_results[1], $temp_results[2] ?? [])];
             }
-            
+
             foreach ($temp_results as $key => $temp_result) {
                 #Remove unnamed groups and empty values
                 foreach ($temp_result as $key2 => $value) {
@@ -204,7 +203,7 @@ trait Parsers
                     #Decode in original data (for consistency)
                     $temp_results[$key][$key2] = \html_entity_decode($value, \ENT_QUOTES | \ENT_HTML5);
                 }
-                
+
                 #Specific processing
                 switch ($this->type) {
                     case 'search_pvp_team':
@@ -547,14 +546,14 @@ trait Parsers
                         $temp_results[$key] = $this->jobDetails($temp_result);
                         break;
                 }
-                
+
                 #Unset stuff for cleaner look. Since it does not trigger warnings if variable is missing, no need to "switch" it
                 unset($temp_results[$key]['crest1'], $temp_results[$key]['crest2'], $temp_results[$key]['crest3'], $temp_results[$key]['fccrestimg1'], $temp_results[$key]['fccrestimg2'], $temp_results[$key]['fccrestimg3'], $temp_results[$key]['gc_name'], $temp_results[$key]['gcrank'], $temp_results[$key]['gc_rank_icon'], $temp_results[$key]['fc_id'], $temp_results[$key]['fcname'], $temp_results[$key]['ls_rank_icon'], $temp_results[$key]['jobicon'], $temp_results[$key]['jobform'], $temp_results[$key]['estate_greeting'], $temp_results[$key]['estate_address'], $temp_results[$key]['estate_name'], $temp_results[$key]['city_icon'], $temp_results[$key]['guardianicon'], $temp_results[$key]['gcicon'], $temp_results[$key]['uppertitle'], $temp_results[$key]['undertitle'], $temp_results[$key]['pvpid'], $temp_results[$key]['pvpname'], $temp_results[$key]['pvpcrest1'], $temp_results[$key]['pvpcrest2'], $temp_results[$key]['pvpcrest3'], $temp_results[$key]['rank1'], $temp_results[$key]['rank2'], $temp_results[$key]['id'], $temp_results[$key]['column1'], $temp_results[$key]['column2'], $temp_results[$key]['column3'], $temp_results[$key]['star1'], $temp_results[$key]['star2'], $temp_results[$key]['star3'], $temp_results[$key]['extraicon']);
-                
+
                 #Adding to results
                 $this->addToResults($resultkey, $resultsubkey, $temp_results[$key], (empty($temp_result['id']) ? null : $temp_result['id']));
             }
-            
+
             #Sort worlds
             if ($this->type === 'worlds') {
                 \ksort($this->result[$resultkey]);
@@ -569,7 +568,7 @@ trait Parsers
             $duration = $finished - $started;
             $this->benchUpdate($duration);
         }
-        
+
         #Processing achievements' details last to get proper order of timings for benchmarking
         if ($this->type === 'achievements' && $this->type_settings['details']) {
             foreach ($this->result[$resultkey][$this->type_settings['id']][$resultsubkey] as $key => $ach) {
@@ -583,10 +582,10 @@ trait Parsers
             }
         }
         $this->allpagesproc($resultkey);
-        
+
         return $this;
     }
-    
+
     /**
      * Add  entity to results
      * @param string          $resultkey    Result key (essentially type of the entity)
@@ -720,7 +719,7 @@ trait Parsers
                 break;
         }
     }
-    
+
     /**
      * Function to check if we need to grab all pages and there are still pages left
      *
@@ -847,7 +846,7 @@ trait Parsers
         }
         return false;
     }
-    
+
     /**
      * Function to parse pages
      * @param array  $pages     List of pages
@@ -968,7 +967,7 @@ trait Parsers
         }
         return $this;
     }
-    
+
     /**
      * Getting crest from array based on "keybase" identifying numbered keys in the array
      * @param array  $tempresult Array to process
@@ -999,7 +998,7 @@ trait Parsers
         }
         return $crest;
     }
-    
+
     /**
      * Generate Grand Company details
      * @param array $tempresult
@@ -1017,7 +1016,7 @@ trait Parsers
         }
         return $gc;
     }
-    
+
     /**
      * Generate free company details
      * @param array $tempresult
@@ -1032,7 +1031,7 @@ trait Parsers
             'crest' => $this->crest($tempresult, 'fccrestimg'),
         ];
     }
-    
+
     /**
      * Process character jobs
      * @return array
@@ -1051,7 +1050,7 @@ trait Parsers
         }
         return $temp_jobs;
     }
-    
+
     /**
      * Process job details
      * @param array $job
@@ -1068,7 +1067,7 @@ trait Parsers
             'icon' => $job['icon'],
         ];
     }
-    
+
     /**
      * Process character attributes
      * @return array
@@ -1089,7 +1088,7 @@ trait Parsers
         }
         return $temp_attrs;
     }
-    
+
     /**
      * Process collectibles
      * @param string $type
@@ -1110,7 +1109,7 @@ trait Parsers
         }
         return $collectables;
     }
-    
+
     /**
      * Process items
      * @return array
@@ -1213,7 +1212,7 @@ trait Parsers
         }
         return $temp_results;
     }
-    
+
     /**
      * Convert stars to integer
      * @param array $stars
@@ -1236,7 +1235,7 @@ trait Parsers
         }
         return 0;
     }
-    
+
     /**
      * Function to return error in case regex resulted in 0 or error
      *
@@ -1258,7 +1257,7 @@ trait Parsers
         }
         return true;
     }
-    
+
     /**
      * Function to save error
      * @param string $errormessage
@@ -1286,7 +1285,7 @@ trait Parsers
             $this->benchUpdate($duration);
         }
     }
-    
+
     /**
      * Update benchmark details
      * @param int $duration
@@ -1299,7 +1298,7 @@ trait Parsers
         $this->result['benchmark']['memory'] = $this->converters->memory(\memory_get_usage(true));
         $this->result['benchmark']['memory_peak'] = $this->converters->memory(\memory_get_peak_usage(true));
     }
-    
+
     /**
      * Function to reset the last error (in case false positive)
      * @return void
