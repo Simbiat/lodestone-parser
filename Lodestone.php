@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Simbiat\FFXIV;
 
@@ -15,11 +16,11 @@ use function is_array, is_string, in_array, sprintf;
  */
 class Lodestone
 {
-    #Use trait
+    // Use trait
     use LodestoneModules\Parsers;
-    
+
     public const array LANGUAGES_ALLOWED = ['na', 'jp', 'ja', 'eu', 'fr', 'de'];
-    
+
     protected string $user_agent = '';
     protected string $language = 'na';
     protected bool $benchmark = false;
@@ -39,15 +40,15 @@ class Lodestone
     protected array $result = [];
     protected array $errors = [];
     protected ?array $last_error = NULL;
-    
+
     #[Pure] public function __construct()
     {
         $this->converters = new Converters();
     }
-    
-    #############
-    #Accessor functions
-    #############
+
+    // ############
+    // Accessor functions
+    // ############
     /**
      * Get results of accumulated from other function
      *
@@ -57,7 +58,7 @@ class Lodestone
     {
         return $this->result;
     }
-    
+
     /**
      * Get list of all errors
      *
@@ -67,7 +68,7 @@ class Lodestone
     {
         return $this->errors;
     }
-    
+
     /**
      * Get last error
      *
@@ -77,7 +78,7 @@ class Lodestone
     {
         return $this->last_error;
     }
-    
+
     /**
      * Reset results
      * @return $this
@@ -87,7 +88,7 @@ class Lodestone
         $this->result = [];
         return $this;
     }
-    
+
     /**
      * Reset errors
      * @return $this
@@ -97,10 +98,10 @@ class Lodestone
         $this->errors = [];
         return $this;
     }
-    
-    #############
-    #Character functions
-    #############
+
+    // ############
+    // Character functions
+    // ############
     /**
      * Get data for a character based on ID
      * @param string|int $id Character ID
@@ -114,7 +115,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
+
     /**
      * Get jobs for a character based on ID
      * @param string|int $id Character ID
@@ -128,7 +129,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
+
     /**
      * Get friends of a character based on ID
      * @param string|int $id   Character ID
@@ -144,7 +145,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
+
     /**
      * Get characters followed by a character based on ID
      * @param string|int $id   Character ID
@@ -160,7 +161,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
+
     /**
      * Get character achievements based on ID
      * @param string|int $id             Character ID.
@@ -202,7 +203,7 @@ class Lodestone
         $this->type_settings['achievement_id'] = $achievement_id;
         return $this->parse();
     }
-    
+
     /**
      * Get achievement details from Lodestone Database page
      * @param string $db_id
@@ -217,10 +218,10 @@ class Lodestone
         $this->type_settings['id'] = $db_id;
         return $this->parse();
     }
-    
-    #############
-    #Groups functions
-    #############
+
+    // ############
+    // Groups functions
+    // ############
     /**
      * Get free company data based on ID
      * @param string|int $id Free company ID
@@ -234,7 +235,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
+
     /**
      * Get free company members based on ID
      * @param string|int $id   Free company ID
@@ -250,7 +251,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
+
     /**
      * Get linkshell members based on ID
      * @param string|int $id   Linkshell ID
@@ -270,7 +271,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
+
     /**
      * Get PvP team data based on ID
      * @param string $id PvP team ID
@@ -284,10 +285,10 @@ class Lodestone
         $this->type_settings['id'] = $id;
         return $this->parse();
     }
-    
-    #############
-    #Search functions
-    #############
+
+    // ############
+    // Search functions
+    // ############
     /**
      * Search Lodestone database
      *
@@ -301,7 +302,7 @@ class Lodestone
      */
     public function searchDatabase(#[ExpectedValues(['item', 'duty', 'quest', 'recipe', 'gathering', 'achievement', 'shop', 'text_command'])] string $type, int $category = 0, int $sub_category = 0, string $search = '', int $page = 1): self
     {
-        #Ensure we have lowercase for consistency
+        // Ensure we have lowercase for consistency
         $type = mb_strtolower($type, 'UTF-8');
         if (!in_array($type, ['item', 'duty', 'quest', 'recipe', 'gathering', 'achievement', 'shop', 'text_command'])) {
             throw new \UnexpectedValueException('Unsupported type of database \''.$type.'\' element was requested');
@@ -310,7 +311,7 @@ class Lodestone
         $query = $this->queryBuilder([
             'db_search_category' => $type,
             'category2' => $category,
-            #Duty has been updated at some point and category3 was replaced with ex_version
+            // Duty has been updated at some point and category3 was replaced with ex_version
             ($type === 'duty' ? 'ex_version' : 'category3') => $sub_category,
             'q' => \str_ireplace(' ', '+', $search),
             'page' => $page,
@@ -323,7 +324,7 @@ class Lodestone
         $this->type_settings['search'] = $search;
         return $this->parse();
     }
-    
+
     /**
      * Search for a characters
      *
@@ -372,7 +373,7 @@ class Lodestone
         $this->type_settings['order'] = $order;
         return $this->parse();
     }
-    
+
     /**
      * Search for a free company
      *
@@ -439,7 +440,7 @@ class Lodestone
         $this->type_settings['order'] = $order;
         return $this->parse();
     }
-    
+
     /**
      * Search for a linkshell
      * @param string $name            Optional linkshell name
@@ -473,7 +474,7 @@ class Lodestone
         $this->type_settings['order'] = $order;
         return $this->parse();
     }
-    
+
     /**
      * Search for a PvP team
      * @param string $name   Optional PvP team
@@ -499,10 +500,10 @@ class Lodestone
         $this->type_settings['order'] = $order;
         return $this->parse();
     }
-    
-    #############
-    #Rankings functions
-    #############
+
+    // ############
+    // Rankings functions
+    // ############
     /**
      * Get Feast ranking
      *
@@ -526,7 +527,7 @@ class Lodestone
         $this->type_settings['season'] = $season;
         return $this->parse();
     }
-    
+
     /**
      * Get Deep Dungeon rankings
      * @param int|string $id         Deep Dungeon ID
@@ -565,7 +566,7 @@ class Lodestone
         $this->type_settings['class'] = $subtype;
         return $this->parse();
     }
-    
+
     /**
      * Get Frontline rankings
      * @param string $week_month Weekly or monthly rankings.
@@ -609,7 +610,7 @@ class Lodestone
         $this->type_settings['week_month'] = $week_month;
         return $this->parse();
     }
-    
+
     /**
      * Get Grand Company rankings
      * @param string $week_month Weekly or monthly rankings
@@ -624,7 +625,7 @@ class Lodestone
     {
         return $this->companyRankingHelper($week_month, $week, $world_name, $gc_id, $page, true);
     }
-    
+
     /**
      * Get Free Company rankings
      * @param string $week_month Weekly or monthly rankings
@@ -639,7 +640,7 @@ class Lodestone
     {
         return $this->companyRankingHelper($week_month, $week, $world_name, $gc_id, $page);
     }
-    
+
     /**
      * Helper for company ranking
      *
@@ -684,10 +685,10 @@ class Lodestone
         $this->type_settings['gc_id'] = $gc_id;
         return $this->parse();
     }
-    
-    #############
-    #Special pages functions
-    #############
+
+    // ############
+    // Special pages functions
+    // ############
     /**
      * Get Lodestone banners (ads at the top)
      * @return self
@@ -698,7 +699,7 @@ class Lodestone
         $this->type = 'banners';
         return $this->parse();
     }
-    
+
     /**
      * Get Lodestone news
      * @return self
@@ -709,7 +710,7 @@ class Lodestone
         $this->type = 'news';
         return $this->parse();
     }
-    
+
     /**
      * Get Lodestone topics
      * @param int $page Page number to scan
@@ -723,7 +724,7 @@ class Lodestone
         $this->type = 'topics';
         return $this->parse();
     }
-    
+
     /**
      * Get Lodestone notices
      * @param int $page Page number to scan
@@ -737,7 +738,7 @@ class Lodestone
         $this->type = 'notices';
         return $this->parse();
     }
-    
+
     /**
      * Get Lodestone maintenance information
      * @param int $page Page number to scan
@@ -751,7 +752,7 @@ class Lodestone
         $this->type = 'maintenance';
         return $this->parse();
     }
-    
+
     /**
      * Get Lodestone updates information
      * @param int $page Page number to scan
@@ -765,7 +766,7 @@ class Lodestone
         $this->type = 'updates';
         return $this->parse();
     }
-    
+
     /**
      * Get Lodestone status updates
      * @param int $page Page number to scan
@@ -779,7 +780,7 @@ class Lodestone
         $this->type = 'status';
         return $this->parse();
     }
-    
+
     /**
      * Get status of servers
      * @param bool $world_details Whether to show detailed status of worlds or not
@@ -793,10 +794,10 @@ class Lodestone
         $this->type_settings['world_details'] = $world_details;
         return $this->parse();
     }
-    
-    #############
-    #Logic to accumulate filters and add them as parameters to URL
-    #############
+
+    // ############
+    // Logic to accumulate filters and add them as parameters to URL
+    // ############
     /**
      * Helper function to generate a GET query for other functions
      * @param array $params
@@ -814,7 +815,7 @@ class Lodestone
         }
         return '?'.\implode('&', $query);
     }
-    
+
     /**
      * Helper function to enable `all pages` logic, where supported
      * @param int $page
@@ -829,7 +830,7 @@ class Lodestone
         }
         return $page;
     }
-    
+
     /**
      * Helper function to convert strings into Grand Company IDs
      * @param array|string|int $gc_id
@@ -849,10 +850,10 @@ class Lodestone
         }
         return $gc_id;
     }
-    
-    #############
-    #Settings functions
-    #############
+
+    // ############
+    // Settings functions
+    // ############
     /**
      * Set a custom user-agent
      * @param string $user_agent
@@ -864,7 +865,7 @@ class Lodestone
         $this->user_agent = $user_agent;
         return $this;
     }
-    
+
     /**
      * Set language
      * @param string $language
@@ -882,7 +883,7 @@ class Lodestone
         $this->language = $language;
         return $this;
     }
-    
+
     /**
      * Enable or disable benchmark
      * @param bool $bench

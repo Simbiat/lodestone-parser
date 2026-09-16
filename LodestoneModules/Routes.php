@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Simbiat\FFXIV\LodestoneModules;
 
@@ -8,10 +9,10 @@ namespace Simbiat\FFXIV\LodestoneModules;
  */
 class Routes
 {
-    #base URL
+    // base URL
     public const string LODESTONE_URL_BASE = 'https://%s.finalfantasyxiv.com/lodestone';
-    
-    #characters
+
+    // characters
     public const string LODESTONE_CHARACTERS_URL = '/character/%s/';
     public const string LODESTONE_CHARACTERS_FRIENDS_URL = '/character/%s/friend/?page=%u';
     public const string LODESTONE_CHARACTERS_FOLLOWING_URL = '/character/%s/following/?page=%u';
@@ -19,24 +20,24 @@ class Routes
     public const string LODESTONE_CHARACTERS_MINIONS_URL = '/character/%s/minion/';
     public const string LODESTONE_CHARACTERS_MOUNTS_URL = '/character/%s/mount/';
     public const string LODESTONE_CHARACTERS_SEARCH_URL = '/character/%s';
-    #achievements
+    // achievements
     public const string LODESTONE_ACHIEVEMENTS_URL = '/character/%s/achievement/kind/%u/';
     public const string LODESTONE_ACHIEVEMENTS_CAT_URL = '/character/%s/achievement/category/%u/';
     public const string LODESTONE_ACHIEVEMENTS_DET_URL = '/character/%s/achievement/detail/%u/';
     public const string LODESTONE_ACHIEVEMENTS_DB_URL = '/playguide/db/achievement/%s/';
-    #free company
+    // free company
     public const string LODESTONE_FREECOMPANY_URL = '/freecompany/%s/';
     public const string LODESTONE_FREECOMPANY_SEARCH_URL = '/freecompany/%s';
     public const string LODESTONE_FREECOMPANY_MEMBERS_URL = '/freecompany/%s/member/?page=%u';
-    #linkshell
+    // linkshell
     public const string LODESTONE_LINKSHELL_SEARCH_URL = '/linkshell/%s';
     public const string LODESTONE_LINKSHELL_MEMBERS_URL = '/linkshell/%s/?page=%u';
     public const string LODESTONE_CROSSWORLD_LINKSHELL_SEARCH_URL = '/crossworld_linkshell/%s';
     public const string LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL = '/crossworld_linkshell/%s/?page=%u';
-    #pvp team
+    // pvp team
     public const string LODESTONE_PVPTEAM_SEARCH_URL = '/pvpteam/%s';
     public const string LODESTONE_PVPTEAM_MEMBERS_URL = '/pvpteam/%s/';
-    #news
+    // news
     public const string LODESTONE_BANNERS = '/';
     public const string LODESTONE_NEWS = '/news/';
     public const string LODESTONE_TOPICS = '/topics/?page=%u';
@@ -44,17 +45,17 @@ class Routes
     public const string LODESTONE_MAINTENANCE = '/news/category/2/?page=%u';
     public const string LODESTONE_UPDATES = '/news/category/3/?page=%u';
     public const string LODESTONE_STATUS = '/news/category/4/?page=%u';
-    #world status
+    // world status
     public const string LODESTONE_WORLD_STATUS = '/worldstatus/';
-    #feast
+    // feast
     public const string LODESTONE_FEAST = '/ranking/thefeast/result/%s/%s';
-    #deep dungeon
+    // deep dungeon
     public const string LODESTONE_DEEP_DUNGEON = '/ranking/deepdungeon%s/%s';
-    #frontline
+    // frontline
     public const string LODESTONE_FRONTLINE = '/ranking/frontline/%s/%u/%s';
-    #company rankings
+    // company rankings
     public const string LODESTONE_GCRANKING = '/ranking/gc/%s/%u/%s';
     public const string LODESTONE_FCRANKING = '/ranking/fc/%s/%u/%s';
-    #database
+    // database
     public const string LODESTONE_DATABASE_URL = '/playguide/db/%s/%s';
 }

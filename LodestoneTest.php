@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Simbiat\FFXIV;
 
@@ -11,7 +12,7 @@ use function in_array;
 class LodestoneTest
 {
     private object $lodestone;
-    
+
     /**
      * Creation of the test object
      * @param string $language
@@ -26,8 +27,8 @@ class LodestoneTest
             </style>
             <table><th>Type of test</th><th>Result</th><th>Page time, hh:mm:ss.ms</th><th>Parse time, hh:mm:ss.ms</th><th>Errors</th><th>Output</th>';
         $this->lodestone = new Lodestone()->setLanguage($language)->setUserAgent('Lodestone PHP Parser')->setBenchmark(true);
-        
-        #Checking characters
+
+        // Checking characters
         $this->lodestone = $this->lodestone->getCharacter('6691027');
         $this->tableLine('Character (regular)', $this->lodestone->getResult()['characters']['6691027']);
         $this->lodestone = $this->lodestone->getCharacter('21915843');
@@ -42,8 +43,8 @@ class LodestoneTest
         $this->tableLine('Character following', $this->lodestone->getResult()['characters']['6691027']['following']);
         $this->lodestone = $this->lodestone->getCharacterAchievements('6691027', false, 39, true, true);
         $this->tableLine('Achievements', $this->lodestone->getResult()['characters']['6691027']['achievements']);
-        
-        #Checking groups
+
+        // Checking groups
         $this->lodestone = $this->lodestone->getFreeCompany('9234631035923213559');
         $this->tableLine('Free company (regular)', $this->lodestone->getResult()['freecompanies']['9234631035923213559']);
         $this->lodestone = $this->lodestone->getFreeCompanyMembers('9234631035923202551', 0);
@@ -56,8 +57,8 @@ class LodestoneTest
         $this->tableLine('Linkshell', $this->lodestone->getResult()['linkshells']['19984723346535274']);
         $this->lodestone = $this->lodestone->getPvPTeam('d1ce24446f4fbf6e0eabd31334feef2bc16966d1');
         $this->tableLine('PvP team', $this->lodestone->getResult()['pvpteams']['d1ce24446f4fbf6e0eabd31334feef2bc16966d1']);
-        
-        #Checking searches
+
+        // Checking searches
         $this->lodestone = $this->lodestone->searchCharacter();
         $this->tableLine('Character search', $this->lodestone->getResult(false)['characters']);
         $this->lodestone = $this->lodestone->searchFreeCompany();
@@ -66,8 +67,8 @@ class LodestoneTest
         $this->tableLine('Linkshell search', $this->lodestone->getResult(false)['linkshells']);
         $this->lodestone = $this->lodestone->searchPvPTeam();
         $this->tableLine('PvP teams search', $this->lodestone->getResult(false)['pvpteams']);
-        
-        #Checking specials
+
+        // Checking specials
         $this->lodestone = $this->lodestone->getLodestoneBanners();
         $this->tableLine('Banners', $this->lodestone->getResult(false)['banners']);
         $this->lodestone = $this->lodestone->getLodestoneNews();
@@ -84,8 +85,8 @@ class LodestoneTest
         $this->tableLine('Status', $this->lodestone->getResult(false)['status']);
         $this->lodestone = $this->lodestone->getWorldStatus();
         $this->tableLine('Worlds', $this->lodestone->getResult(false)['worlds']);
-        
-        #Checking rankings
+
+        // Checking rankings
         $this->lodestone = $this->lodestone->getFeast();
         $this->tableLine('Feast (older format)', $this->lodestone->getResult(false)['feast'][1]);
         $this->lodestone = $this->lodestone->getFeast(8);
@@ -100,8 +101,8 @@ class LodestoneTest
         $this->tableLine('Grand Company Ranking', $this->lodestone->getResult(false)['grand_company_ranking']['weekly'][0]);
         $this->lodestone = $this->lodestone->getFreeCompanyRanking('weekly', 0, 'Cerberus');
         $this->tableLine('Free Company Ranking', $this->lodestone->getResult(false)['free_company_ranking']['weekly'][0]);
-        
-        #Checking database
+
+        // Checking database
         $this->lodestone = $this->lodestone->searchDatabase('achievement', 1);
         $this->tableLine('Play guide: achievements', $this->lodestone->getResult(false)['database']['achievement']);
         $this->lodestone = $this->lodestone->searchDatabase('quest', 1);
@@ -118,8 +119,8 @@ class LodestoneTest
         $this->tableLine('Play guide: shops', $this->lodestone->getResult(false)['database']['shop']);
         $this->lodestone = $this->lodestone->searchDatabase('text_command', 1);
         $this->tableLine('Play guide: text commands', $this->lodestone->getResult(false)['database']['text_command']);
-        
-        #Checking Errors
+
+        // Checking Errors
         $this->lodestone = $this->lodestone->getFreeCompany('1');
         $this->tableLine('Non-existent free company', $this->lodestone->getResult(false)['freecompanies']['1'], true);
         $this->lodestone = $this->lodestone->getLinkshellMembers('1');
@@ -131,7 +132,7 @@ class LodestoneTest
         unset($this->lodestone);
         echo '</table>';
     }
-    
+
     /**
      * Generate table row for the report
      * @param string $type    Type of the test

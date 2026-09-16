@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Simbiat\FFXIV\LodestoneModules;
 
@@ -9,23 +10,23 @@ namespace Simbiat\FFXIV\LodestoneModules;
 class Regex
 {
     public const string CREST = 'https:\/\/[\.a-zA-Z0-9\/_\-]{56,72}\.png';
-    #Original limit as a backup. Length limit does not properly work in case of multiple HTML entities
-    #public const string CHARNAME = '([a-zA-Z\' \-]|\&[^\s]*\;){1,50}';
+    // Original limit as a backup. Length limit does not properly work in case of multiple HTML entities
+    // public const string CHARNAME = '([a-zA-Z\' \-]|\&[^\s]*\;){1,50}';
     public const string CHARNAME = '[a-zA-Z\' \-\&;#0-9]{1,450}';
-    #Names of free companies, linkshells, PvP teams
+    // Names of free companies, linkshells, PvP teams
     public const string NONSENAME = '[^<]*';
     public const string SERVER = '[a-zA-Z]{1,15}';
-    #Data center name showed after server in some cases
+    // Data center name showed after server in some cases
     public const string DATACENTER = '((&nbsp;|\s*)\[[a-zA-Z]{1,15}\])?';
     public const string PVPID = '[a-zA-Z0-9]{40}';
-    #Icons used for grand companies, ranks, classes, .etc
+    // Icons used for grand companies, ranks, classes, .etc
     public const string SEICON = 'https:\/\/[\.a-zA-Z0-9\/_\-]{58}\.png';
-    #Items icons
+    // Items icons
     public const string ITEMICON = 'https:\/\/[\.a-zA-Z0-9\/_\-]{80,97}\.png(?:\?n\d*\.?\d*)?';
-    #Dimensions, in case they change
+    // Dimensions, in case they change
     public const string DIMENSIONS = 'width="\d*" height="\d*"(?:\s*alt="[^"]*")?';
     public const string AVATAR = '(?<avatar>https:\/\/[\.a-zA-Z0-9\/_\-]{1,101}\.jpg)\?\d*';
-    #Representation of float values
+    // Representation of float values
     public const string FLOATVAL = '[\d\.]*';
 
     public const string PAGECOUNT = /** @lang PhpRegExp */
@@ -67,7 +68,7 @@ class Regex
     public const string NOTICES2 = /** @lang PhpRegExp */
         '/<li class="news__list"><a href="(?<url>.{63})" class="news__list--link ic__.{1,20}--list"><div class="clearfix"><p class="news__list--title">(<span class="news__list--tag">\[(?<tag>.{1,20})]<\/span>)?(?<title>'.self::NONSENAME.')<\/p><time class="news__list--time"><span id="datetime-.{1,20}">-<\/span><script>document\.getElementById\(\'datetime-.{1,20}\'\)\.innerHTML = ldst_strftime\((?<time>\d*), \'YMD\'\);<\/script><\/time><\/div><\/a><\/li>/miu';
 
-    #Suppressing redundant escape because this field is used in other regex, and we *need* to escape it
+    // Suppressing redundant escape because this field is used in other regex, and we *need* to escape it
     /** @noinspection RegExpRedundantEscape */
     public const string WORLD = /** @lang PhpRegExp */
         '<li class="item-list\s*"\s*>\s*<div class="world-list__item">\s*<div class="world-list__status_icon">\s*<i class="world-ic__(?<maintenance>\d) js__tooltip" data-tooltip="\s*(?<status>.{1,10})\s*">\s*<\/i>\s*<\/div>\s*<div class="world-list__world_name">\s*(<i class="xiv-lds xiv-lds-home-world js__tooltip" data-tooltip=".{1,30}"><\/i>)?<p( class="my_world")?>(?<server>'.self::SERVER.')<\/p>\s*<\/div>\s*<div class="world-list__world_category">\s*<p>(?<population>.{1,50})<\/p>\s*<\/div>\s*<div class="world-list__create_character">\s*<i class="world-ic__(un)?available js__tooltip" data-tooltip="(?<newchars>.{1,50})"><\/i>\s*<\/div>\s*<\/div>\s*<\/li>\s*';

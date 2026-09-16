@@ -1,6 +1,6 @@
 <?php
-#Functions used to convert textual filters to appropriate IDs used by Lodestone
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Simbiat\FFXIV\LodestoneModules;
 
@@ -11,11 +11,11 @@ use function in_array;
 use Simbiat\FFXIV\Lodestone;
 
 /**
- * List of functions, that convert something to something else
+ * List of functions that convert something to something else
  */
 class Converters
 {
-    
+
     /**
      * Convert image of the Free Company rank to rank ID
      *
@@ -61,7 +61,7 @@ class Converters
         }
         return $rank;
     }
-    
+
     /**
      * Convert certain images (and not only) to a boolean value
      * @param string $img
@@ -80,7 +80,7 @@ class Converters
             'https://img.finalfantasyxiv.com/lds/h/D/_VRXR3uARNQzxAv1v16NYvS5xk.png',
         ]);
     }
-    
+
     /**
      * Get Feast rank ID  (for filter) based on value provided
      * @param string $rank
@@ -98,7 +98,7 @@ class Converters
             default => 'all',
         };
     }
-    
+
     /**
      * Get role ID (for filter) based on value provided
      * @param string $role
@@ -117,7 +117,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get activity ID  (for filter) based on value provided
      * @param string $act
@@ -140,7 +140,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get house estate ID  (for filter) based on value provided
      * @param string $house
@@ -156,7 +156,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get Free Company open status ID  (for filter) based on value provided
      * @param string $join
@@ -171,7 +171,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get Free Company activity time ID (for filter) based on value provided
      * @param string $active
@@ -187,7 +187,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get ID of number of matches (for filter) based on value provided
      * @param int $count
@@ -207,7 +207,7 @@ class Converters
         }
         return $count_new;
     }
-    
+
     /**
      * Get PvP rank ID (for filter) based on value provided
      * @param int $count
@@ -229,7 +229,7 @@ class Converters
         }
         return $count_new;
     }
-    
+
     /**
      * Get ID for number of members (for filter) based on value provided
      * @param int|string $count
@@ -255,7 +255,7 @@ class Converters
         }
         return $count;
     }
-    
+
     /**
      * Convert region identifier to language
      * @param string $lang
@@ -279,7 +279,7 @@ class Converters
         }
         return $lang;
     }
-    
+
     /**
      * Get order ID (for filter) based on value provided
      * @param string $order
@@ -298,7 +298,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get grand company ID (for filter) based on value provided
      * @param string $gc
@@ -315,7 +315,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get race/clan ID (for filter) based on value provided
      * @param string $clan
@@ -352,7 +352,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Convert class to Job. This is for original classes only
      * @param string $class
@@ -395,7 +395,7 @@ class Converters
             default => $class,
         };
     }
-    
+
     /**
      * Get class or job ID (for filter) based on value provided
      * @param string $classname
@@ -456,7 +456,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get deep dungeon class ID (for filter) based on value provided
      * @param string $classname
@@ -490,7 +490,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get guardian ID (for filter) based on value provided
      * @param string $guardian
@@ -515,7 +515,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get city ID (for filter) based on value provided
      * @param string $city
@@ -524,7 +524,7 @@ class Converters
      */
     public function getCityId(string $city): string
     {
-        #IDs are based on what I have in my own database, there is no other meaning behind them
+        // IDs are based on what I have in my own database, there is no other meaning behind them
         return match (mb_strtolower($city, 'UTF-8')) {
             'gridania', 'the lavender beds', 'グリダニア', 'ラベンダーベッド', 'lavandière', 'lavendelbeete' => '2',
             'limsa lominsa', 'mist', 'リムサ・ロミンサ', 'ミスト・ヴィレッジ', 'brumée', 'dorf des Nebels' => '4',
@@ -533,7 +533,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get city name for specific language
      * @param int    $id   City ID
@@ -566,7 +566,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get grand company ID (for filter) based on value provided
      * @param string $gc
@@ -582,7 +582,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Get grand company name in specific language
      * @param int    $id   ID of the company
@@ -616,7 +616,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Returns guardian's color
      * @param string $guardian
@@ -641,7 +641,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Returns city's color
      * @param string $city
@@ -658,7 +658,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Returns grand company's color
      * @param string $company
@@ -674,7 +674,7 @@ class Converters
             default => '',
         };
     }
-    
+
     /**
      * Convert memory size for benchmark
      * @param $bytes

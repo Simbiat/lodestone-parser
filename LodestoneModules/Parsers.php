@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Simbiat\FFXIV\LodestoneModules;
 
@@ -20,7 +21,7 @@ trait Parsers
     protected function parse(): self
     {
         $started = \hrtime(true);
-        #Set array key for results
+        // Set array key for results
         $resultkey = match ($this->type) {
             'search_character', 'character', 'character_jobs', 'character_friends', 'character_following', 'achievements', 'achievement_details' => 'characters',
             'free_company_members', 'search_free_company', 'free_company' => 'freecompanies',
@@ -51,7 +52,7 @@ trait Parsers
                     $this->addToResults($resultkey, $resultsubkey, 403);
                 }
             } else {
-                #Any network errors or throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
+                // Any network errors or throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
                 throw $exception;
             }
             return $this;
@@ -64,7 +65,7 @@ trait Parsers
         $started = \hrtime(true);
         try {
             $this->last_error = NULL;
-            #Parsing of pages
+            // Parsing of pages
             if (in_array($this->type, [
                 'search_character',
                 'character_friends',
@@ -99,7 +100,7 @@ trait Parsers
                 $this->pages($pages, $resultkey);
             }
 
-            #Banners special precut
+            // Banners special precut
             if ($this->type === 'banners') {
                 if (!$this->regexfail(\preg_match(Regex::BANNERS, $this->html, $banners), \preg_last_error(), 'BANNERS')) {
                     return $this;
@@ -107,7 +108,7 @@ trait Parsers
                 $this->html = $banners[0];
             }
 
-            #Notices special precut for pinned items
+            // Notices special precut for pinned items
             if (in_array($this->type, [
                 'notices',
                 'maintenance',
@@ -120,8 +121,8 @@ trait Parsers
                 $this->html = $notices[0][0];
             }
 
-            #Main (general) parser
-            #Setting initial regex
+            // Main (general) parser
+            // Setting initial regex
             $this->regex = match ($this->type) {
                 'search_pvp_team' => Regex::PVPTEAMLIST,
                 'search_linkshell' => Regex::LINKSHELLLIST,
@@ -145,9 +146,9 @@ trait Parsers
                 default => Regex::CHARACTERLIST,
             };
 
-            #Uncomment for debugging purposes
-            #\file_put_contents(__DIR__.'/regex.txt', $this->regex);
-            #\file_put_contents(__DIR__.'/html.txt', $this->html);
+            // Uncomment for debugging purposes
+            // \file_put_contents(__DIR__.'/regex.txt', $this->regex);
+            // \file_put_contents(__DIR__.'/html.txt', $this->html);
 
             if (!$this->regexfail(\preg_match_all($this->regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
                 if (in_array($this->type, [
@@ -175,13 +176,13 @@ trait Parsers
                 }
             }
 
-            #Character results update
+            // Character results update
             if ($this->type === 'character') {
-                #Remove non-named groups before rearranging results to avoid overwrites
+                // Remove non-named groups before rearranging results to avoid overwrites
                 foreach ($temp_results as $key => $temp_result) {
                     foreach ($temp_result as $key2 => $details) {
                         if (\is_numeric($key2) || empty($details)) {
-                            #No idea why EA thinks $key2 is float when it's either string or int. Probably gets confused by is_numeric check
+                            // No idea why EA thinks $key2 is float when it's either string or int. Probably gets confused by is_numeric check
                             unset($temp_results[$key][$key2]);
                         }
                     }
@@ -190,21 +191,21 @@ trait Parsers
             }
 
             foreach ($temp_results as $key => $temp_result) {
-                #Remove unnamed groups and empty values
+                // Remove unnamed groups and empty values
                 foreach ($temp_result as $key2 => $value) {
                     if (\is_numeric($key2) || empty($value)) {
                         unset($temp_results[$key][$key2], $temp_result[$key2]);
                     }
                 }
-                #Decode HTML entities
+                // Decode HTML entities
                 foreach ($temp_result as $key2 => $value) {
-                    #Decode in the data inside loop
+                    // Decode in the data inside loop
                     $temp_result[$key2] = \html_entity_decode($value, \ENT_QUOTES | \ENT_HTML5);
-                    #Decode in original data (for consistency)
+                    // Decode in original data (for consistency)
                     $temp_results[$key][$key2] = \html_entity_decode($value, \ENT_QUOTES | \ENT_HTML5);
                 }
 
-                #Specific processing
+                // Specific processing
                 switch ($this->type) {
                     case 'search_pvp_team':
                     case 'search_free_company':
@@ -234,7 +235,7 @@ trait Parsers
                         if (!empty($temp_result['ls_rank']) && !empty($temp_result['ls_rank_icon'])) {
                             $temp_results[$key]['rank_icon'] = $temp_result['ls_rank_icon'];
                         }
-                        #Specific for linkshell members
+                        // Specific for linkshell members
                         if ($this->type === 'linkshell_members') {
                             if (empty($this->result['server']) && !empty($this->type_settings['id'])) {
                                 $this->result[$resultkey][$this->type_settings['id']]['server'] = $temp_result['server'];
@@ -277,14 +278,14 @@ trait Parsers
                         break;
                     case 'free_company':
                         $temp_results[$key]['crest'] = $this->crest($temp_result, 'crest');
-                        #Ranking checks for --
+                        // Ranking checks for --
                         if ($temp_result['weekly_rank'] === '--') {
                             $temp_results[$key]['weekly_rank'] = NULL;
                         }
                         if ($temp_result['monthly_rank'] === '--') {
                             $temp_results[$key]['monthly_rank'] = NULL;
                         }
-                        #Estates
+                        // Estates
                         if (!empty($temp_result['estate_name'])) {
                             $temp_results[$key]['estate']['name'] = $temp_result['estate_name'];
                         }
@@ -294,14 +295,14 @@ trait Parsers
                         if (!empty($temp_result['estate_greeting']) && !in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'], true)) {
                             $temp_results[$key]['estate']['greeting'] = $temp_result['estate_greeting'];
                         }
-                        #Grand companies reputation
+                        // Grand companies reputation
                         for ($iteration = 1; $iteration <= 3; $iteration++) {
                             if (!empty($temp_result['gc_name_'.$iteration])) {
                                 $temp_results[$key]['reputation'][$temp_result['gc_name_'.$iteration]] = $temp_result['gcrepu'.$iteration];
                                 unset($temp_results[$key]['gc_name_'.$iteration], $temp_results[$key]['gcrepu'.$iteration]);
                             }
                         }
-                        #Focus
+                        // Focus
                         for ($iteration = 1; $iteration <= 9; $iteration++) {
                             if (!empty($temp_result['focusname'.$iteration])) {
                                 $temp_results[$key]['focus'][] = [
@@ -312,7 +313,7 @@ trait Parsers
                                 unset($temp_results[$key]['focusname'.$iteration], $temp_results[$key]['focusoff'.$iteration], $temp_results[$key]['focusicon'.$iteration]);
                             }
                         }
-                        #Seeking
+                        // Seeking
                         for ($iteration = 1; $iteration <= 5; $iteration++) {
                             if (!empty($temp_result['seekingname'.$iteration])) {
                                 $temp_results[$key]['seeking'][] = [
@@ -323,7 +324,7 @@ trait Parsers
                                 unset($temp_results[$key]['seekingname'.$iteration], $temp_results[$key]['seekingoff'.$iteration], $temp_results[$key]['seekingicon'.$iteration]);
                             }
                         }
-                        #Trim stuff
+                        // Trim stuff
                         $temp_results[$key]['slogan'] = mb_trim($temp_result['slogan'] ?? '', null, 'UTF-8');
                         $temp_results[$key]['active'] = mb_trim($temp_result['active'], null, 'UTF-8');
                         $temp_results[$key]['recruitment'] = mb_trim($temp_result['recruitment'], null, 'UTF-8');
@@ -446,16 +447,16 @@ trait Parsers
                         }
                         break;
                     case 'character':
-                        #There are cases of characters not returning a proper race or clan (usually both).
-                        #I've reported this issue to Square Enix several times, and they simply update affected characters.
-                        #This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
+                        // There are cases of characters not returning a proper race or clan (usually both).
+                        // I've reported this issue to Square Enix several times, and they simply update affected characters.
+                        // This breaks normal update routines, though, so both race and clan are defaulted to what the game suggests for new characters: Midlander Hyur. Appropriate comments are added, though for information purposes.
                         $temp_results[$key]['private'] = !empty($temp_results[$key]['private']);
-                        #Portrait
+                        // Portrait
                         if (!\array_key_exists('avatar', $temp_results[$key])) {
                             throw new \UnexpectedValueException('No avatar key for character '.$this->type_settings['id']);
                         }
                         $temp_results[$key]['portrait'] = \str_replace('c0.jpg', 'l0.jpg', $temp_result['avatar']);
-                        #Since the release of Dawntrail, if profile is private, you won't get any of the fields below
+                        // Since the release of Dawntrail, if profile is private, you won't get any of the fields below
                         if ($temp_results[$key]['private'] === false) {
                             $temp_results[$key]['race'] = mb_trim($temp_results[$key]['race'], null, 'UTF-8');
                             $temp_results[$key]['clan'] = mb_trim($temp_results[$key]['clan'], null, 'UTF-8');
@@ -479,9 +480,9 @@ trait Parsers
                             } else {
                                 $temp_results[$key]['title'] = '';
                             }
-                            #Gender to text
+                            // Gender to text
                             $temp_results[$key]['gender'] = ($temp_result['gender'] === '♂' ? 'male' : 'female');
-                            #Guardian
+                            // Guardian
                             if (empty($temp_results[$key]['guardian'])) {
                                 $temp_results[$key]['guardian']['name'] = match (mb_strtolower($this->language, 'UTF-8')) {
                                     'jp', 'ja' => 'ハルオーネ',
@@ -501,20 +502,20 @@ trait Parsers
                                     'icon' => $temp_result['guardianicon'],
                                 ];
                             }
-                            #City
+                            // City
                             $temp_results[$key]['city'] = [
                                 'name' => $temp_result['city'],
                                 'icon' => $temp_result['city_icon'],
                             ];
-                            #Grand Company
+                            // Grand Company
                             if (!empty($temp_result['gc_name'])) {
                                 $temp_results[$key]['grand_company'] = $this->grandcompany($temp_result);
                             }
-                            #Free Company
+                            // Free Company
                             if (!empty($temp_result['fc_id'])) {
                                 $temp_results[$key]['free_company'] = $this->freecompany($temp_result);
                             }
-                            #PvP Team
+                            // PvP Team
                             if (!empty($temp_result['pvpid'])) {
                                 $temp_results[$key]['pvp'] = [
                                     'id' => $temp_result['pvpid'],
@@ -522,7 +523,7 @@ trait Parsers
                                 ];
                                 $temp_results[$key]['pvp']['crest'] = $this->crest($temp_result, 'pvpcrest');
                             }
-                            #Bio
+                            // Bio
                             $temp_result['bio'] = mb_trim($temp_result['bio'], null, 'UTF-8');
                             if ($temp_result['bio'] === '-') {
                                 $temp_result['bio'] = '';
@@ -533,9 +534,9 @@ trait Parsers
                                 $temp_results[$key]['bio'] = '';
                             }
                             $temp_results[$key]['attributes'] = $this->attributes();
-                            #Minions and mounts now show only icon on Lodestone, thus it's not really practically to grab them
-                            #$temp_results[$key]['mounts'] = $this->collectibles('mounts');
-                            #$temp_results[$key]['minions'] = $this->collectibles('minions');
+                            // Minions and mounts now show only icon on Lodestone, thus it's not really practically to grab them
+                            // $temp_results[$key]['mounts'] = $this->collectibles('mounts');
+                            // $temp_results[$key]['minions'] = $this->collectibles('minions');
                             $temp_results[$key]['gear'] = $this->items();
                         }
                         break;
@@ -547,14 +548,14 @@ trait Parsers
                         break;
                 }
 
-                #Unset stuff for cleaner look. Since it does not trigger warnings if variable is missing, no need to "switch" it
+                // Unset stuff for cleaner look. Since it does not trigger warnings if variable is missing, no need to "switch" it
                 unset($temp_results[$key]['crest1'], $temp_results[$key]['crest2'], $temp_results[$key]['crest3'], $temp_results[$key]['fccrestimg1'], $temp_results[$key]['fccrestimg2'], $temp_results[$key]['fccrestimg3'], $temp_results[$key]['gc_name'], $temp_results[$key]['gcrank'], $temp_results[$key]['gc_rank_icon'], $temp_results[$key]['fc_id'], $temp_results[$key]['fcname'], $temp_results[$key]['ls_rank_icon'], $temp_results[$key]['jobicon'], $temp_results[$key]['jobform'], $temp_results[$key]['estate_greeting'], $temp_results[$key]['estate_address'], $temp_results[$key]['estate_name'], $temp_results[$key]['city_icon'], $temp_results[$key]['guardianicon'], $temp_results[$key]['gcicon'], $temp_results[$key]['uppertitle'], $temp_results[$key]['undertitle'], $temp_results[$key]['pvpid'], $temp_results[$key]['pvpname'], $temp_results[$key]['pvpcrest1'], $temp_results[$key]['pvpcrest2'], $temp_results[$key]['pvpcrest3'], $temp_results[$key]['rank1'], $temp_results[$key]['rank2'], $temp_results[$key]['id'], $temp_results[$key]['column1'], $temp_results[$key]['column2'], $temp_results[$key]['column3'], $temp_results[$key]['star1'], $temp_results[$key]['star2'], $temp_results[$key]['star3'], $temp_results[$key]['extraicon']);
 
-                #Adding to results
+                // Adding to results
                 $this->addToResults($resultkey, $resultsubkey, $temp_results[$key], (empty($temp_result['id']) ? null : $temp_result['id']));
             }
 
-            #Sort worlds
+            // Sort worlds
             if ($this->type === 'worlds') {
                 \ksort($this->result[$resultkey]);
             }
@@ -562,14 +563,14 @@ trait Parsers
             $this->errorRegister($exception->getMessage(), 'parse', $started);
             return $this;
         }
-        #Benchmarking
+        // Benchmarking
         if ($this->benchmark) {
             $finished = \hrtime(true);
             $duration = $finished - $started;
             $this->benchUpdate($duration);
         }
 
-        #Processing achievements' details last to get proper order of timings for benchmarking
+        // Processing achievements' details last to get proper order of timings for benchmarking
         if ($this->type === 'achievements' && $this->type_settings['details']) {
             foreach ($this->result[$resultkey][$this->type_settings['id']][$resultsubkey] as $key => $ach) {
                 $this->getCharacterAchievements($this->type_settings['id'], $key, 1, false, true);
@@ -936,7 +937,7 @@ trait Parsers
                 }
                 break;
         }
-        #Linkshell members specific
+        // Linkshell members specific
         if (!empty($pages[0]['linkshell_name'])) {
             $this->result[$resultkey][$this->type_settings['id']]['name'] = mb_trim($pages[0]['linkshell_name'], null, 'UTF-8');
             if (!empty($pages[0]['linkshell_server'])) {
@@ -954,7 +955,7 @@ trait Parsers
                 $this->result[$resultkey][$this->type_settings['id']]['page_total'] = 0;
             }
         }
-        #PvpTeam members specific
+        // PvpTeam members specific
         if (!empty($pages[0]['pvpname'])) {
             $this->result[$resultkey][$this->type_settings['id']]['name'] = $pages[0]['pvpname'];
             if (!empty($pages[0]['server'])) {
@@ -985,7 +986,7 @@ trait Parsers
             $crest[] = \str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'3']);
         }
         foreach ($crest as $key => $value) {
-            #Lodestone now serves one of the default emblems using non-standard URL sometimes, so we change it to a standard one
+            // Lodestone now serves one of the default emblems using non-standard URL sometimes, so we change it to a standard one
             if ($value === 'https://lds-img.finalfantasyxiv.com/h/s/79TDIxvk2GApbpkZ8_0xbfvGAM.png') {
                 $crest[$key] = 'https://img2.finalfantasyxiv.com/c/S00_9a8096c55d9b806ba05b5626ccfa14e8_00_128x128.png';
             }
@@ -1120,7 +1121,7 @@ trait Parsers
         if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_GEAR, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_GEAR')) {
             return [];
         }
-        #Remove non-named groups
+        // Remove non-named groups
         foreach ($temp_results as $key => $temp_result) {
             foreach ($temp_result as $key2 => $details) {
                 if (\is_numeric($key2) || empty($details)) {
@@ -1129,24 +1130,24 @@ trait Parsers
             }
             $temp_results[$key]['url'] = $temp_result['url'];
             $temp_results[$key]['icon'] = $temp_result['icon'];
-            #Below no longer works, since only tooltip URLs are provided, which require extra parsing
+            // Below no longer works, since only tooltip URLs are provided, which require extra parsing
             /*
             $temp_results[$key]['armoireable'] = $this->converters->imageToBool($temp_result['armoireable']);
             $temp_results[$key]['hq'] = !empty($temp_result['hq']);
             $temp_results[$key]['unique'] = !empty($temp_result['unique']);
-            #Requirements
+            // Requirements
             $temp_results[$key]['requirements'] = [
                 'level' => $temp_result['level'],
                 'classes' => (in_array($temp_result['classes'], ['Disciple of the Land', 'Disciple of the Hand', 'Disciple of Magic', 'Disciple of War', 'Disciples of War or Magic', 'All Classes', 'ギャザラー', 'Sammler', 'Récolteurs', 'Handwerker', 'Artisans', 'クラフター', 'Magier', 'Mages', 'ソーサラー', 'Krieger', 'Combattants', 'ファイター', 'Krieger, Magier', 'Combattants et mages', 'ファイター ソーサラー', 'Alle Klassen', 'Toutes les classes', '全クラス'], true) ? $temp_result['classes'] : \explode(' ', $temp_result['classes'])),
             ];
-            #Attributes
+            // Attributes
             for ($iteration = 1; $iteration <= 15; $iteration++) {
                 if (!empty($temp_result['attrname'.$iteration])) {
                     $temp_results[$key]['attributes'][$temp_result['attrname'.$iteration]] = $temp_result['attrvalue'.$iteration];
                     unset($temp_results[$key]['attrname'.$iteration], $temp_results[$key]['attrvalue'.$iteration]);
                 }
             }
-            #Materia
+            // Materia
             if (!empty($temp_result['materianame1']) || !empty($temp_result['materianame2']) || !empty($temp_result['materianame3']) || !empty($temp_result['materianame4']) || !empty($temp_result['materianame5'])) {
                 $temp_results[$key]['materia'] = [];
                 for ($iteration = 1; $iteration <= 5; $iteration++) {
@@ -1160,7 +1161,7 @@ trait Parsers
                     }
                 }
             }
-            #Crafting
+            // Crafting
             if (!empty($temp_result['repair'])) {
                 $temp_results[$key]['crafting']['class'] = $temp_result['repair'];
                 $temp_results[$key]['crafting']['materials'] = $temp_result['materials'];
@@ -1177,7 +1178,7 @@ trait Parsers
                 }
                 $temp_results[$key]['crafting']['convertible'] = $this->converters->imageToBool($temp_result['convertible']);
             }
-            #Trading
+            // Trading
             if (empty($temp_result['price'])) {
                 $temp_results[$key]['trading']['price'] = NULL;
             } else {
@@ -1186,20 +1187,20 @@ trait Parsers
             $temp_results[$key]['trading']['sellable'] = empty($temp_result['unsellable']);
             $temp_results[$key]['trading']['marketable'] = empty($temp_result['marketprohibited']);
             $temp_results[$key]['trading']['tradeable'] = empty($temp_result['untradeable']);
-            #Link to shop, if present
+            // Link to shop, if present
             if (empty($temp_result['shop'])) {
                 $temp_results[$key]['trading']['shop'] = NULL;
             } else {
                 $temp_results[$key]['trading']['shop'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$temp_result['shop'];
             }
-            #Customization
+            // Customization
             $temp_results[$key]['customization'] = [
                 'crestable' => $this->converters->imageToBool($temp_result['crestable']),
                 'glamourable' => $this->converters->imageToBool($temp_result['glamourable']),
                 'projectable' => $this->converters->imageToBool($temp_result['projectable']),
                 'dyeable' => $this->converters->imageToBool($temp_result['dyeable']),
             ];
-            #Glamour
+            // Glamour
             if (!empty($temp_result['glamourname'])) {
                 $temp_results[$key]['customization']['glamour'] = [
                     'id' => $temp_result['glamourid'],

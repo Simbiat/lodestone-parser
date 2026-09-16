@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Simbiat\FFXIV\LodestoneModules;
 
@@ -10,15 +11,15 @@ use Simbiat\StringHelpers\Sanitize;
  */
 class HttpRequest
 {
-    #cURL options
+    // cURL options
     protected static array $curl_options = [
         \CURLOPT_POST => false,
         \CURLOPT_HEADER => true,
         \CURLOPT_RETURNTRANSFER => true,
-        #Allow caching and reuse of already open connections
+        // Allow caching and reuse of already open connections
         \CURLOPT_FRESH_CONNECT => false,
         \CURLOPT_FORBID_REUSE => false,
-        #Let cURL determine appropriate HTTP version
+        // Let cURL determine appropriate HTTP version
         \CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_NONE,
         \CURLOPT_CONNECTTIMEOUT => 10,
         \CURLOPT_TIMEOUT => 30,
@@ -29,9 +30,9 @@ class HttpRequest
         \CURLOPT_ENCODING => '',
         \CURLOPT_SSL_VERIFYPEER => true,
     ];
-    
+
     private(set) static \CurlHandle|null|false $curl_handle = null;
-    
+
     /**
      * Main constructor
      * @param string $user_agent User-agent to use
@@ -41,9 +42,9 @@ class HttpRequest
         if (!Sanitize::whiteString($user_agent)) {
             self::$curl_options[\CURLOPT_USERAGENT] = $user_agent;
         }
-        #Check if the handle already created
+        // Check if the handle already created
         if (self::$curl_handle === null || self::$curl_handle === false) {
-            #Create or retrieve a persistent cURL share handle to share data to help speed up connections
+            // Create or retrieve a persistent cURL share handle to share data to help speed up connections
             $share = \curl_share_init_persistent([\CURL_LOCK_DATA_DNS, \CURL_LOCK_DATA_SSL_SESSION, \CURL_LOCK_DATA_CONNECT, \CURL_LOCK_DATA_PSL]);
             self::$curl_handle = \curl_init();
             if (self::$curl_handle === false) {
@@ -55,7 +56,7 @@ class HttpRequest
             }
         }
     }
-    
+
     /**
      * Get content from a page
      * @internal
@@ -64,35 +65,35 @@ class HttpRequest
     public function get(string $url): string
     {
         $url = \str_ireplace(' ', '+', $url);
-        
+
         \curl_setopt(self::$curl_handle, \CURLOPT_URL, $url);
-        #Handle response
+        // Handle response
         $response = \curl_exec(self::$curl_handle);
         $curl_error = \curl_error(self::$curl_handle);
         $header_length = \curl_getinfo(self::$curl_handle, \CURLINFO_HEADER_SIZE);
         $http_code = \curl_getinfo(self::$curl_handle, \CURLINFO_HTTP_CODE);
         if ($response === false) {
-            #While this may not be a true 503 and can be an issue on the client side, we treat it as Lodestone being 503
+            // While this may not be a true 503 and can be an issue on the client side, we treat it as Lodestone being 503
             if (\preg_match('/(Operation timed out after|Could not resolve host|Resolving timed out after|Connection reset by peer|was not closed cleanly|Connection timed out)/ui', $curl_error)) {
                 throw new \RuntimeException('Lodestone not available, 503', 503);
             }
             throw new \RuntimeException($curl_error, $http_code);
         }
         $data = mb_substr($response, $header_length, null, 'UTF-8');
-        
-        #Specific conditions to return code on
+
+        // Specific conditions to return code on
         $http_code = (int)$http_code;
         if ($http_code === 404) {
             throw new \RuntimeException('Requested page was not found, '.$http_code, $http_code);
         }
-        #While different 5xx errors can mean different things, ultimately they mean server-side issue, thus that Lodestone is not available for us
+        // While different 5xx errors can mean different things, ultimately they mean server-side issue, thus that Lodestone is not available for us
         if ($http_code >= 500) {
             throw new \RuntimeException('Lodestone not available, '.$http_code, $http_code);
         }
         if ($http_code === 403) {
-            #Get the message from Lodestone
+            // Get the message from Lodestone
             $message = \preg_replace('/(.*<h1 class="error__heading">)([^<]+)(<\/h1>\s*<p class="error__text">)([^<]+)(<\/p>.*)/muis', '$2: $4', $data ?? '');
-            #If the message is the same as original data, then it's not a full error page, but a partially blocked page due to privacy settings, so we get the text differently
+            // If the message is the same as original data, then it's not a full error page, but a partially blocked page due to privacy settings, so we get the text differently
             if ($message === ($data ?? '')) {
                 $message = \preg_replace('/(.*<p class="parts__zero">)([^<]+)(\.?<\/p>.*)/muis', '$2', $data ?? '');
             }
@@ -106,15 +107,15 @@ class HttpRequest
                 throw new \RuntimeException('Lodestone has throttled the request, '.$http_code, $http_code);
             }
             \file_put_contents(__DIR__.'/html.txt', $data ?? '');
-            #Get the message from Lodestone
+            // Get the message from Lodestone
             $message = \preg_replace('/(.*?<h1 class="(error|maintenance)__heading">)([^<]+)(<\/h1>\s*<p class="(error|maintenance)__text">)([^<]+)(<\/p>.*)/muis', '$3: $6', $data ?? '');
             throw new \RuntimeException((Sanitize::whiteString($message) ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
         }
-        #Check that data is not empty
+        // Check that data is not empty
         if (Sanitize::whiteString($data)) {
             throw new \RuntimeException('Requested page is empty');
         }
-        
+
         return $data;
     }
 }
