@@ -39,9 +39,10 @@ class Lodestone
     protected ?object $converters = null;
     protected array $result = [];
     protected array $errors = [];
-    protected ?array $last_error = NULL;
+    protected ?array $last_error = null;
 
-    #[Pure] public function __construct()
+    #[Pure]
+    public function __construct()
     {
         $this->converters = new Converters();
     }
@@ -81,6 +82,7 @@ class Lodestone
 
     /**
      * Reset results
+     *
      * @return $this
      */
     public function resetResult(): self
@@ -91,6 +93,7 @@ class Lodestone
 
     /**
      * Reset errors
+     *
      * @return $this
      */
     public function resetErrors(): self
@@ -104,6 +107,7 @@ class Lodestone
     // ############
     /**
      * Get data for a character based on ID
+     *
      * @param string|int $id Character ID
      *
      * @return self
@@ -118,6 +122,7 @@ class Lodestone
 
     /**
      * Get jobs for a character based on ID
+     *
      * @param string|int $id Character ID
      *
      * @return self
@@ -132,6 +137,7 @@ class Lodestone
 
     /**
      * Get friends of a character based on ID
+     *
      * @param string|int $id   Character ID
      * @param int        $page Page number to read
      *
@@ -148,6 +154,7 @@ class Lodestone
 
     /**
      * Get characters followed by a character based on ID
+     *
      * @param string|int $id   Character ID
      * @param int        $page Page number to read
      *
@@ -164,6 +171,7 @@ class Lodestone
 
     /**
      * Get character achievements based on ID
+     *
      * @param string|int $id             Character ID.
      * @param int|bool   $achievement_id Optional achievement ID. Use if you need specific achievement data.
      * @param string|int $kind           Get only specific category of achievements. If `$category` is `true`, will work as subcategory.
@@ -175,7 +183,7 @@ class Lodestone
      */
     public function getCharacterAchievements(string|int $id, int|bool $achievement_id = false, string|int $kind = 1, bool $category = false, bool $details = false, bool $only_owned = false): self
     {
-        if ((int)$kind < 1) {
+        if ((int) $kind < 1) {
             $category = false;
             $kind = 1;
             $this->type_settings['allachievements'] = true;
@@ -193,9 +201,9 @@ class Lodestone
         } else {
             $this->type = 'achievements';
             if ($category) {
-                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_CAT_URL, $id, (string)$kind);
+                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_CAT_URL, $id, (string) $kind);
             } else {
-                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_URL, $id, (string)$kind);
+                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_URL, $id, (string) $kind);
             }
         }
         $this->type_settings['id'] = $id;
@@ -206,6 +214,7 @@ class Lodestone
 
     /**
      * Get achievement details from Lodestone Database page
+     *
      * @param string $db_id
      *
      * @return self
@@ -224,6 +233,7 @@ class Lodestone
     // ############
     /**
      * Get free company data based on ID
+     *
      * @param string|int $id Free company ID
      *
      * @return self
@@ -238,6 +248,7 @@ class Lodestone
 
     /**
      * Get free company members based on ID
+     *
      * @param string|int $id   Free company ID
      * @param int        $page Page number to read
      *
@@ -254,6 +265,7 @@ class Lodestone
 
     /**
      * Get linkshell members based on ID
+     *
      * @param string|int $id   Linkshell ID
      * @param int        $page Page number to read
      *
@@ -262,7 +274,7 @@ class Lodestone
     public function getLinkshellMembers(string|int $id, int $page = 1): self
     {
         $page = $this->pageCheck($page);
-        if (\preg_match('/[a-zA-Z0-9]{40}/mui', (string)$id)) {
+        if (\preg_match('/[a-zA-Z0-9]{40}/mui', (string) $id)) {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL, $id, $page);
         } else {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_MEMBERS_URL, $id, $page);
@@ -274,6 +286,7 @@ class Lodestone
 
     /**
      * Get PvP team data based on ID
+     *
      * @param string $id PvP team ID
      *
      * @return self
@@ -443,6 +456,7 @@ class Lodestone
 
     /**
      * Search for a linkshell
+     *
      * @param string $name            Optional linkshell name
      * @param string $server          Optional server (or data center) name
      * @param int    $character_count Optional member count
@@ -477,6 +491,7 @@ class Lodestone
 
     /**
      * Search for a PvP team
+     *
      * @param string $name   Optional PvP team
      * @param string $server Optional server name
      * @param string $order  Optional order to sort results by
@@ -522,7 +537,7 @@ class Lodestone
             'dcGroup' => $dc_group,
             'rank_type' => $this->converters->getFeastRankId($rank_type),
         ]);
-        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FEAST, (string)$season, $query);
+        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FEAST, (string) $season, $query);
         $this->type = 'feast';
         $this->type_settings['season'] = $season;
         return $this->parse();
@@ -530,6 +545,7 @@ class Lodestone
 
     /**
      * Get Deep Dungeon rankings
+     *
      * @param int|string $id         Deep Dungeon ID
      * @param string     $dc_group   Server/data center name
      * @param string     $solo_party Solo or party ranking
@@ -539,7 +555,7 @@ class Lodestone
      */
     public function getDeepDungeon(int|string $id = 1, string $dc_group = '', string $solo_party = 'party', string $subtype = 'PLD'): self
     {
-        if ((int)$id <= 1) {
+        if ((int) $id <= 1) {
             $id = '';
         }
         if ($subtype) {
@@ -553,7 +569,7 @@ class Lodestone
             'solo_party' => $solo_party,
             'subtype' => $this->converters->getDeepDungeonClassId($subtype),
         ]);
-        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_DEEP_DUNGEON, (string)$id, $query);
+        $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_DEEP_DUNGEON, (string) $id, $query);
         if (empty($id)) {
             $id = 1;
         }
@@ -569,6 +585,7 @@ class Lodestone
 
     /**
      * Get Frontline rankings
+     *
      * @param string $week_month Weekly or monthly rankings.
      * @param int    $week       Week number in `YYYYNN` format or month number in `YYYYMM` format.
      * @param string $dc_group   Optional data center name.
@@ -589,10 +606,10 @@ class Lodestone
             $sort = 'win';
         }
         if ($week_month === 'weekly') {
-            if (!\preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
+            if (!\preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string) $week)) {
                 $week = 0;
             }
-        } elseif (!\preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
+        } elseif (!\preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string) $week)) {
             $week = 0;
         }
         $query = $this->queryBuilder([
@@ -613,6 +630,7 @@ class Lodestone
 
     /**
      * Get Grand Company rankings
+     *
      * @param string $week_month Weekly or monthly rankings
      * @param int    $week       Week number
      * @param string $world_name Optional server name
@@ -628,9 +646,10 @@ class Lodestone
 
     /**
      * Get Free Company rankings
+     *
      * @param string $week_month Weekly or monthly rankings
      * @param int    $week       Week number
-     * @param string $world_name  Optional server name
+     * @param string $world_name Optional server name
      * @param string $gc_id      Optional Grand Company to filter
      * @param int    $page       Page number to scan
      *
@@ -646,7 +665,7 @@ class Lodestone
      *
      * @param string $week_month Weekly or monthly rankings
      * @param int    $week       Week number
-     * @param string $world_name  Optional server name
+     * @param string $world_name Optional server name
      * @param string $gc_id      Optional Grand Company to filter
      * @param int    $page       Page number to scan
      * @param bool   $gc         Whether this is a Grand Company ranking
@@ -660,10 +679,10 @@ class Lodestone
             $week_month = 'weekly';
         }
         if ($week_month === 'weekly') {
-            if (!\preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string)$week)) {
+            if (!\preg_match('/^\d{4}(0[1-9]|[1-4]\d|5[0-3])$/', (string) $week)) {
                 $week = 0;
             }
-        } elseif (!\preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string)$week)) {
+        } elseif (!\preg_match('/^\d{4}(0[1-9]|1[0-2])$/', (string) $week)) {
             $week = 0;
         }
         $query = $this->queryBuilder([
@@ -691,6 +710,7 @@ class Lodestone
     // ############
     /**
      * Get Lodestone banners (ads at the top)
+     *
      * @return self
      */
     public function getLodestoneBanners(): self
@@ -702,6 +722,7 @@ class Lodestone
 
     /**
      * Get Lodestone news
+     *
      * @return self
      */
     public function getLodestoneNews(): self
@@ -713,6 +734,7 @@ class Lodestone
 
     /**
      * Get Lodestone topics
+     *
      * @param int $page Page number to scan
      *
      * @return self
@@ -727,6 +749,7 @@ class Lodestone
 
     /**
      * Get Lodestone notices
+     *
      * @param int $page Page number to scan
      *
      * @return self
@@ -741,6 +764,7 @@ class Lodestone
 
     /**
      * Get Lodestone maintenance information
+     *
      * @param int $page Page number to scan
      *
      * @return self
@@ -755,6 +779,7 @@ class Lodestone
 
     /**
      * Get Lodestone updates information
+     *
      * @param int $page Page number to scan
      *
      * @return self
@@ -769,6 +794,7 @@ class Lodestone
 
     /**
      * Get Lodestone status updates
+     *
      * @param int $page Page number to scan
      *
      * @return self
@@ -783,6 +809,7 @@ class Lodestone
 
     /**
      * Get status of servers
+     *
      * @param bool $world_details Whether to show detailed status of worlds or not
      *
      * @return self
@@ -800,6 +827,7 @@ class Lodestone
     // ############
     /**
      * Helper function to generate a GET query for other functions
+     *
      * @param array $params
      *
      * @return string
@@ -818,6 +846,7 @@ class Lodestone
 
     /**
      * Helper function to enable `all pages` logic, where supported
+     *
      * @param int $page
      *
      * @return int
@@ -833,11 +862,13 @@ class Lodestone
 
     /**
      * Helper function to convert strings into Grand Company IDs
+     *
      * @param array|string|int $gc_id
      *
      * @return string|array
      */
-    #[Pure] private function gcIdCheck(array|string|int $gc_id): string|array
+    #[Pure]
+    private function gcIdCheck(array|string|int $gc_id): string|array
     {
         if (is_array($gc_id)) {
             foreach ($gc_id as $key => $item) {
@@ -856,6 +887,7 @@ class Lodestone
     // ############
     /**
      * Set a custom user-agent
+     *
      * @param string $user_agent
      *
      * @return $this
@@ -868,6 +900,7 @@ class Lodestone
 
     /**
      * Set language
+     *
      * @param string $language
      *
      * @return $this
@@ -886,6 +919,7 @@ class Lodestone
 
     /**
      * Enable or disable benchmark
+     *
      * @param bool $bench
      *
      * @return $this

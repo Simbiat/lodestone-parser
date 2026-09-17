@@ -79,10 +79,10 @@ class HttpRequest
             }
             throw new \RuntimeException($curl_error, $http_code);
         }
-        $data = mb_substr($response, $header_length, null, 'UTF-8');
+        $data = \mb_substr($response, $header_length, null, 'UTF-8');
 
         // Specific conditions to return code on
-        $http_code = (int)$http_code;
+        $http_code = (int) $http_code;
         if ($http_code === 404) {
             throw new \RuntimeException('Requested page was not found, '.$http_code, $http_code);
         }

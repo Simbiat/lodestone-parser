@@ -146,8 +146,8 @@ class LodestoneTest
         echo '<tr>
                     <td><b>'.$type.'</b></td>
                     <td>'.(!empty($this->lodestone->getErrors()) && !$reverse ? '<span style="color: red; font-weight: bold;">error</span>' : '<span style="color: lightgreen; font-weight: bold;">success</span>').'</td>
-                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? \implode('<br>', $this->lodestone->getResult(false)['benchmark']['http_time']) : $this->lodestone->getResult(false)['benchmark']['http_time'][0]).'</td>
-                    <td>'.(in_array($type, ['Achievements', 'Free company members']) ? \implode('<br>', $this->lodestone->getResult(false)['benchmark']['parse_time']) : $this->lodestone->getResult(false)['benchmark']['parse_time'][0]).'</td>
+                    <td>'.(\in_array($type, ['Achievements', 'Free company members']) ? \implode('<br>', $this->lodestone->getResult(false)['benchmark']['http_time']) : $this->lodestone->getResult(false)['benchmark']['http_time'][0]).'</td>
+                    <td>'.(\in_array($type, ['Achievements', 'Free company members']) ? \implode('<br>', $this->lodestone->getResult(false)['benchmark']['parse_time']) : $this->lodestone->getResult(false)['benchmark']['parse_time'][0]).'</td>
                     <td>'.(empty($this->lodestone->getErrors()) ? '' : '<pre>'.\var_export($this->lodestone->getErrors(), true).'</pre>').'</td>
                     <td>'.(empty($what) ? '' : '<pre>'.\var_export($what, true).'</pre>').'</td>
                 </tr>';

@@ -48,7 +48,7 @@ trait Parsers
             if ($exception->getCode() === 404) {
                 $this->addToResults($resultkey, $resultsubkey, 404);
             } elseif ($exception->getCode() === 403) {
-                if (in_array($this->type, ['character', 'achievements', 'achievement_details', 'character_friends', 'character_following'], true)) {
+                if (\in_array($this->type, ['character', 'achievements', 'achievement_details', 'character_friends', 'character_following'], true)) {
                     $this->addToResults($resultkey, $resultsubkey, 403);
                 }
             } else {
@@ -60,13 +60,13 @@ trait Parsers
         if ($this->benchmark) {
             $finished = \hrtime(true);
             $duration = $finished - $started;
-            $this->result['benchmark']['http_time'][] = \date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+            $this->result['benchmark']['http_time'][] = \date('H:i:s.'.\sprintf('%06d', ($duration / 1000)), (int) ($duration / 1000000000));
         }
         $started = \hrtime(true);
         try {
             $this->last_error = NULL;
             // Parsing of pages
-            if (in_array($this->type, [
+            if (\in_array($this->type, [
                 'search_character',
                 'character_friends',
                 'character_following',
@@ -87,7 +87,7 @@ trait Parsers
                 }
                 $this->pages($pages, $resultkey);
             }
-            if (in_array($this->type, ['grand_company_ranking', 'free_company_ranking'], true)) {
+            if (\in_array($this->type, ['grand_company_ranking', 'free_company_ranking'], true)) {
                 if (!$this->regexfail(\preg_match_all(Regex::PAGECOUNT2, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'PAGECOUNT2')) {
                     return $this;
                 }
@@ -109,7 +109,7 @@ trait Parsers
             }
 
             // Notices special precut for pinned items
-            if (in_array($this->type, [
+            if (\in_array($this->type, [
                 'notices',
                 'maintenance',
                 'updates',
@@ -151,7 +151,7 @@ trait Parsers
             // \file_put_contents(__DIR__.'/html.txt', $this->html);
 
             if (!$this->regexfail(\preg_match_all($this->regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
-                if (in_array($this->type, [
+                if (\in_array($this->type, [
                     'search_character',
                     'character_friends',
                     'character_following',
@@ -265,7 +265,7 @@ trait Parsers
                     case 'maintenance':
                     case 'updates':
                     case 'status':
-                        $temp_results[$key]['url'] = sprintf(Routes::LODESTONE_URL_BASE, $this->language).$temp_result['url'];
+                        $temp_results[$key]['url'] = \sprintf(Routes::LODESTONE_URL_BASE, $this->language).$temp_result['url'];
                         break;
                     case 'deep_dungeon':
                         $temp_results[$key]['job'] = [
@@ -292,7 +292,7 @@ trait Parsers
                         if (!empty($temp_result['estate_address'])) {
                             $temp_results[$key]['estate']['address'] = $temp_result['estate_address'];
                         }
-                        if (!empty($temp_result['estate_greeting']) && !in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'], true)) {
+                        if (!empty($temp_result['estate_greeting']) && !\in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'], true)) {
                             $temp_results[$key]['estate']['greeting'] = $temp_result['estate_greeting'];
                         }
                         // Grand companies reputation
@@ -325,14 +325,14 @@ trait Parsers
                             }
                         }
                         // Trim stuff
-                        $temp_results[$key]['slogan'] = mb_trim($temp_result['slogan'] ?? '', null, 'UTF-8');
-                        $temp_results[$key]['active'] = mb_trim($temp_result['active'], null, 'UTF-8');
-                        $temp_results[$key]['recruitment'] = mb_trim($temp_result['recruitment'], null, 'UTF-8');
-                        $temp_results[$key]['grand_company'] = mb_trim($temp_result['grand_company'], null, 'UTF-8');
+                        $temp_results[$key]['slogan'] = \mb_trim($temp_result['slogan'] ?? '', null, 'UTF-8');
+                        $temp_results[$key]['active'] = \mb_trim($temp_result['active'], null, 'UTF-8');
+                        $temp_results[$key]['recruitment'] = \mb_trim($temp_result['recruitment'], null, 'UTF-8');
+                        $temp_results[$key]['grand_company'] = \mb_trim($temp_result['grand_company'], null, 'UTF-8');
                         if (empty($temp_result['members_count'])) {
                             $temp_results[$key]['members_count'] = 0;
                         } else {
-                            $temp_results[$key]['members_count'] = (int)$temp_result['members_count'];
+                            $temp_results[$key]['members_count'] = (int) $temp_result['members_count'];
                         }
                         break;
                     case 'achievements':
@@ -345,7 +345,7 @@ trait Parsers
                             if (empty($temp_result['title'])) {
                                 $temp_results[$key]['title'] = null;
                             } else {
-                                $temp_result['title'] = mb_trim($temp_result['title'], null, 'UTF-8');
+                                $temp_result['title'] = \mb_trim($temp_result['title'], null, 'UTF-8');
                             }
                             if (empty($temp_result['item'])) {
                                 $temp_results[$key]['item'] = null;
@@ -374,23 +374,23 @@ trait Parsers
                         }
                         break;
                     case 'database':
-                        $temp_results[$key]['name'] = \str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['name'], null, 'UTF-8'));
+                        $temp_results[$key]['name'] = \str_replace(['<i>', '</i>'], '', \mb_trim($temp_results[$key]['name'], null, 'UTF-8'));
                         switch ($this->type_settings['type']) {
                             case 'achievement':
-                                $temp_results[$key]['reward'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
-                                $temp_results[$key]['points'] = (int)($temp_results[$key]['column2'] ?? 0);
+                                $temp_results[$key]['reward'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : \mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
+                                $temp_results[$key]['points'] = (int) ($temp_results[$key]['column2'] ?? 0);
                                 break;
                             case 'quest':
-                                $temp_results[$key]['area'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
-                                $temp_results[$key]['character_level'] = (int)($temp_results[$key]['column2'] ?? 0);
+                                $temp_results[$key]['area'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : \mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
+                                $temp_results[$key]['character_level'] = (int) ($temp_results[$key]['column2'] ?? 0);
                                 break;
                             case 'duty':
-                                $temp_results[$key]['character_level'] = (int)($temp_results[$key]['column1'] ?? 0);
-                                $temp_results[$key]['item_level'] = (mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column2']);
+                                $temp_results[$key]['character_level'] = (int) ($temp_results[$key]['column1'] ?? 0);
+                                $temp_results[$key]['item_level'] = (\mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column2']);
                                 break;
                             case 'item':
-                                $temp_results[$key]['item_level'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column1']);
-                                $temp_results[$key]['character_level'] = (mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column2']);
+                                $temp_results[$key]['item_level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
+                                $temp_results[$key]['character_level'] = (\mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column2']);
                                 break;
                             case 'recipe':
                                 if (isset($temp_results[$key]['extraicon'])) {
@@ -401,14 +401,14 @@ trait Parsers
                                 if (!isset($temp_results[$key]['master'])) {
                                     $temp_results[$key]['master'] = NULL;
                                 }
-                                $temp_results[$key]['recipe_level'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column1']);
+                                $temp_results[$key]['recipe_level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
                                 $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
                                 if (isset($temp_results[$key]['expert'])) {
                                     $temp_results[$key]['expert'] = true;
                                 } else {
                                     $temp_results[$key]['expert'] = false;
                                 }
-                                $temp_results[$key]['item_level'] = (mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column2']);
+                                $temp_results[$key]['item_level'] = (\mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column2']);
                                 break;
                             case 'gathering':
                                 if (isset($temp_results[$key]['extraicon'])) {
@@ -421,24 +421,24 @@ trait Parsers
                                 } else {
                                     $temp_results[$key]['hidden'] = false;
                                 }
-                                $temp_results[$key]['level'] = (mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int)$temp_results[$key]['column1']);
+                                $temp_results[$key]['level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
                                 $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
                                 break;
                             case 'shop':
-                                $temp_results[$key]['area'] = \preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', \str_replace(['<i>', '</i>'], '', mb_trim($temp_results[$key]['column1'], null, 'UTF-8')));
+                                $temp_results[$key]['area'] = \preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', \str_replace(['<i>', '</i>'], '', \mb_trim($temp_results[$key]['column1'], null, 'UTF-8')));
                                 break;
                             case 'text_command':
-                                if (in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'], true)) {
+                                if (\in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'], true)) {
                                     $temp_results[$key]['Windows'] = true;
                                 } else {
                                     $temp_results[$key]['Windows'] = false;
                                 }
-                                if (in_array($temp_results[$key]['column2'], ['Yes', '○', 'oui', '○'], true)) {
+                                if (\in_array($temp_results[$key]['column2'], ['Yes', '○', 'oui', '○'], true)) {
                                     $temp_results[$key]['PS4'] = true;
                                 } else {
                                     $temp_results[$key]['PS4'] = false;
                                 }
-                                if (in_array($temp_results[$key]['column3'], ['Yes', '○', 'oui', '○'], true)) {
+                                if (\in_array($temp_results[$key]['column3'], ['Yes', '○', 'oui', '○'], true)) {
                                     $temp_results[$key]['Mac'] = true;
                                 } else {
                                     $temp_results[$key]['Mac'] = false;
@@ -458,8 +458,8 @@ trait Parsers
                         $temp_results[$key]['portrait'] = \str_replace('c0.jpg', 'l0.jpg', $temp_result['avatar']);
                         // Since the release of Dawntrail, if profile is private, you won't get any of the fields below
                         if ($temp_results[$key]['private'] === false) {
-                            $temp_results[$key]['race'] = mb_trim($temp_results[$key]['race'], null, 'UTF-8');
-                            $temp_results[$key]['clan'] = mb_trim($temp_results[$key]['clan'], null, 'UTF-8');
+                            $temp_results[$key]['race'] = \mb_trim($temp_results[$key]['race'], null, 'UTF-8');
+                            $temp_results[$key]['clan'] = \mb_trim($temp_results[$key]['clan'], null, 'UTF-8');
                             if ($temp_results[$key]['race'] === '----') {
                                 $temp_results[$key]['race'] = null;
                                 $temp_results[$key]['comment'] = 'No race';
@@ -484,7 +484,7 @@ trait Parsers
                             $temp_results[$key]['gender'] = ($temp_result['gender'] === '♂' ? 'male' : 'female');
                             // Guardian
                             if (empty($temp_results[$key]['guardian'])) {
-                                $temp_results[$key]['guardian']['name'] = match (mb_strtolower($this->language, 'UTF-8')) {
+                                $temp_results[$key]['guardian']['name'] = match (\mb_strtolower($this->language, 'UTF-8')) {
                                     'jp', 'ja' => 'ハルオーネ',
                                     'fr' => 'Halone, la Conquérante',
                                     'de' => 'Halone - Die Furie',
@@ -524,7 +524,7 @@ trait Parsers
                                 $temp_results[$key]['pvp']['crest'] = $this->crest($temp_result, 'pvpcrest');
                             }
                             // Bio
-                            $temp_result['bio'] = mb_trim($temp_result['bio'], null, 'UTF-8');
+                            $temp_result['bio'] = \mb_trim($temp_result['bio'], null, 'UTF-8');
                             if ($temp_result['bio'] === '-') {
                                 $temp_result['bio'] = '';
                             }
@@ -579,7 +579,7 @@ trait Parsers
         if ($this->type === 'achievements' && $this->type_settings['allachievements']) {
             $this->type_settings['allachievements'] = false;
             for ($iteration = 1; $iteration <= 13; $iteration++) {
-                $this->getCharacterAchievements($this->type_settings['id'], false, (string)$iteration, false, $this->type_settings['details'], $this->type_settings['only_owned']);
+                $this->getCharacterAchievements($this->type_settings['id'], false, (string) $iteration, false, $this->type_settings['details'], $this->type_settings['only_owned']);
             }
         }
         $this->allpagesproc($resultkey);
@@ -620,10 +620,10 @@ trait Parsers
             case 'character_following':
             case 'free_company_members':
             case 'linkshell_members':
-                if ($result === 403 && in_array($this->type, ['character_friends', 'character_following'], true)) {
+                if ($result === 403 && \in_array($this->type, ['character_friends', 'character_following'], true)) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
                 } elseif ($result === 404) {
-                    if (!\array_key_exists($resultkey, $this->result) || (!\is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
+                    if (!\array_key_exists($resultkey, $this->result) || (!\is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !\is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
                         $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = $result;
                     }
                 } else {
@@ -640,7 +640,7 @@ trait Parsers
             case 'achievements':
                 if ($result === 403) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
-                } elseif ($result !== 404 && ($this->type_settings['only_owned'] === false || ($this->type_settings['only_owned'] === true && is_array($result) && $result['time'] !== null))) {
+                } elseif ($result !== 404 && ($this->type_settings['only_owned'] === false || ($this->type_settings['only_owned'] === true && \is_array($result) && $result['time'] !== null))) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
                 break;
@@ -669,7 +669,7 @@ trait Parsers
                 }
                 break;
             case 'worlds':
-                if ($result !== 404 && is_array($result)) {
+                if ($result !== 404 && \is_array($result)) {
                     $this->result[$resultkey][$result['data_center']] = [];
                     \preg_match_all(Regex::WORLDS, $result['servers'], $servers, \PREG_SET_ORDER);
                     if ($this->type_settings['world_details']) {
@@ -678,9 +678,9 @@ trait Parsers
                                 'Online' => $server['maintenance'] === '1',
                                 'Partial maintenance' => $server['maintenance'] === '2',
                                 'Full maintenance' => $server['maintenance'] === '3',
-                                'Preferred' => in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt'], true),
-                                'Congested' => in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet'], true),
-                                'New characters' => in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich'], true),
+                                'Preferred' => \in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt'], true),
+                                'Congested' => \in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet'], true),
+                                'New characters' => \in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich'], true),
                             ];
                         }
                     } else {
@@ -730,7 +730,7 @@ trait Parsers
      */
     protected function allpagesproc(string $result_key): bool
     {
-        if ($this->all_pages && in_array($this->type, [
+        if ($this->all_pages && \in_array($this->type, [
                 'search_character',
                 'character_friends',
                 'character_following',
@@ -837,7 +837,7 @@ trait Parsers
                 case 'maintenance':
                 case 'updates':
                 case 'status':
-                    $function_to_call = 'getLodestone'.mb_ucfirst($this->type, 'UTF-8');
+                    $function_to_call = 'getLodestone'.\mb_ucfirst($this->type, 'UTF-8');
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->$function_to_call($iteration);
                     }
@@ -939,7 +939,7 @@ trait Parsers
         }
         // Linkshell members specific
         if (!empty($pages[0]['linkshell_name'])) {
-            $this->result[$resultkey][$this->type_settings['id']]['name'] = mb_trim($pages[0]['linkshell_name'], null, 'UTF-8');
+            $this->result[$resultkey][$this->type_settings['id']]['name'] = \mb_trim($pages[0]['linkshell_name'], null, 'UTF-8');
             if (!empty($pages[0]['linkshell_server'])) {
                 if (\preg_match('/[a-zA-Z0-9]{40}/miu', $this->type_settings['id'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['data_center'] = $pages[0]['linkshell_server'];
@@ -1061,10 +1061,10 @@ trait Parsers
     protected function jobDetails(array $job): array
     {
         return [
-            'level' => (\is_numeric($job['level']) ? (int)$job['level'] : 0),
+            'level' => (\is_numeric($job['level']) ? (int) $job['level'] : 0),
             'specialist' => !empty($job['specialist']),
-            'expcur' => (\is_numeric($job['expcur']) ? (int)$job['expcur'] : 0),
-            'expmax' => (\is_numeric($job['expmax']) ? (int)$job['expmax'] : 0),
+            'expcur' => (\is_numeric($job['expcur']) ? (int) $job['expcur'] : 0),
+            'expmax' => (\is_numeric($job['expmax']) ? (int) $job['expmax'] : 0),
             'icon' => $job['icon'],
         ];
     }
@@ -1125,7 +1125,7 @@ trait Parsers
         foreach ($temp_results as $key => $temp_result) {
             foreach ($temp_result as $key2 => $details) {
                 if (\is_numeric($key2) || empty($details)) {
-                    unset($temp_results[$key][(int)$key2]);
+                    unset($temp_results[$key][(int) $key2]);
                 }
             }
             $temp_results[$key]['url'] = $temp_result['url'];
@@ -1280,7 +1280,7 @@ trait Parsers
                 $duration = $finished - $started;
             }
             if ($type === 'http') {
-                $this->result['benchmark']['http_time'][] = \date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+                $this->result['benchmark']['http_time'][] = \date('H:i:s.'.\sprintf('%06d', ($duration / 1000)), (int) ($duration / 1000000000));
                 $duration = 0;
             }
             $this->benchUpdate($duration);
@@ -1295,7 +1295,7 @@ trait Parsers
      */
     protected function benchUpdate(int $duration): void
     {
-        $this->result['benchmark']['parse_time'][] = \date('H:i:s.'.sprintf('%06d', ($duration / 1000)), (int)($duration / 1000000000));
+        $this->result['benchmark']['parse_time'][] = \date('H:i:s.'.\sprintf('%06d', ($duration / 1000)), (int) ($duration / 1000000000));
         $this->result['benchmark']['memory'] = $this->converters->memory(\memory_get_usage(true));
         $this->result['benchmark']['memory_peak'] = $this->converters->memory(\memory_get_peak_usage(true));
     }

@@ -6,7 +6,6 @@ namespace Simbiat\FFXIV\LodestoneModules;
 
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
-use function in_array;
 
 use Simbiat\FFXIV\Lodestone;
 
@@ -26,35 +25,35 @@ class Converters
      */
     public function fcRankId(string $image): string
     {
-        if (str_contains($image, 'W5a6yeRyN2eYiaV-AGU7mJKEhs')) {
+        if (\str_contains($image, 'W5a6yeRyN2eYiaV-AGU7mJKEhs')) {
             $rank = '0';
-        } elseif (str_contains($image, 'SO2DiXPE4vb5ZquxK9qZzaS2FI')) {
+        } elseif (\str_contains($image, 'SO2DiXPE4vb5ZquxK9qZzaS2FI')) {
             $rank = '12';
-        } elseif (str_contains($image, 'hOa5rExOnxaN1WNnQqZYe3Vb7c')) {
+        } elseif (\str_contains($image, 'hOa5rExOnxaN1WNnQqZYe3Vb7c')) {
             $rank = '8';
-        } elseif (str_contains($image, 'eWQ8n_shMm6W0LoRN9KodNZ8tw')) {
+        } elseif (\str_contains($image, 'eWQ8n_shMm6W0LoRN9KodNZ8tw')) {
             $rank = '14';
-        } elseif (str_contains($image, 'p94F1j-5xhM2ySM16VNrA08qjU')) {
+        } elseif (\str_contains($image, 'p94F1j-5xhM2ySM16VNrA08qjU')) {
             $rank = '1';
-        } elseif (str_contains($image, 'nw6rom1Gt5lCuBPbSsRUeFEAYo')) {
+        } elseif (\str_contains($image, 'nw6rom1Gt5lCuBPbSsRUeFEAYo')) {
             $rank = '9';
-        } elseif (str_contains($image, 'qm0y-fW7o2TvgYFH-vvcL-IH8s')) {
+        } elseif (\str_contains($image, 'qm0y-fW7o2TvgYFH-vvcL-IH8s')) {
             $rank = '10';
-        } elseif (str_contains($image, 'hU1Eoa9YXYljYZSLr_PDKlS9rA')) {
+        } elseif (\str_contains($image, 'hU1Eoa9YXYljYZSLr_PDKlS9rA')) {
             $rank = '11';
-        } elseif (str_contains($image, 'cliLaxMGlva579Q7-BGQofaHoU')) {
+        } elseif (\str_contains($image, 'cliLaxMGlva579Q7-BGQofaHoU')) {
             $rank = '3';
-        } elseif (str_contains($image, 'zXxmuKQfvR0_XbK-Q9tGafCvZQ')) {
+        } elseif (\str_contains($image, 'zXxmuKQfvR0_XbK-Q9tGafCvZQ')) {
             $rank = '4';
-        } elseif (str_contains($image, 'ZgBF9xaOv1cXJ5hpqJk775gPnU')) {
+        } elseif (\str_contains($image, 'ZgBF9xaOv1cXJ5hpqJk775gPnU')) {
             $rank = '7';
-        } elseif (str_contains($image, 'MORWKTwHdU9RwJjwTjA8Goqczg')) {
+        } elseif (\str_contains($image, 'MORWKTwHdU9RwJjwTjA8Goqczg')) {
             $rank = '13';
-        } elseif (str_contains($image, 'uIrHic2MOYHNS316SWOpAFgMKM')) {
+        } elseif (\str_contains($image, 'uIrHic2MOYHNS316SWOpAFgMKM')) {
             $rank = '6';
-        } elseif (str_contains($image, 'wy6luU_yTtJcSMjKaq-g7_uxX0')) {
+        } elseif (\str_contains($image, 'wy6luU_yTtJcSMjKaq-g7_uxX0')) {
             $rank = '2';
-        } elseif (str_contains($image, 'IjnNzh88h17r2k16noer9mUzZo')) {
+        } elseif (\str_contains($image, 'IjnNzh88h17r2k16noer9mUzZo')) {
             $rank = '5';
         } else {
             $rank = '';
@@ -64,13 +63,14 @@ class Converters
 
     /**
      * Convert certain images (and not only) to a boolean value
+     *
      * @param string $img
      *
      * @return bool
      */
     public function imageToBool(string $img): bool
     {
-        return in_array(mb_strtolower($img, 'UTF-8'), [
+        return \in_array(\mb_strtolower($img, 'UTF-8'), [
             'yes',
             '○',
             'oui',
@@ -83,13 +83,14 @@ class Converters
 
     /**
      * Get Feast rank ID  (for filter) based on value provided
+     *
      * @param string $rank
      *
      * @return string
      */
     public function getFeastRankId(string $rank): string
     {
-        return match (mb_strtolower($rank, 'UTF-8')) {
+        return match (\mb_strtolower($rank, 'UTF-8')) {
             '1', 'bronze', 'verteidiger' => '0',
             '2', 'silver', 'argent', 'silber' => '1',
             '3', 'gold', 'or' => '2',
@@ -101,13 +102,14 @@ class Converters
 
     /**
      * Get role ID (for filter) based on value provided
+     *
      * @param string $role
      *
      * @return string
      */
     public function getSearchRolesId(string $role): string
     {
-        return match (mb_strtolower($role, 'UTF-8')) {
+        return match (\mb_strtolower($role, 'UTF-8')) {
             '0', 'tank', 'tanks', 'verteidiger' => '0',
             '1', 'healer', 'soigneurs', 'heiler' => '1',
             '2', 'dps', 'angreifer' => '2',
@@ -120,13 +122,14 @@ class Converters
 
     /**
      * Get activity ID  (for filter) based on value provided
+     *
      * @param string $act
      *
      * @return string
      */
     public function getSearchActivitiesId(string $act): string
     {
-        return match (mb_strtolower($act, 'UTF-8')) {
+        return match (\mb_strtolower($act, 'UTF-8')) {
             '0', 'role-playing', 'ロールプレイ', 'jeu de rôle', 'rollenspiel' => '0',
             '1', 'leveling', 'レベリング', 'gain d\'expérience', 'stufenaufstieg' => '1',
             '2', 'casual', 'カジュアル', 'jeu décontracté', 'gelegenheitsspieler' => '2',
@@ -143,13 +146,14 @@ class Converters
 
     /**
      * Get house estate ID  (for filter) based on value provided
+     *
      * @param string $house
      *
      * @return string
      */
     public function getSearchHouseId(string $house): string
     {
-        return match (mb_strtolower($house, 'UTF-8')) {
+        return match (\mb_strtolower($house, 'UTF-8')) {
             '2', 'estate built', '所有あり', 'logement construit', 'besitzt unterkunft' => '2',
             '1', 'plot only', '土地のみ', 'terrain seul', 'nur grundstück' => '1',
             '0', 'no estate or plot', '所有なし', 'sans logement ni terrain', 'besitzt keine unterkunft' => '0',
@@ -159,13 +163,14 @@ class Converters
 
     /**
      * Get Free Company open status ID  (for filter) based on value provided
+     *
      * @param string $join
      *
      * @return string
      */
     public function getSearchJoinId(string $join): string
     {
-        return match (mb_strtolower($join, 'UTF-8')) {
+        return match (\mb_strtolower($join, 'UTF-8')) {
             '1', 'open', '申請可', 'candidatures acceptées', 'nimmt gesuche an' => '1',
             '0', 'closed', '申請不可', 'candidatures refusées', 'nimmt keine gesuche an' => '0',
             default => '',
@@ -174,13 +179,14 @@ class Converters
 
     /**
      * Get Free Company activity time ID (for filter) based on value provided
+     *
      * @param string $active
      *
      * @return string
      */
     public function getSearchActiveTimeId(string $active): string
     {
-        return match (mb_strtolower($active, 'UTF-8')) {
+        return match (\mb_strtolower($active, 'UTF-8')) {
             '1', 'weekdays', 'weekdays only', '平日のみ', 'en semaine seulement', 'nur wochentags' => '1',
             '2', 'weekends', 'weekends only', '週末のみ', 'le week-end seulement', 'nur Wochenende' => '2',
             '3', 'always', '平日/週末', 'toute la semaine', 'jeden Tag' => '3',
@@ -190,6 +196,7 @@ class Converters
 
     /**
      * Get ID of number of matches (for filter) based on value provided
+     *
      * @param int $count
      *
      * @return string
@@ -210,6 +217,7 @@ class Converters
 
     /**
      * Get PvP rank ID (for filter) based on value provided
+     *
      * @param int $count
      *
      * @return string
@@ -232,6 +240,7 @@ class Converters
 
     /**
      * Get ID for number of members (for filter) based on value provided
+     *
      * @param int|string $count
      *
      * @return string
@@ -250,7 +259,7 @@ class Converters
             } else {
                 $count = '';
             }
-        } elseif (!in_array($count, ['1-10', '11-30', '31-50', '51-'])) {
+        } elseif (!\in_array($count, ['1-10', '11-30', '31-50', '51-'])) {
             $count = '';
         }
         return $count;
@@ -258,6 +267,7 @@ class Converters
 
     /**
      * Convert region identifier to language
+     *
      * @param string $lang
      *
      * @return string
@@ -265,13 +275,13 @@ class Converters
     public function languageConvert(string $lang): string
     {
         if (!empty($lang)) {
-            if (!in_array($lang, Lodestone::LANGUAGES_ALLOWED)) {
+            if (!\in_array($lang, Lodestone::LANGUAGES_ALLOWED)) {
                 $lang = 'na';
             }
-            if (in_array($lang, ['jp', 'ja'])) {
+            if (\in_array($lang, ['jp', 'ja'])) {
                 $lang = 'ja';
             }
-            if (in_array($lang, ['na', 'eu'])) {
+            if (\in_array($lang, ['na', 'eu'])) {
                 $lang = 'en';
             }
         } else {
@@ -282,13 +292,14 @@ class Converters
 
     /**
      * Get order ID (for filter) based on value provided
+     *
      * @param string $order
      *
      * @return string
      */
     public function getSearchOrderId(string $order): string
     {
-        return match (mb_strtolower($order, 'UTF-8')) {
+        return match (\mb_strtolower($order, 'UTF-8')) {
             '1', 'charaz', 'fcaz', 'lsaz', 'pvpaz' => '1',
             '2', 'charza', 'fcza', 'lsza', 'pvpza' => '2',
             '3', 'worldaz', 'fcmembersza', 'lsmembersza' => '3',
@@ -301,13 +312,14 @@ class Converters
 
     /**
      * Get grand company ID (for filter) based on value provided
+     *
      * @param string $gc
      *
      * @return string
      */
     public function getSearchGCId(string $gc): string
     {
-        return match (mb_strtolower($gc, 'UTF-8')) {
+        return match (\mb_strtolower($gc, 'UTF-8')) {
             '1', 'maelstrom', '黒渦団', 'le maelstrom', 'mahlstrom' => '1',
             '2', 'order of the twin adder', '双蛇党 ', 'l\'ordre des deux vipères', 'bruderschaft der morgenviper' => '2',
             '3', 'immortal flames', '不滅隊', 'les immortels', 'legion der unsterblichen' => '3',
@@ -318,13 +330,14 @@ class Converters
 
     /**
      * Get race/clan ID (for filter) based on value provided
+     *
      * @param string $clan
      *
      * @return string
      */
     public function getSearchClanId(string $clan): string
     {
-        return match (mb_strtolower($clan, 'UTF-8')) {
+        return match (\mb_strtolower($clan, 'UTF-8')) {
             'hyur', 'ヒューラン', 'hyuran' => 'race_1',
             'midlander', 'ミッドランダー', 'hyurois', 'wiesländer' => 'tribe_1',
             'highlander', 'ハイランダー', 'hyurgoth', 'hochländer' => 'tribe_2',
@@ -355,13 +368,14 @@ class Converters
 
     /**
      * Convert class to Job. This is for original classes only
+     *
      * @param string $class
      *
      * @return string
      */
     public function classToJob(string $class): string
     {
-        return match (mb_strtolower($class, 'UTF-8')) {
+        return match (\mb_strtolower($class, 'UTF-8')) {
             'gladiator', 'gladiateur' => 'Paladin',
             'marauder' => 'Warrior',
             'conjurer' => 'White Mage',
@@ -398,13 +412,14 @@ class Converters
 
     /**
      * Get class or job ID (for filter) based on value provided
+     *
      * @param string $classname
      *
      * @return string
      */
     public function getSearchClassId(string $classname): string
     {
-        return match (mb_strtolower($classname, 'UTF-8')) {
+        return match (\mb_strtolower($classname, 'UTF-8')) {
             'tnk' => '_job_TANK&classjob=_class_TANK',
             'hlr' => '_job_HEALER&classjob=_class_HEALER',
             'dps' => '_job_DPS&classjob=_class_DPS',
@@ -459,13 +474,14 @@ class Converters
 
     /**
      * Get deep dungeon class ID (for filter) based on value provided
+     *
      * @param string $classname
      *
      * @return string
      */
     public function getDeepDungeonClassId(string $classname): string
     {
-        return match (mb_strtolower($classname, 'UTF-8')) {
+        return match (\mb_strtolower($classname, 'UTF-8')) {
             'gla', 'pld' => '125bf9c1198a3a148377efea9c167726d58fa1a5',
             'mar', 'war' => '741ae8622fa496b4f98b040ff03f623bf46d790f',
             'drk' => 'c31f30f41ab1562461262daa74b4d374e633a790',
@@ -493,13 +509,14 @@ class Converters
 
     /**
      * Get guardian ID (for filter) based on value provided
+     *
      * @param string $guardian
      *
      * @return string
      */
     public function getGuardianId(string $guardian): string
     {
-        return match (mb_strtolower($guardian, 'UTF-8')) {
+        return match (\mb_strtolower($guardian, 'UTF-8')) {
             'althyk, the keeper', 'アルジク', 'althyk, le contemplateur', 'althyk - der hüter', 'althyk' => '1',
             'azeyma, the warden', 'アーゼマ', 'azeyma, la gardienne', 'azeyma - die aufseherin', 'azeyma' => '2',
             'byregot, the builder', 'ビエルゴ', 'byregot, l\'artisan', 'byregot - der erbauer', 'byregot' => '3',
@@ -518,6 +535,7 @@ class Converters
 
     /**
      * Get city ID (for filter) based on value provided
+     *
      * @param string $city
      *
      * @return string
@@ -525,7 +543,7 @@ class Converters
     public function getCityId(string $city): string
     {
         // IDs are based on what I have in my own database, there is no other meaning behind them
-        return match (mb_strtolower($city, 'UTF-8')) {
+        return match (\mb_strtolower($city, 'UTF-8')) {
             'gridania', 'the lavender beds', 'グリダニア', 'ラベンダーベッド', 'lavandière', 'lavendelbeete' => '2',
             'limsa lominsa', 'mist', 'リムサ・ロミンサ', 'ミスト・ヴィレッジ', 'brumée', 'dorf des Nebels' => '4',
             'ul\'dah', 'the goblet', 'ウルダハ', 'la Coupe', 'ゴブレットビュート', 'kelchkuppe' => '5',
@@ -536,6 +554,7 @@ class Converters
 
     /**
      * Get city name for specific language
+     *
      * @param int    $id   City ID
      * @param string $lang Expected language
      *
@@ -543,23 +562,23 @@ class Converters
      */
     public function getCityName(int $id = 1, #[ExpectedValues(['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])] string $lang = 'en'): string
     {
-        if (!in_array(mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
+        if (!\in_array(\mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for City name');
         }
         return match ($id) {
-            2 => match (mb_strtolower($lang, 'UTF-8')) {
+            2 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Gridania',
                 'jp', 'ja' => 'グリダニア',
             },
-            4 => match (mb_strtolower($lang, 'UTF-8')) {
+            4 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Limsa Lominsa',
                 'jp', 'ja' => 'リムサ・ロミンサ',
             },
-            5 => match (mb_strtolower($lang, 'UTF-8')) {
+            5 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Ul\'dah',
                 'jp', 'ja' => 'ウルダハ',
             },
-            7 => match (mb_strtolower($lang, 'UTF-8')) {
+            7 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Kugane',
                 'jp', 'ja' => 'クガネ',
             },
@@ -569,13 +588,14 @@ class Converters
 
     /**
      * Get grand company ID (for filter) based on value provided
+     *
      * @param string $gc
      *
      * @return string
      */
     public function getGrandCompanyId(string $gc): string
     {
-        return match (mb_strtolower($gc, 'UTF-8')) {
+        return match (\mb_strtolower($gc, 'UTF-8')) {
             'maelstrom', '黒渦団', 'mahlstrom' => '1',
             'order of the twin adder', '双蛇党', 'ordre des deux vipères', 'bruderschaft' => '2',
             'immortal flames', '不滅隊', 'immortels', 'legion' => '3',
@@ -585,6 +605,7 @@ class Converters
 
     /**
      * Get grand company name in specific language
+     *
      * @param int    $id   ID of the company
      * @param string $lang Expected language
      *
@@ -592,22 +613,22 @@ class Converters
      */
     public function getGrandCompanyName(int $id = 1, #[ExpectedValues(['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])] string $lang = 'en'): string
     {
-        if (!in_array(mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
+        if (!\in_array(\mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for Grand Company name');
         }
         return match ($id) {
-            1 => match (mb_strtolower($lang, 'UTF-8')) {
+            1 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr' => 'Maelstrom',
                 'jp', 'ja' => '黒渦団',
                 'de' => 'Mahlstrom',
             },
-            2 => match (mb_strtolower($lang, 'UTF-8')) {
+            2 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en' => 'Order of the Twin Adder',
                 'jp', 'ja' => '双蛇党',
                 'fr' => 'Ordre des Deux Vipères',
                 'de' => 'Bruderschaft',
             },
-            3 => match (mb_strtolower($lang, 'UTF-8')) {
+            3 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en' => 'Immortal Flames',
                 'jp', 'ja' => '不滅隊',
                 'fr' => 'Immortels',
@@ -619,11 +640,13 @@ class Converters
 
     /**
      * Returns guardian's color
+     *
      * @param string $guardian
      *
      * @return string
      */
-    #[Pure] public function colorGuardians(string $guardian): string
+    #[Pure]
+    public function colorGuardians(string $guardian): string
     {
         return match ($this->getGuardianId($guardian)) {
             '1' => '#776c3e',
@@ -644,11 +667,13 @@ class Converters
 
     /**
      * Returns city's color
+     *
      * @param string $city
      *
      * @return string
      */
-    #[Pure] public function colorCities(string $city): string
+    #[Pure]
+    public function colorCities(string $city): string
     {
         return match ($this->getCityId($city)) {
             '2' => '#ffb200',
@@ -661,11 +686,13 @@ class Converters
 
     /**
      * Returns grand company's color
+     *
      * @param string $company
      *
      * @return string
      */
-    #[Pure] public function colorGC(string $company): string
+    #[Pure]
+    public function colorGC(string $company): string
     {
         return match ($this->getGrandCompanyId($company)) {
             '1' => '#c22e46',
@@ -677,13 +704,15 @@ class Converters
 
     /**
      * Convert memory size for benchmark
+     *
      * @param $bytes
-     * @internal
+     *
      * @return string
+     * @internal
      */
     public function memory($bytes): string
     {
         $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
-        return \round($bytes / (1024 ** ($i = (int)\floor(\log($bytes, 1024)))), 2).' '.$unit[$i];
+        return \round($bytes / (1024 ** ($i = (int) \floor(\log($bytes, 1024)))), 2).' '.$unit[$i];
     }
 }
