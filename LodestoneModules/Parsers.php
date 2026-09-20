@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Simbiat\FFXIV\LodestoneModules;
 
 use Simbiat\StringHelpers\Sanitize;
-use function in_array, is_array, sprintf;
 
 /**
  * Main parsing logic
@@ -16,6 +15,7 @@ trait Parsers
      * Parse Lodestone HTML
      *
      * @return \Simbiat\FFXIV\LodestoneModules\Parsers|\Simbiat\FFXIV\Lodestone
+     *
      * @throws \Throwable
      */
     protected function parse(): self
@@ -41,7 +41,7 @@ trait Parsers
             default => '',
         };
         try {
-            $this->last_error = NULL;
+            $this->last_error = null;
             $this->html = new HttpRequest($this->user_agent)->get($this->url);
         } catch (\Throwable $exception) {
             $this->errorRegister($exception->getMessage(), 'http', $started);
@@ -55,16 +55,17 @@ trait Parsers
                 // Any network errors or throttling can be bad when chaining multiple requests, which can result in incomplete dataset, so we re-throw here
                 throw $exception;
             }
+
             return $this;
         }
         if ($this->benchmark) {
             $finished = \hrtime(true);
             $duration = $finished - $started;
-            $this->result['benchmark']['http_time'][] = \date('H:i:s.'.\sprintf('%06d', ($duration / 1000)), (int) ($duration / 1000000000));
+            $this->result['benchmark']['http_time'][] = \date('H:i:s.'.\sprintf('%06d', $duration / 1000), (int) ($duration / 1000000000));
         }
         $started = \hrtime(true);
         try {
-            $this->last_error = NULL;
+            $this->last_error = null;
             // Parsing of pages
             if (\in_array($this->type, [
                 'search_character',
@@ -167,7 +168,10 @@ trait Parsers
                     'updates',
                     'status',
                 ], true)) {
-                    if (!empty($this->type_settings['id']) && !empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]['total'])) {
+                    if (
+                        !empty($this->type_settings['id'])
+                        && !empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]['total'])
+                    ) {
                         return $this;
                     }
                     $this->errorUnregister();
@@ -181,7 +185,10 @@ trait Parsers
                 // Remove non-named groups before rearranging results to avoid overwrites
                 foreach ($temp_results as $key => $temp_result) {
                     foreach ($temp_result as $key2 => $details) {
-                        if (\is_numeric($key2) || empty($details)) {
+                        if (
+                            \is_numeric($key2)
+                            || empty($details)
+                        ) {
                             // No idea why EA thinks $key2 is float when it's either string or int. Probably gets confused by is_numeric check
                             unset($temp_results[$key][$key2]);
                         }
@@ -193,7 +200,10 @@ trait Parsers
             foreach ($temp_results as $key => $temp_result) {
                 // Remove unnamed groups and empty values
                 foreach ($temp_result as $key2 => $value) {
-                    if (\is_numeric($key2) || empty($value)) {
+                    if (
+                        \is_numeric($key2)
+                        || empty($value)
+                    ) {
                         unset($temp_results[$key][$key2], $temp_result[$key2]);
                     }
                 }
@@ -210,6 +220,7 @@ trait Parsers
                     case 'search_pvp_team':
                     case 'search_free_company':
                         $temp_results[$key]['crest'] = $this->crest($temp_result, 'crest');
+
                         break;
                     case 'search_character':
                     case 'character_friends':
@@ -232,18 +243,28 @@ trait Parsers
                         if (!empty($temp_result['fc_id'])) {
                             $temp_results[$key]['free_company'] = $this->freecompany($temp_result);
                         }
-                        if (!empty($temp_result['ls_rank']) && !empty($temp_result['ls_rank_icon'])) {
+                        if (
+                            !empty($temp_result['ls_rank'])
+                            && !empty($temp_result['ls_rank_icon'])
+                        ) {
                             $temp_results[$key]['rank_icon'] = $temp_result['ls_rank_icon'];
                         }
                         // Specific for linkshell members
                         if ($this->type === 'linkshell_members') {
-                            if (empty($this->result['server']) && !empty($this->type_settings['id'])) {
+                            if (
+                                empty($this->result['server'])
+                                && !empty($this->type_settings['id'])
+                            ) {
                                 $this->result[$resultkey][$this->type_settings['id']]['server'] = $temp_result['server'];
                             }
-                            if (!empty($pages[0]['linkshell_server']) && !empty($this->type_settings['id'])) {
+                            if (
+                                !empty($pages[0]['linkshell_server'])
+                                && !empty($this->type_settings['id'])
+                            ) {
                                 $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
                             }
                         }
+
                         break;
                     case 'frontline':
                     case 'grand_company_ranking':
@@ -254,10 +275,12 @@ trait Parsers
                             $temp_results[$key]['free_company'] = $this->freecompany($temp_result);
                         }
                         $temp_results[$key]['rank'] = ($temp_result['rank2'] ?: $temp_result['rank1']);
+
                         break;
                     case 'free_company_ranking':
                         $temp_results[$key]['crest'] = $this->crest($temp_result, 'crest');
                         $temp_results[$key]['rank'] = ($temp_result['rank2'] ?: $temp_result['rank1']);
+
                         break;
                     case 'topics':
                     case 'news':
@@ -266,6 +289,7 @@ trait Parsers
                     case 'updates':
                     case 'status':
                         $temp_results[$key]['url'] = \sprintf(Routes::LODESTONE_URL_BASE, $this->language).$temp_result['url'];
+
                         break;
                     case 'deep_dungeon':
                         $temp_results[$key]['job'] = [
@@ -275,15 +299,16 @@ trait Parsers
                         if (!empty($temp_result['jobform'])) {
                             $temp_results[$key]['job']['form'] = $temp_result['jobform'];
                         }
+
                         break;
                     case 'free_company':
                         $temp_results[$key]['crest'] = $this->crest($temp_result, 'crest');
                         // Ranking checks for --
                         if ($temp_result['weekly_rank'] === '--') {
-                            $temp_results[$key]['weekly_rank'] = NULL;
+                            $temp_results[$key]['weekly_rank'] = null;
                         }
                         if ($temp_result['monthly_rank'] === '--') {
-                            $temp_results[$key]['monthly_rank'] = NULL;
+                            $temp_results[$key]['monthly_rank'] = null;
                         }
                         // Estates
                         if (!empty($temp_result['estate_name'])) {
@@ -292,7 +317,10 @@ trait Parsers
                         if (!empty($temp_result['estate_address'])) {
                             $temp_results[$key]['estate']['address'] = $temp_result['estate_address'];
                         }
-                        if (!empty($temp_result['estate_greeting']) && !\in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'], true)) {
+                        if (
+                            !empty($temp_result['estate_greeting'])
+                            && !\in_array($temp_result['estate_greeting'], ['No greeting available.', 'グリーティングメッセージが設定されていません。', 'Il n\'y a aucun message d\'accueil.', 'Keine Begrüßung vorhanden.'], true)
+                        ) {
                             $temp_results[$key]['estate']['greeting'] = $temp_result['estate_greeting'];
                         }
                         // Grand companies reputation
@@ -334,6 +362,7 @@ trait Parsers
                         } else {
                             $temp_results[$key]['members_count'] = (int) $temp_result['members_count'];
                         }
+
                         break;
                     case 'achievements':
                     case 'achievement_details':
@@ -360,18 +389,22 @@ trait Parsers
                             }
                         }
                         if (empty($temp_result['time'])) {
-                            $temp_results[$key]['time'] = NULL;
+                            $temp_results[$key]['time'] = null;
                         }
                         if (empty($temp_result['points'])) {
                             $temp_results[$key]['points'] = 0;
                         }
-                        if (empty($temp_result['subcategory']) && !empty($temp_result['category'])) {
+                        if (
+                            empty($temp_result['subcategory'])
+                            && !empty($temp_result['category'])
+                        ) {
                             if ($temp_result['category'] === 'Quests') {
                                 $temp_results[$key]['subcategory'] = 'Seasonal Events';
                             } elseif ($temp_result['category'] === 'PvP') {
                                 $temp_results[$key]['subcategory'] = 'Ranking';
                             }
                         }
+
                         break;
                     case 'database':
                         $temp_results[$key]['name'] = \str_replace(['<i>', '</i>'], '', \mb_trim($temp_results[$key]['name'], null, 'UTF-8'));
@@ -379,18 +412,22 @@ trait Parsers
                             case 'achievement':
                                 $temp_results[$key]['reward'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : \mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
                                 $temp_results[$key]['points'] = (int) ($temp_results[$key]['column2'] ?? 0);
+
                                 break;
                             case 'quest':
                                 $temp_results[$key]['area'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? null : \mb_trim($temp_results[$key]['column1'], null, 'UTF-8'));
                                 $temp_results[$key]['character_level'] = (int) ($temp_results[$key]['column2'] ?? 0);
+
                                 break;
                             case 'duty':
                                 $temp_results[$key]['character_level'] = (int) ($temp_results[$key]['column1'] ?? 0);
                                 $temp_results[$key]['item_level'] = (\mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column2']);
+
                                 break;
                             case 'item':
                                 $temp_results[$key]['item_level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
                                 $temp_results[$key]['character_level'] = (\mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column2']);
+
                                 break;
                             case 'recipe':
                                 if (isset($temp_results[$key]['extraicon'])) {
@@ -399,7 +436,7 @@ trait Parsers
                                     $temp_results[$key]['collectable'] = false;
                                 }
                                 if (!isset($temp_results[$key]['master'])) {
-                                    $temp_results[$key]['master'] = NULL;
+                                    $temp_results[$key]['master'] = null;
                                 }
                                 $temp_results[$key]['recipe_level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
                                 $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
@@ -409,6 +446,7 @@ trait Parsers
                                     $temp_results[$key]['expert'] = false;
                                 }
                                 $temp_results[$key]['item_level'] = (\mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column2']);
+
                                 break;
                             case 'gathering':
                                 if (isset($temp_results[$key]['extraicon'])) {
@@ -423,9 +461,11 @@ trait Parsers
                                 }
                                 $temp_results[$key]['level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
                                 $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
+
                                 break;
                             case 'shop':
                                 $temp_results[$key]['area'] = \preg_replace('/\s+((Other Locations)|(ほか)|(Etc.)|(Anderer Ort))/miu', '', \str_replace(['<i>', '</i>'], '', \mb_trim($temp_results[$key]['column1'], null, 'UTF-8')));
+
                                 break;
                             case 'text_command':
                                 if (\in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'], true)) {
@@ -443,8 +483,10 @@ trait Parsers
                                 } else {
                                     $temp_results[$key]['Mac'] = false;
                                 }
+
                                 break;
                         }
+
                         break;
                     case 'character':
                         // There are cases of characters not returning a proper race or clan (usually both).
@@ -473,9 +515,15 @@ trait Parsers
                                 }
                             }
                             $temp_results[$key]['nameday'] = \str_replace('32st', '32nd', $temp_results[$key]['nameday']);
-                            if (\array_key_exists('uppertitle', $temp_result) && !Sanitize::whiteString($temp_result['uppertitle'])) {
+                            if (
+                                \array_key_exists('uppertitle', $temp_result)
+                                && !Sanitize::whiteString($temp_result['uppertitle'])
+                            ) {
                                 $temp_results[$key]['title'] = $temp_result['uppertitle'];
-                            } elseif (\array_key_exists('undertitle', $temp_result) && !Sanitize::whiteString($temp_result['undertitle'])) {
+                            } elseif (
+                                \array_key_exists('undertitle', $temp_result)
+                                && !Sanitize::whiteString($temp_result['undertitle'])
+                            ) {
                                 $temp_results[$key]['title'] = $temp_result['undertitle'];
                             } else {
                                 $temp_results[$key]['title'] = '';
@@ -539,12 +587,14 @@ trait Parsers
                             // $temp_results[$key]['minions'] = $this->collectibles('minions');
                             $temp_results[$key]['gear'] = $this->items();
                         }
+
                         break;
                     case 'character_jobs':
                         $temp_result['id'] = $this->converters->classToJob($temp_result['name']);
                         $temp_result['expcur'] = \preg_replace('/\D/u', '', $temp_result['expcur'] ?? '');
                         $temp_result['expmax'] = \preg_replace('/\D/u', '', $temp_result['expmax'] ?? '');
                         $temp_results[$key] = $this->jobDetails($temp_result);
+
                         break;
                 }
 
@@ -561,6 +611,7 @@ trait Parsers
             }
         } catch (\Throwable $exception) {
             $this->errorRegister($exception->getMessage(), 'parse', $started);
+
             return $this;
         }
         // Benchmarking
@@ -571,12 +622,18 @@ trait Parsers
         }
 
         // Processing achievements' details last to get proper order of timings for benchmarking
-        if ($this->type === 'achievements' && $this->type_settings['details']) {
+        if (
+            $this->type === 'achievements'
+            && $this->type_settings['details']
+        ) {
             foreach ($this->result[$resultkey][$this->type_settings['id']][$resultsubkey] as $key => $ach) {
                 $this->getCharacterAchievements($this->type_settings['id'], $key, 1, false, true);
             }
         }
-        if ($this->type === 'achievements' && $this->type_settings['allachievements']) {
+        if (
+            $this->type === 'achievements'
+            && $this->type_settings['allachievements']
+        ) {
             $this->type_settings['allachievements'] = false;
             for ($iteration = 1; $iteration <= 13; $iteration++) {
                 $this->getCharacterAchievements($this->type_settings['id'], false, (string) $iteration, false, $this->type_settings['details'], $this->type_settings['only_owned']);
@@ -589,6 +646,7 @@ trait Parsers
 
     /**
      * Add  entity to results
+     *
      * @param string          $resultkey    Result key (essentially type of the entity)
      * @param string          $resultsubkey Sub-key of result
      * @param array|int       $result       Actual result
@@ -606,6 +664,7 @@ trait Parsers
                 if ($result !== 404) {
                     $this->result[$resultkey][$id] = $result;
                 }
+
                 break;
             case 'free_company':
             case 'character':
@@ -614,21 +673,32 @@ trait Parsers
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']] = $result;
                 }
+
                 break;
             case 'character_jobs':
             case 'character_friends':
             case 'character_following':
             case 'free_company_members':
             case 'linkshell_members':
-                if ($result === 403 && \in_array($this->type, ['character_friends', 'character_following'], true)) {
+                if (
+                    $result === 403
+                    && \in_array($this->type, ['character_friends', 'character_following'], true)
+                ) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
                 } elseif ($result === 404) {
-                    if (!\array_key_exists($resultkey, $this->result) || (!\is_scalar($this->result[$resultkey][$this->type_settings['id']]) && !\is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]))) {
+                    if (
+                        !\array_key_exists($resultkey, $this->result)
+                        || (
+                            !\is_scalar($this->result[$resultkey][$this->type_settings['id']])
+                            && !\is_array($this->result[$resultkey][$this->type_settings['id']][$resultsubkey])
+                        )
+                    ) {
                         $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = $result;
                     }
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
+
                 break;
             case 'pvp_team_members':
                 if ($result === 404) {
@@ -636,26 +706,44 @@ trait Parsers
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
+
                 break;
             case 'achievements':
                 if ($result === 403) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
-                } elseif ($result !== 404 && ($this->type_settings['only_owned'] === false || ($this->type_settings['only_owned'] === true && \is_array($result) && $result['time'] !== null))) {
+                } elseif (
+                    $result !== 404
+                    && (
+                        $this->type_settings['only_owned'] === false
+                        || (
+                            $this->type_settings['only_owned'] === true
+                            && \is_array($result)
+                            && $result['time'] !== null
+                        )
+                    )
+                ) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$id] = $result;
                 }
+
                 break;
             case 'achievement_details':
                 if ($result === 403) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey] = ['private' => true];
-                } elseif ($result !== 404 || empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']])) {
+                } elseif (
+                    $result !== 404
+                    || empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']])
+                ) {
                     $this->result[$resultkey][$this->type_settings['id']][$resultsubkey][$this->type_settings['achievement_id']] = $result;
                 }
+
                 break;
             case 'database':
                 $this->result[$resultkey][$resultsubkey][$id] = $result;
+
                 break;
             case 'achievement_from_db':
                 $this->result[$resultkey]['achievement'][$this->type_settings['id']] = $result;
+
                 break;
             case 'banners':
             case 'topics':
@@ -667,9 +755,13 @@ trait Parsers
                 if ($result !== 404) {
                     $this->result[$resultkey][] = $result;
                 }
+
                 break;
             case 'worlds':
-                if ($result !== 404 && \is_array($result)) {
+                if (
+                    $result !== 404
+                    && \is_array($result)
+                ) {
                     $this->result[$resultkey][$result['data_center']] = [];
                     \preg_match_all(Regex::WORLDS, $result['servers'], $servers, \PREG_SET_ORDER);
                     if ($this->type_settings['world_details']) {
@@ -688,6 +780,7 @@ trait Parsers
                     }
                     \ksort($this->result[$resultkey][$result['data_center']]);
                 }
+
                 break;
             case 'feast':
                 if ($result === 404) {
@@ -695,6 +788,7 @@ trait Parsers
                 } else {
                     $this->result[$resultkey][$this->type_settings['season']][$id] = $result;
                 }
+
                 break;
             case 'frontline':
             case 'grand_company_ranking':
@@ -704,6 +798,7 @@ trait Parsers
                 } else {
                     $this->result[$resultkey][$resultsubkey][$this->type_settings['week']][$id] = $result;
                 }
+
                 break;
             case 'deep_dungeon':
                 if ($this->type_settings['solo_party'] === 'solo') {
@@ -717,6 +812,7 @@ trait Parsers
                 } else {
                     $this->result[$resultkey][$this->type_settings['dungeon']][$this->type_settings['solo_party']][$id] = $result;
                 }
+
                 break;
         }
     }
@@ -755,19 +851,23 @@ trait Parsers
                 case 'linkshell_members':
                     $current_page = $this->result[$result_key][$this->type_settings['id']]['page_current'];
                     $total_page = $this->result[$result_key][$this->type_settings['id']]['page_total'];
+
                     break;
                 case 'grand_company_ranking':
                 case 'free_company_ranking':
                     $current_page = $this->result[$result_key][$this->type_settings['week']]['page_current'];
                     $total_page = $this->result[$result_key][$this->type_settings['week']]['page_total'];
+
                     break;
                 case 'database':
                     $current_page = $this->result[$result_key][$this->type_settings['type']]['page_current'];
                     $total_page = $this->result[$result_key][$this->type_settings['type']]['page_total'];
+
                     break;
                 default:
                     $current_page = $this->result[$result_key]['page_current'];
                     $total_page = $this->result[$result_key]['page_total'];
+
                     break;
             }
             if ($current_page === $total_page) {
@@ -781,56 +881,67 @@ trait Parsers
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->getCharacterFriends($this->type_settings['id'], $iteration);
                     }
+
                     break;
                 case 'character_following':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->getCharacterFollowing($this->type_settings['id'], $iteration);
                     }
+
                     break;
                 case 'free_company_members':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->getFreeCompanyMembers($this->type_settings['id'], $iteration);
                     }
+
                     break;
                 case 'linkshell_members':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->getLinkshellMembers($this->type_settings['id'], $iteration);
                     }
+
                     break;
                 case 'grand_company_ranking':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->getGrandCompanyRanking($this->type_settings['week_month'], $this->type_settings['week'], $this->type_settings['worldname'], $this->type_settings['gcid'], $iteration);
                     }
+
                     break;
                 case 'free_company_ranking':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->getFreeCompanyRanking($this->type_settings['week_month'], $this->type_settings['week'], $this->type_settings['worldname'], $this->type_settings['gcid'], $iteration);
                     }
+
                     break;
                 case 'search_character':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->searchCharacter($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['classjob'], $this->type_settings['race_tribe'], $this->type_settings['gcid'], $this->type_settings['blog_lang'], $this->type_settings['order'], $iteration);
                     }
+
                     break;
                 case 'search_free_company':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->searchFreeCompany($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['character_count'], $this->type_settings['activities'], $this->type_settings['roles'], $this->type_settings['activetime'], $this->type_settings['join'], $this->type_settings['house'], $this->type_settings['gcid'], $this->type_settings['order'], $iteration);
                     }
+
                     break;
                 case 'search_linkshell':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->searchLinkshell($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['character_count'], $this->type_settings['order'], $iteration);
                     }
+
                     break;
                 case 'search_pvp_team':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->searchPvPTeam($this->type_settings['name'], $this->type_settings['server'], $this->type_settings['order'], $iteration);
                     }
+
                     break;
                 case 'database':
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->searchDatabase($this->type_settings['type'], $this->type_settings['category'], $this->type_settings['subcatecory'], $this->type_settings['search'], $iteration);
                     }
+
                     break;
                 case 'topics':
                 case 'notices':
@@ -841,15 +952,19 @@ trait Parsers
                     for ($iteration = $current_page; $iteration <= $total_page; $iteration++) {
                         $this->$function_to_call($iteration);
                     }
+
                     break;
             }
+
             return true;
         }
+
         return false;
     }
 
     /**
      * Function to parse pages
+     *
      * @param array  $pages     List of pages
      * @param string $resultkey Result key (essentially entity type)
      *
@@ -876,65 +991,105 @@ trait Parsers
                 if (!empty($pages[0]['pvp_team_community_id'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['community_id'] = $pages[0]['pvp_team_community_id'];
                 }
-                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
+                if (
+                    isset($pages[0]['page_current'])
+                    && \is_numeric($pages[0]['page_current'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['id']]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
+                if (
+                    isset($pages[0]['page_total'])
+                    && \is_numeric($pages[0]['page_total'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['id']]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['id']]['page_total'] = $this->result[$resultkey][$this->type_settings['id']]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
+                if (
+                    isset($pages[0]['total'])
+                    && \is_numeric($pages[0]['total'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['id']]['members_count'] = $pages[0]['total'];
                 }
+
                 break;
             case 'grand_company_ranking':
             case 'free_company_ranking':
-                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
+                if (
+                    isset($pages[0]['page_current'])
+                    && \is_numeric($pages[0]['page_current'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['week']]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['week']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
+                if (
+                    isset($pages[0]['page_total'])
+                    && \is_numeric($pages[0]['page_total'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['week']]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['week']]['page_total'] = $this->result[$resultkey][$this->type_settings['week']]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
+                if (
+                    isset($pages[0]['total'])
+                    && \is_numeric($pages[0]['total'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['week']]['total'] = $pages[0]['total'];
                 }
+
                 break;
             case 'database':
-                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
+                if (
+                    isset($pages[0]['page_current'])
+                    && \is_numeric($pages[0]['page_current'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['type']]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['type']]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
+                if (
+                    isset($pages[0]['page_total'])
+                    && \is_numeric($pages[0]['page_total'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['type']]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey][$this->type_settings['type']]['page_total'] = $this->result[$resultkey][$this->type_settings['type']]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
+                if (
+                    isset($pages[0]['total'])
+                    && \is_numeric($pages[0]['total'])
+                ) {
                     $this->result[$resultkey][$this->type_settings['type']]['total'] = $pages[0]['total'];
                 }
+
                 break;
             default:
-                if (isset($pages[0]['page_current']) && \is_numeric($pages[0]['page_current'])) {
+                if (
+                    isset($pages[0]['page_current'])
+                    && \is_numeric($pages[0]['page_current'])
+                ) {
                     $this->result[$resultkey]['page_current'] = $pages[0]['page_current'];
                 } else {
                     $this->result[$resultkey]['page_current'] = 1;
                 }
-                if (isset($pages[0]['page_total']) && \is_numeric($pages[0]['page_total'])) {
+                if (
+                    isset($pages[0]['page_total'])
+                    && \is_numeric($pages[0]['page_total'])
+                ) {
                     $this->result[$resultkey]['page_total'] = $pages[0]['page_total'];
                 } else {
                     $this->result[$resultkey]['page_total'] = $this->result[$resultkey]['page_current'];
                 }
-                if (isset($pages[0]['total']) && \is_numeric($pages[0]['total'])) {
+                if (
+                    isset($pages[0]['total'])
+                    && \is_numeric($pages[0]['total'])
+                ) {
                     $this->result[$resultkey]['total'] = $pages[0]['total'];
                 }
+
                 break;
         }
         // Linkshell members specific
@@ -966,11 +1121,13 @@ trait Parsers
             }
             $this->result[$resultkey][$this->type_settings['id']]['crest'] = $this->crest($pages[0], 'pvpcrest');
         }
+
         return $this;
     }
 
     /**
      * Getting crest from array based on "keybase" identifying numbered keys in the array
+     *
      * @param array  $tempresult Array to process
      * @param string $keybase    Prefix for key
      *
@@ -997,11 +1154,13 @@ trait Parsers
                 $crest[$key] = 'https://img2.finalfantasyxiv.com/c/S01_49d2902352dde56ae3c6423a937ac151_00_128x128.png';
             }
         }
+
         return $crest;
     }
 
     /**
      * Generate Grand Company details
+     *
      * @param array $tempresult
      *
      * @return array
@@ -1015,11 +1174,13 @@ trait Parsers
         if (!empty($tempresult['gc_rank_icon'])) {
             $gc['icon'] = $tempresult['gc_rank_icon'];
         }
+
         return $gc;
     }
 
     /**
      * Generate free company details
+     *
      * @param array $tempresult
      *
      * @return array
@@ -1035,6 +1196,7 @@ trait Parsers
 
     /**
      * Process character jobs
+     *
      * @return array
      */
     protected function jobs(): array
@@ -1049,11 +1211,13 @@ trait Parsers
             $job['expmax'] = \preg_replace('/\D/u', '', $job['expmax']);
             $temp_jobs[$this->converters->classToJob($job['name'])] = $this->jobDetails($job);
         }
+
         return $temp_jobs;
     }
 
     /**
      * Process job details
+     *
      * @param array $job
      *
      * @return array
@@ -1071,6 +1235,7 @@ trait Parsers
 
     /**
      * Process character attributes
+     *
      * @return array
      */
     protected function attributes(): array
@@ -1087,11 +1252,13 @@ trait Parsers
                 $temp_attrs[$attribute['name']] = $attribute['value'];
             }
         }
+
         return $temp_attrs;
     }
 
     /**
      * Process collectibles
+     *
      * @param string $type
      *
      * @return array
@@ -1108,11 +1275,13 @@ trait Parsers
             \preg_match_all(Regex::COLLECTIBLE, $results[0][0], $results, \PREG_SET_ORDER);
             $collectables = \array_column($results, 2, 1);
         }
+
         return $collectables;
     }
 
     /**
      * Process items
+     *
      * @return array
      */
     protected function items(): array
@@ -1124,7 +1293,10 @@ trait Parsers
         // Remove non-named groups
         foreach ($temp_results as $key => $temp_result) {
             foreach ($temp_result as $key2 => $details) {
-                if (\is_numeric($key2) || empty($details)) {
+                if (
+                    \is_numeric($key2)
+                    || empty($details)
+                ) {
                     unset($temp_results[$key][(int) $key2]);
                 }
             }
@@ -1211,11 +1383,13 @@ trait Parsers
             unset($temp_results[$key]['level'], $temp_results[$key]['classes'], $temp_results[$key]['price'], $temp_results[$key]['unsellable'], $temp_results[$key]['marketprohibited'], $temp_results[$key]['repair'], $temp_results[$key]['materials'], $temp_results[$key]['desynthesizable'], $temp_results[$key]['melding'], $temp_results[$key]['advancedmelding'], $temp_results[$key]['convertible'], $temp_results[$key]['glamourname'], $temp_results[$key]['glamourid'], $temp_results[$key]['glamouricon'], $temp_results[$key]['crestable'], $temp_results[$key]['glamourable'], $temp_results[$key]['projectable'], $temp_results[$key]['dyeable'], $temp_results[$key]['untradeable'], $temp_results[$key]['shop']);
             */
         }
+
         return $temp_results;
     }
 
     /**
      * Convert stars to integer
+     *
      * @param array $stars
      *
      * @return int
@@ -1234,6 +1408,7 @@ trait Parsers
         if (isset($stars['star1'])) {
             return 1;
         }
+
         return 0;
     }
 
@@ -1250,17 +1425,21 @@ trait Parsers
     {
         if ($matchescount === 0) {
             $this->errorRegister('No matches found for regex ('.$regexid.')');
+
             return false;
         }
         if ($matchescount === false) {
             $this->errorRegister('Regex ('.$regexid.') failed with error code '.$errorcode);
+
             return false;
         }
+
         return true;
     }
 
     /**
      * Function to save error
+     *
      * @param string $errormessage
      * @param string $type
      * @param int    $started
@@ -1269,7 +1448,7 @@ trait Parsers
      */
     protected function errorRegister(string $errormessage, string $type = 'parse', int $started = 0): void
     {
-        $error = ['type' => $this->type, 'id' => ($this->type_settings['id'] ?? NULL), 'error' => $errormessage, 'url' => $this->url];
+        $error = ['type' => $this->type, 'id' => ($this->type_settings['id'] ?? null), 'error' => $errormessage, 'url' => $this->url];
         $this->last_error = \array_merge($error, ['html' => $this->html, 'regex' => $this->regex]);
         $this->errors[] = $error;
         if ($this->benchmark) {
@@ -1280,7 +1459,7 @@ trait Parsers
                 $duration = $finished - $started;
             }
             if ($type === 'http') {
-                $this->result['benchmark']['http_time'][] = \date('H:i:s.'.\sprintf('%06d', ($duration / 1000)), (int) ($duration / 1000000000));
+                $this->result['benchmark']['http_time'][] = \date('H:i:s.'.\sprintf('%06d', $duration / 1000), (int) ($duration / 1000000000));
                 $duration = 0;
             }
             $this->benchUpdate($duration);
@@ -1289,26 +1468,28 @@ trait Parsers
 
     /**
      * Update benchmark details
+     *
      * @param int $duration
      *
      * @return void
      */
     protected function benchUpdate(int $duration): void
     {
-        $this->result['benchmark']['parse_time'][] = \date('H:i:s.'.\sprintf('%06d', ($duration / 1000)), (int) ($duration / 1000000000));
+        $this->result['benchmark']['parse_time'][] = \date('H:i:s.'.\sprintf('%06d', $duration / 1000), (int) ($duration / 1000000000));
         $this->result['benchmark']['memory'] = $this->converters->memory(\memory_get_usage(true));
         $this->result['benchmark']['memory_peak'] = $this->converters->memory(\memory_get_peak_usage(true));
     }
 
     /**
      * Function to reset the last error (in case false positive)
+     *
      * @return void
      */
     protected function errorUnregister(): void
     {
         \array_pop($this->errors);
         if (\count($this->errors) === 0) {
-            $this->last_error = NULL;
+            $this->last_error = null;
         } else {
             $this->last_error = \end($this->errors);
         }

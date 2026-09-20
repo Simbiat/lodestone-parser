@@ -21,6 +21,7 @@ class Converters
      * @param string $image
      *
      * @return string
+     *
      * @noinspection SpellCheckingInspection
      */
     public function fcRankId(string $image): string
@@ -58,6 +59,7 @@ class Converters
         } else {
             $rank = '';
         }
+
         return $rank;
     }
 
@@ -203,15 +205,22 @@ class Converters
      */
     public function matchesCount(int $count): string
     {
-        if ($count >= 1 && $count <= 29) {
+        if (
+            $count >= 1
+            && $count <= 29
+        ) {
             $count_new = '1';
-        } elseif ($count >= 30 && $count <= 49) {
+        } elseif (
+            $count >= 30
+            && $count <= 49
+        ) {
             $count_new = '2';
         } elseif ($count >= 50) {
             $count_new = '3';
         } else {
             $count_new = '';
         }
+
         return $count_new;
     }
 
@@ -224,17 +233,27 @@ class Converters
      */
     public function pvpRank(int $count): string
     {
-        if ($count >= 1 && $count <= 10) {
+        if (
+            $count >= 1
+            && $count <= 10
+        ) {
             $count_new = '1';
-        } elseif ($count >= 11 && $count <= 20) {
+        } elseif (
+            $count >= 11
+            && $count <= 20
+        ) {
             $count_new = '2';
-        } elseif ($count >= 21 && $count <= 30) {
+        } elseif (
+            $count >= 21
+            && $count <= 30
+        ) {
             $count_new = '3';
         } elseif ($count >= 31) {
             $count_new = '4';
         } else {
             $count_new = '';
         }
+
         return $count_new;
     }
 
@@ -248,11 +267,20 @@ class Converters
     public function membersCount(int|string $count): string
     {
         if (\is_int($count)) {
-            if ($count >= 1 && $count <= 10) {
+            if (
+                $count >= 1
+                && $count <= 10
+            ) {
                 $count = '1-10';
-            } elseif ($count >= 11 && $count <= 30) {
+            } elseif (
+                $count >= 11
+                && $count <= 30
+            ) {
                 $count = '11-30';
-            } elseif ($count >= 31 && $count <= 50) {
+            } elseif (
+                $count >= 31
+                && $count <= 50
+            ) {
                 $count = '31-50';
             } elseif ($count >= 51) {
                 $count = '51-';
@@ -262,6 +290,7 @@ class Converters
         } elseif (!\in_array($count, ['1-10', '11-30', '31-50', '51-'])) {
             $count = '';
         }
+
         return $count;
     }
 
@@ -287,6 +316,7 @@ class Converters
         } else {
             $lang = '';
         }
+
         return $lang;
     }
 
@@ -565,6 +595,7 @@ class Converters
         if (!\in_array(\mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for City name');
         }
+
         return match ($id) {
             2 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr', 'de' => 'Gridania',
@@ -616,6 +647,7 @@ class Converters
         if (!\in_array(\mb_strtolower($lang, 'UTF-8'), ['na', 'jp', 'ja', 'eu', 'fr', 'de', 'en'])) {
             throw new \UnexpectedValueException('Unsupported language \''.$lang.'\' requested for Grand Company name');
         }
+
         return match ($id) {
             1 => match (\mb_strtolower($lang, 'UTF-8')) {
                 'na', 'eu', 'en', 'fr' => 'Maelstrom',
@@ -708,11 +740,13 @@ class Converters
      * @param $bytes
      *
      * @return string
+     *
      * @internal
      */
     public function memory($bytes): string
     {
         $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
+
         return \round($bytes / (1024 ** ($i = (int) \floor(\log($bytes, 1024)))), 2).' '.$unit[$i];
     }
 }

@@ -35,6 +35,7 @@ class HttpRequest
 
     /**
      * Main constructor
+     *
      * @param string $user_agent User-agent to use
      */
     public function __construct(string $user_agent = '')
@@ -43,7 +44,10 @@ class HttpRequest
             self::$curl_options[\CURLOPT_USERAGENT] = $user_agent;
         }
         // Check if the handle already created
-        if (self::$curl_handle === null || self::$curl_handle === false) {
+        if (
+            self::$curl_handle === null
+            || self::$curl_handle === false
+        ) {
             // Create or retrieve a persistent cURL share handle to share data to help speed up connections
             $share = \curl_share_init_persistent([\CURL_LOCK_DATA_DNS, \CURL_LOCK_DATA_SSL_SESSION, \CURL_LOCK_DATA_CONNECT, \CURL_LOCK_DATA_PSL]);
             self::$curl_handle = \curl_init();
@@ -59,7 +63,9 @@ class HttpRequest
 
     /**
      * Get content from a page
+     *
      * @internal
+     *
      * @throws \Exception
      */
     public function get(string $url): string
@@ -77,6 +83,7 @@ class HttpRequest
             if (\preg_match('/(Operation timed out after|Could not resolve host|Resolving timed out after|Connection reset by peer|was not closed cleanly|Connection timed out)/ui', $curl_error)) {
                 throw new \RuntimeException('Lodestone not available, 503', 503);
             }
+
             throw new \RuntimeException($curl_error, $http_code);
         }
         $data = \mb_substr($response, $header_length, null, 'UTF-8');
@@ -97,18 +104,26 @@ class HttpRequest
             if ($message === ($data ?? '')) {
                 $message = \preg_replace('/(.*<p class="parts__zero">)([^<]+)(\.?<\/p>.*)/muis', '$2', $data ?? '');
             }
+
             throw new \RuntimeException((Sanitize::whiteString($message) ? 'No access, possibly private entity' : $message).', '.$http_code, $http_code);
         }
         if ($http_code === 0) {
             throw new \RuntimeException($curl_error, $http_code);
         }
-        if ($http_code < 200 || $http_code > 308) {
-            if ($http_code === 429 || \preg_match('/The server is experiencing unusually heavy traffic/ui', $data ?? '') === 1) {
+        if (
+            $http_code < 200
+            || $http_code > 308
+        ) {
+            if (
+                $http_code === 429
+                || \preg_match('/The server is experiencing unusually heavy traffic/ui', $data ?? '') === 1
+            ) {
                 throw new \RuntimeException('Lodestone has throttled the request, '.$http_code, $http_code);
             }
             \file_put_contents(__DIR__.'/html.txt', $data ?? '');
             // Get the message from Lodestone
             $message = \preg_replace('/(.*?<h1 class="(error|maintenance)__heading">)([^<]+)(<\/h1>\s*<p class="(error|maintenance)__text">)([^<]+)(<\/p>.*)/muis', '$3: $6', $data ?? '');
+
             throw new \RuntimeException((Sanitize::whiteString($message) ? 'Requested page is not available' : $message).', '.$http_code, $http_code);
         }
         // Check that data is not empty

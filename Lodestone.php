@@ -88,6 +88,7 @@ class Lodestone
     public function resetResult(): self
     {
         $this->result = [];
+
         return $this;
     }
 
@@ -99,6 +100,7 @@ class Lodestone
     public function resetErrors(): self
     {
         $this->errors = [];
+
         return $this;
     }
 
@@ -117,6 +119,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_URL, $id);
         $this->type = 'character';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -132,6 +135,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_JOBS_URL, $id);
         $this->type = 'character_jobs';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -149,6 +153,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_FRIENDS_URL, $id, $page);
         $this->type = 'character_friends';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -166,6 +171,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_FOLLOWING_URL, $id, $page);
         $this->type = 'character_following';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -209,6 +215,7 @@ class Lodestone
         $this->type_settings['id'] = $id;
         $this->type_settings['details'] = $details;
         $this->type_settings['achievement_id'] = $achievement_id;
+
         return $this->parse();
     }
 
@@ -225,6 +232,7 @@ class Lodestone
         $this->type = 'achievement_from_db';
         $this->type_settings['type'] = 'achievement';
         $this->type_settings['id'] = $db_id;
+
         return $this->parse();
     }
 
@@ -243,6 +251,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FREECOMPANY_URL, $id);
         $this->type = 'free_company';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -260,6 +269,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FREECOMPANY_MEMBERS_URL, $id, $page);
         $this->type = 'free_company_members';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -281,6 +291,7 @@ class Lodestone
         }
         $this->type = 'linkshell_members';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -296,6 +307,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_PVPTEAM_MEMBERS_URL, $id);
         $this->type = 'pvp_team_members';
         $this->type_settings['id'] = $id;
+
         return $this->parse();
     }
 
@@ -335,6 +347,7 @@ class Lodestone
         $this->type_settings['category'] = $category;
         $this->type_settings['sub_category'] = $sub_category;
         $this->type_settings['search'] = $search;
+
         return $this->parse();
     }
 
@@ -384,6 +397,7 @@ class Lodestone
         $this->type_settings['gc_id'] = $gc_id;
         $this->type_settings['blog_lang'] = $blog_lang;
         $this->type_settings['order'] = $order;
+
         return $this->parse();
     }
 
@@ -451,6 +465,7 @@ class Lodestone
         $this->type_settings['house'] = $house;
         $this->type_settings['gc_id'] = $gc_id;
         $this->type_settings['order'] = $order;
+
         return $this->parse();
     }
 
@@ -486,6 +501,7 @@ class Lodestone
         $this->type_settings['server'] = $server;
         $this->type_settings['character_count'] = $character_count;
         $this->type_settings['order'] = $order;
+
         return $this->parse();
     }
 
@@ -513,6 +529,7 @@ class Lodestone
         $this->type_settings['name'] = $name;
         $this->type_settings['server'] = $server;
         $this->type_settings['order'] = $order;
+
         return $this->parse();
     }
 
@@ -540,6 +557,7 @@ class Lodestone
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FEAST, (string) $season, $query);
         $this->type = 'feast';
         $this->type_settings['season'] = $season;
+
         return $this->parse();
     }
 
@@ -580,6 +598,7 @@ class Lodestone
         $this->type_settings['dungeon'] = $id;
         $this->type_settings['solo_party'] = $solo_party;
         $this->type_settings['class'] = $subtype;
+
         return $this->parse();
     }
 
@@ -625,6 +644,7 @@ class Lodestone
         $this->type = 'frontline';
         $this->type_settings['week'] = $week;
         $this->type_settings['week_month'] = $week_month;
+
         return $this->parse();
     }
 
@@ -702,6 +722,7 @@ class Lodestone
         $this->type_settings['week_month'] = $week_month;
         $this->type_settings['worldname'] = $world_name;
         $this->type_settings['gc_id'] = $gc_id;
+
         return $this->parse();
     }
 
@@ -717,6 +738,7 @@ class Lodestone
     {
         $this->url = sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_BANNERS;
         $this->type = 'banners';
+
         return $this->parse();
     }
 
@@ -729,6 +751,7 @@ class Lodestone
     {
         $this->url = sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_NEWS;
         $this->type = 'news';
+
         return $this->parse();
     }
 
@@ -744,6 +767,7 @@ class Lodestone
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_TOPICS, $page);
         $this->type = 'topics';
+
         return $this->parse();
     }
 
@@ -759,6 +783,7 @@ class Lodestone
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_NOTICES, $page);
         $this->type = 'notices';
+
         return $this->parse();
     }
 
@@ -774,6 +799,7 @@ class Lodestone
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_MAINTENANCE, $page);
         $this->type = 'maintenance';
+
         return $this->parse();
     }
 
@@ -789,6 +815,7 @@ class Lodestone
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_UPDATES, $page);
         $this->type = 'updates';
+
         return $this->parse();
     }
 
@@ -804,6 +831,7 @@ class Lodestone
         $page = $this->pageCheck($page);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_STATUS, $page);
         $this->type = 'status';
+
         return $this->parse();
     }
 
@@ -819,6 +847,7 @@ class Lodestone
         $this->url = sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_WORLD_STATUS;
         $this->type = 'worlds';
         $this->type_settings['world_details'] = $world_details;
+
         return $this->parse();
     }
 
@@ -836,11 +865,15 @@ class Lodestone
     {
         $query = [];
         foreach ($params as $param => $value) {
-            if (empty($value) && $value !== '0') {
+            if (
+                empty($value)
+                && $value !== '0'
+            ) {
                 continue;
             }
             $query[] = $param.'='.$value;
         }
+
         return '?'.\implode('&', $query);
     }
 
@@ -857,6 +890,7 @@ class Lodestone
             $page = 1;
             $this->all_pages = true;
         }
+
         return $page;
     }
 
@@ -879,6 +913,7 @@ class Lodestone
         } else {
             $gc_id = '';
         }
+
         return $gc_id;
     }
 
@@ -895,6 +930,7 @@ class Lodestone
     public function setUserAgent(string $user_agent = ''): self
     {
         $this->user_agent = $user_agent;
+
         return $this;
     }
 
@@ -914,6 +950,7 @@ class Lodestone
             $language = 'jp';
         }
         $this->language = $language;
+
         return $this;
     }
 
@@ -927,6 +964,7 @@ class Lodestone
     public function setBenchmark(bool $bench = false): self
     {
         $this->benchmark = $bench;
+
         return $this;
     }
 }

@@ -15,6 +15,7 @@ class LodestoneTest
 
     /**
      * Creation of the test object
+     *
      * @param string $language
      */
     public function __construct(string $language = 'na')
@@ -135,6 +136,7 @@ class LodestoneTest
 
     /**
      * Generate table row for the report
+     *
      * @param string $type    Type of the test
      * @param mixed  $what    Contents of the test
      * @param bool   $reverse Whether to reverse `good/bad` logic
