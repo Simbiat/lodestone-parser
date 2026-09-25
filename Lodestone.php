@@ -9,14 +9,14 @@ use Simbiat\FFXIV\LodestoneModules\{Converters, Routes, HttpRequest};
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 
-use function is_array, 
+use function is_array,
 
 is_string, in_array, sprintf;
 
 /**
  * Provides quick functions to various parsing routes
  */
-class Lodestone
+final class Lodestone
 {
     // Use trait
     use LodestoneModules\Parsers;
@@ -200,21 +200,13 @@ class Lodestone
         } else {
             $this->type_settings['allachievements'] = false;
         }
-        if ($only_owned) {
-            $this->type_settings['only_owned'] = true;
-        } else {
-            $this->type_settings['only_owned'] = false;
-        }
+        $this->type_settings['only_owned'] = $only_owned;
         if ($achievement_id !== false) {
             $this->type = 'achievement_details';
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_DET_URL, $id, $achievement_id);
         } else {
             $this->type = 'achievements';
-            if ($category) {
-                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_CAT_URL, $id, (string) $kind);
-            } else {
-                $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_URL, $id, (string) $kind);
-            }
+            $this->url = $category ? sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_CAT_URL, $id, (string) $kind) : sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_ACHIEVEMENTS_URL, $id, (string) $kind);
         }
         $this->type_settings['id'] = $id;
         $this->type_settings['details'] = $details;
@@ -288,11 +280,7 @@ class Lodestone
     public function getLinkshellMembers(string|int $id, int $page = 1): self
     {
         $page = $this->pageCheck($page);
-        if (\preg_match('/[a-zA-Z0-9]{40}/mui', (string) $id)) {
-            $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL, $id, $page);
-        } else {
-            $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_MEMBERS_URL, $id, $page);
-        }
+        $this->url = \preg_match('/[a-zA-Z0-9]{40}/mui', (string) $id) ? sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_MEMBERS_URL, $id, $page) : sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_MEMBERS_URL, $id, $page);
         $this->type = 'linkshell_members';
         $this->type_settings['id'] = $id;
 
@@ -495,11 +483,7 @@ class Lodestone
             'q' => \str_ireplace(' ', '+', $name),
             'worldname' => $server,
         ]);
-        if ($crossworld) {
-            $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_SEARCH_URL, $query);
-        } else {
-            $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_SEARCH_URL, $query);
-        }
+        $this->url = $crossworld ? sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_SEARCH_URL, $query) : sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_LINKSHELL_SEARCH_URL, $query);
         $this->type = 'search_linkshell';
         $this->type_settings['name'] = $name;
         $this->type_settings['server'] = $server;

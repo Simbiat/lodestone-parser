@@ -7,7 +7,7 @@ namespace Simbiat\FFXIV\LodestoneModules;
 /**
  * Regex for everything
  */
-class Regex
+final class Regex
 {
     public const string CREST = 'https:\/\/[\.a-zA-Z0-9\/_\-]{56,72}\.png';
     // Original limit as a backup. Length limit does not properly work in case of multiple HTML entities

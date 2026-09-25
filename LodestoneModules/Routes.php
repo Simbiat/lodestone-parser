@@ -7,7 +7,7 @@ namespace Simbiat\FFXIV\LodestoneModules;
 /**
  * URL's for Lodestone content
  */
-class Routes
+final class Routes
 {
     // base URL
     public const string LODESTONE_URL_BASE = 'https://%s.finalfantasyxiv.com/lodestone';

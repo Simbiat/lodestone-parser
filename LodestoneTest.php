@@ -7,7 +7,7 @@ namespace Simbiat\FFXIV;
 /**
  * Class to generate a test report for Lodestone Parser
  */
-class LodestoneTest
+final class LodestoneTest
 {
     private object $lodestone;
 

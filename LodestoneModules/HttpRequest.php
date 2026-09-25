@@ -9,7 +9,7 @@ use Simbiat\StringHelpers\Sanitize;
 /**
  * Class to make HTTP requests
  */
-class HttpRequest
+final class HttpRequest
 {
     // cURL options
     protected static array $curl_options = [
@@ -45,19 +45,21 @@ class HttpRequest
         }
         // Check if the handle already created
         if (
-            self::$curl_handle === null
-            || self::$curl_handle === false
+            self::$curl_handle !== null
+            && self::$curl_handle !== false
         ) {
-            // Create or retrieve a persistent cURL share handle to share data to help speed up connections
-            $share = \curl_share_init_persistent([\CURL_LOCK_DATA_DNS, \CURL_LOCK_DATA_SSL_SESSION, \CURL_LOCK_DATA_CONNECT, \CURL_LOCK_DATA_PSL]);
-            self::$curl_handle = \curl_init();
-            if (self::$curl_handle === false) {
-                throw new \RuntimeException('Failed to initiate cURL handle');
-            }
-            self::$curl_options[\CURLOPT_SHARE] = $share;
-            if (!\curl_setopt_array(self::$curl_handle, self::$curl_options)) {
-                throw new \RuntimeException('Failed to set cURL handle options');
-            }
+            return;
+        }
+
+        // Create or retrieve a persistent cURL share handle to share data to help speed up connections
+        $share = \curl_share_init_persistent([\CURL_LOCK_DATA_DNS, \CURL_LOCK_DATA_SSL_SESSION, \CURL_LOCK_DATA_CONNECT, \CURL_LOCK_DATA_PSL]);
+        self::$curl_handle = \curl_init();
+        if (self::$curl_handle === false) {
+            throw new \RuntimeException('Failed to initiate cURL handle');
+        }
+        self::$curl_options[\CURLOPT_SHARE] = $share;
+        if (!\curl_setopt_array(self::$curl_handle, self::$curl_options)) {
+            throw new \RuntimeException('Failed to set cURL handle options');
         }
     }
 

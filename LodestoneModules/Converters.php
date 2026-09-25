@@ -11,7 +11,7 @@ use Simbiat\FFXIV\Lodestone;
 /**
  * List of functions that convert something to something else
  */
-class Converters
+final class Converters
 {
 
     /**
