@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Simbiat\FFXIV;
 
-use function in_array;
-
 /**
  * Class to generate a test report for Lodestone Parser
  */

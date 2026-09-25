@@ -9,7 +9,9 @@ use Simbiat\FFXIV\LodestoneModules\{Converters, Routes, HttpRequest};
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 
-use function is_array, is_string, in_array, sprintf;
+use function is_array, 
+
+is_string, in_array, sprintf;
 
 /**
  * Provides quick functions to various parsing routes
@@ -27,10 +29,12 @@ class Lodestone
     protected string $url = '';
     protected string $type = '';
     protected array $type_settings = [];
+
     /**
      * @var string Latest HTML grabbed by the parser
      */
     protected string $html = '';
+
     /**
      * @var string Latest RegExp string used by the parser
      */
@@ -334,12 +338,12 @@ class Lodestone
         }
         $page = $this->pageCheck($page);
         $query = $this->queryBuilder([
-            'db_search_category' => $type,
             'category2' => $category,
+            'db_search_category' => $type,
+            'page' => $page,
+            'q' => \str_ireplace(' ', '+', $search),
             // Duty has been updated at some point and category3 was replaced with ex_version
             ($type === 'duty' ? 'ex_version' : 'category3') => $sub_category,
-            'q' => \str_ireplace(' ', '+', $search),
-            'page' => $page,
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_DATABASE_URL, $type, $query);
         $this->type = 'database';
@@ -379,14 +383,14 @@ class Lodestone
             $blog_lang = '';
         }
         $query = \str_replace(['&blog_lang=&', '&gcId=&'], '&', $this->queryBuilder([
-            'q' => \str_ireplace(' ', '+', $name),
-            'worldname' => $server,
-            'class_job' => $this->converters->getSearchClassId($class_job),
-            'race_tribe' => $this->converters->getSearchClanId($race_tribe),
-            'gcId' => (is_array($gc_id) ? \implode('&gcId=', $gc_id) : $gc_id),
             'blog_lang' => (is_array($blog_lang) ? \implode('&blog_lang=', $blog_lang) : $blog_lang),
+            'class_job' => $this->converters->getSearchClassId($class_job),
+            'gcId' => (is_array($gc_id) ? \implode('&gcId=', $gc_id) : $gc_id),
             'order' => $this->converters->getSearchOrderId($order),
             'page' => $page,
+            'q' => \str_ireplace(' ', '+', $name),
+            'race_tribe' => $this->converters->getSearchClanId($race_tribe),
+            'worldname' => $server,
         ]));
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CHARACTERS_SEARCH_URL, $query);
         $this->type = 'search_character';
@@ -441,17 +445,17 @@ class Lodestone
             $roles = '';
         }
         $query = \str_replace(['&activities=&', '&roles=&', '&gcId=&'], '&', $this->queryBuilder([
-            'q' => \str_ireplace(' ', '+', $name),
-            'worldname' => $server,
-            'character_count' => $this->converters->membersCount($character_count),
-            'activities' => (is_array($activities) ? \implode('&activities=', $activities) : $activities),
-            'roles' => (is_array($roles) ? \implode('&roles=', $roles) : $roles),
             'active_time' => $this->converters->getSearchActiveTimeId($active_time),
-            'join' => $this->converters->getSearchJoinId($join),
-            'house' => $this->converters->getSearchHouseId($house),
+            'activities' => (is_array($activities) ? \implode('&activities=', $activities) : $activities),
+            'character_count' => $this->converters->membersCount($character_count),
             'gcId' => (is_array($gc_id) ? \implode('&gcId=', $gc_id) : $gc_id),
+            'house' => $this->converters->getSearchHouseId($house),
+            'join' => $this->converters->getSearchJoinId($join),
             'order' => $this->converters->getSearchOrderId($order),
             'page' => $page,
+            'q' => \str_ireplace(' ', '+', $name),
+            'roles' => (is_array($roles) ? \implode('&roles=', $roles) : $roles),
+            'worldname' => $server,
         ]));
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FREECOMPANY_SEARCH_URL, $query);
         $this->type = 'search_free_company';
@@ -485,11 +489,11 @@ class Lodestone
     {
         $page = $this->pageCheck($page);
         $query = $this->queryBuilder([
-            'q' => \str_ireplace(' ', '+', $name),
-            'worldname' => $server,
             'character_count' => $this->converters->membersCount($character_count),
             'order' => $this->converters->getSearchOrderId($order),
             'page' => $page,
+            'q' => \str_ireplace(' ', '+', $name),
+            'worldname' => $server,
         ]);
         if ($crossworld) {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_CROSSWORLD_LINKSHELL_SEARCH_URL, $query);
@@ -519,10 +523,10 @@ class Lodestone
     {
         $page = $this->pageCheck($page);
         $query = $this->queryBuilder([
-            'q' => \str_ireplace(' ', '+', $name),
-            'worldname' => $server,
             'order' => $this->converters->getSearchOrderId($order),
             'page' => $page,
+            'q' => \str_ireplace(' ', '+', $name),
+            'worldname' => $server,
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_PVPTEAM_SEARCH_URL, $query);
         $this->type = 'search_pvp_team';
@@ -632,13 +636,13 @@ class Lodestone
             $week = 0;
         }
         $query = $this->queryBuilder([
-            'filter' => 1,
-            'sort' => $sort,
             'dcGroup' => $dc_group,
-            'worldname' => $world_name,
-            'pvp_rank' => $this->converters->pvpRank($pvp_rank),
-            'match' => $this->converters->matchesCount($match),
+            'filter' => 1,
             'gcId' => $this->converters->getSearchGCId($gc_id),
+            'match' => $this->converters->matchesCount($match),
+            'pvp_rank' => $this->converters->pvpRank($pvp_rank),
+            'sort' => $sort,
+            'worldname' => $world_name,
         ]);
         $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_FRONTLINE, $week_month, $week, $query);
         $this->type = 'frontline';
@@ -707,9 +711,9 @@ class Lodestone
         }
         $query = $this->queryBuilder([
             'filter' => 1,
-            'worldname' => $world_name,
             'gcId' => $this->converters->getSearchGCId($gc_id),
             'page' => $page,
+            'worldname' => $world_name,
         ]);
         if ($gc) {
             $this->url = sprintf(sprintf(Routes::LODESTONE_URL_BASE, $this->language).Routes::LODESTONE_GCRANKING, $week_month, $week, $query);

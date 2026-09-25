@@ -67,7 +67,8 @@ trait Parsers
         try {
             $this->last_error = null;
             // Parsing of pages
-            if (\in_array($this->type, [
+            if (
+                \in_array($this->type, [
                 'search_character',
                 'character_friends',
                 'character_following',
@@ -82,7 +83,8 @@ trait Parsers
                 'maintenance',
                 'updates',
                 'status',
-            ], true)) {
+                ], true)
+            ) {
                 if (!$this->regexfail(\preg_match_all(Regex::PAGECOUNT, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'PAGECOUNT')) {
                     return $this;
                 }
@@ -110,12 +112,14 @@ trait Parsers
             }
 
             // Notices special precut for pinned items
-            if (\in_array($this->type, [
+            if (
+                \in_array($this->type, [
                 'notices',
                 'maintenance',
                 'updates',
                 'status',
-            ], true)) {
+                ], true)
+            ) {
                 if (!$this->regexfail(\preg_match_all(Regex::NOTICES, $this->html, $notices, \PREG_SET_ORDER), \preg_last_error(), 'NOTICES')) {
                     return $this;
                 }
@@ -152,7 +156,8 @@ trait Parsers
             // \file_put_contents(__DIR__.'/html.txt', $this->html);
 
             if (!$this->regexfail(\preg_match_all($this->regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
-                if (\in_array($this->type, [
+                if (
+                    \in_array($this->type, [
                     'search_character',
                     'character_friends',
                     'character_following',
@@ -167,7 +172,8 @@ trait Parsers
                     'maintenance',
                     'updates',
                     'status',
-                ], true)) {
+                    ], true)
+                ) {
                     if (
                         !empty($this->type_settings['id'])
                         && !empty($this->result[$resultkey][$this->type_settings['id']][$resultsubkey]['total'])
@@ -293,8 +299,8 @@ trait Parsers
                         break;
                     case 'deep_dungeon':
                         $temp_results[$key]['job'] = [
-                            'name' => $temp_result['job'],
                             'icon' => $temp_result['jobicon'],
+                            'name' => $temp_result['job'],
                         ];
                         if (!empty($temp_result['jobform'])) {
                             $temp_results[$key]['job']['form'] = $temp_result['jobform'];
@@ -334,9 +340,9 @@ trait Parsers
                         for ($iteration = 1; $iteration <= 9; $iteration++) {
                             if (!empty($temp_result['focusname'.$iteration])) {
                                 $temp_results[$key]['focus'][] = [
-                                    'name' => $temp_result['focusname'.$iteration],
                                     'enabled' => (empty($temp_result['focusoff'.$iteration]) ? 1 : 0),
                                     'icon' => $temp_result['focusicon'.$iteration],
+                                    'name' => $temp_result['focusname'.$iteration],
                                 ];
                                 unset($temp_results[$key]['focusname'.$iteration], $temp_results[$key]['focusoff'.$iteration], $temp_results[$key]['focusicon'.$iteration]);
                             }
@@ -345,9 +351,9 @@ trait Parsers
                         for ($iteration = 1; $iteration <= 5; $iteration++) {
                             if (!empty($temp_result['seekingname'.$iteration])) {
                                 $temp_results[$key]['seeking'][] = [
-                                    'name' => $temp_result['seekingname'.$iteration],
                                     'enabled' => (empty($temp_result['seekingoff'.$iteration]) ? 1 : 0),
                                     'icon' => $temp_result['seekingicon'.$iteration],
+                                    'name' => $temp_result['seekingname'.$iteration],
                                 ];
                                 unset($temp_results[$key]['seekingname'.$iteration], $temp_results[$key]['seekingoff'.$iteration], $temp_results[$key]['seekingicon'.$iteration]);
                             }
@@ -381,9 +387,9 @@ trait Parsers
                             }
                             if (!empty($temp_result['item_name'])) {
                                 $temp_results[$key]['item'] = [
+                                    'icon' => $temp_result['item_icon'],
                                     'id' => $temp_result['item_id'],
                                     'name' => $temp_result['item_name'],
-                                    'icon' => $temp_result['item_icon'],
                                 ];
                                 unset($temp_results[$key]['item_id'], $temp_results[$key]['item_name'], $temp_results[$key]['item_icon']);
                             }
@@ -546,14 +552,14 @@ trait Parsers
                                 }
                             } else {
                                 $temp_results[$key]['guardian'] = [
-                                    'name' => $temp_result['guardian'],
                                     'icon' => $temp_result['guardianicon'],
+                                    'name' => $temp_result['guardian'],
                                 ];
                             }
                             // City
                             $temp_results[$key]['city'] = [
-                                'name' => $temp_result['city'],
                                 'icon' => $temp_result['city_icon'],
+                                'name' => $temp_result['city'],
                             ];
                             // Grand Company
                             if (!empty($temp_result['gc_name'])) {
@@ -767,12 +773,12 @@ trait Parsers
                     if ($this->type_settings['world_details']) {
                         foreach ($servers as $server) {
                             $this->result[$resultkey][$result['data_center']][$server['server']] = [
+                                'Congested' => \in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet'], true),
+                                'Full maintenance' => $server['maintenance'] === '3',
+                                'New characters' => \in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich'], true),
                                 'Online' => $server['maintenance'] === '1',
                                 'Partial maintenance' => $server['maintenance'] === '2',
-                                'Full maintenance' => $server['maintenance'] === '3',
                                 'Preferred' => \in_array($server['population'], ['Preferred', '優遇', 'Désignés', 'Bevorzugt'], true),
-                                'Congested' => \in_array($server['population'], ['Congested', '混雑', 'Surpeuplés', 'Belastet'], true),
-                                'New characters' => \in_array($server['newchars'], ['Creation of New Characters Available', '新規キャラクター作成可', 'Création de personnage possible', 'Erstellung möglich'], true),
                             ];
                         }
                     } else {
@@ -826,7 +832,8 @@ trait Parsers
      */
     protected function allpagesproc(string $result_key): bool
     {
-        if ($this->all_pages && \in_array($this->type, [
+        if (
+            $this->all_pages && \in_array($this->type, [
                 'search_character',
                 'character_friends',
                 'character_following',
@@ -843,7 +850,8 @@ trait Parsers
                 'grand_company_ranking',
                 'free_company_ranking',
                 'database',
-            ], true)) {
+            ], true)
+        ) {
             switch ($this->type) {
                 case 'character_friends':
                 case 'character_following':
@@ -1188,9 +1196,9 @@ trait Parsers
     protected function freecompany(array $tempresult): array
     {
         return [
+            'crest' => $this->crest($tempresult, 'fccrestimg'),
             'id' => $tempresult['fc_id'],
             'name' => $tempresult['fcname'],
-            'crest' => $this->crest($tempresult, 'fccrestimg'),
         ];
     }
 
@@ -1225,11 +1233,11 @@ trait Parsers
     protected function jobDetails(array $job): array
     {
         return [
-            'level' => (\is_numeric($job['level']) ? (int) $job['level'] : 0),
-            'specialist' => !empty($job['specialist']),
             'expcur' => (\is_numeric($job['expcur']) ? (int) $job['expcur'] : 0),
             'expmax' => (\is_numeric($job['expmax']) ? (int) $job['expmax'] : 0),
             'icon' => $job['icon'],
+            'level' => (\is_numeric($job['level']) ? (int) $job['level'] : 0),
+            'specialist' => !empty($job['specialist']),
         ];
     }
 

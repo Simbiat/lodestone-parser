@@ -13,22 +13,22 @@ class HttpRequest
 {
     // cURL options
     protected static array $curl_options = [
-        \CURLOPT_POST => false,
-        \CURLOPT_HEADER => true,
-        \CURLOPT_RETURNTRANSFER => true,
+        \CURLOPT_CONNECTTIMEOUT => 10,
+        \CURLOPT_ENCODING => '',
+        \CURLOPT_FOLLOWLOCATION => true,
+        \CURLOPT_FORBID_REUSE => false,
         // Allow caching and reuse of already open connections
         \CURLOPT_FRESH_CONNECT => false,
-        \CURLOPT_FORBID_REUSE => false,
+        \CURLOPT_HEADER => true,
+        \CURLOPT_HTTPHEADER => ['Content-type: text/html; charset=utf-8', 'Accept-Language: en'],
         // Let cURL determine appropriate HTTP version
         \CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_NONE,
-        \CURLOPT_CONNECTTIMEOUT => 10,
-        \CURLOPT_TIMEOUT => 30,
-        \CURLOPT_FOLLOWLOCATION => true,
         \CURLOPT_MAXREDIRS => 3,
-        \CURLOPT_HTTPHEADER => ['Content-type: text/html; charset=utf-8', 'Accept-Language: en'],
-        \CURLOPT_USERAGENT => 'Lodestone PHP Parser (https://github.com/Simbiat/lodestone-parser)',
-        \CURLOPT_ENCODING => '',
+        \CURLOPT_POST => false,
+        \CURLOPT_RETURNTRANSFER => true,
         \CURLOPT_SSL_VERIFYPEER => true,
+        \CURLOPT_TIMEOUT => 30,
+        \CURLOPT_USERAGENT => 'Lodestone PHP Parser (https://github.com/Simbiat/lodestone-parser)',
     ];
 
     private(set) static \CurlHandle|null|false $curl_handle = null;

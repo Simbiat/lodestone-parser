@@ -6,7 +6,6 @@ namespace Simbiat\FFXIV\LodestoneModules;
 
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
-
 use Simbiat\FFXIV\Lodestone;
 
 /**
