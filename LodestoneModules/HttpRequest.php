@@ -12,6 +12,8 @@ use Simbiat\StringHelpers\Sanitize;
 final class HttpRequest
 {
     // cURL options
+    private(set) static \CurlHandle|null|false $curl_handle = null;
+
     protected static array $curl_options = [
         \CURLOPT_CONNECTTIMEOUT => 10,
         \CURLOPT_ENCODING => '',
@@ -30,8 +32,6 @@ final class HttpRequest
         \CURLOPT_TIMEOUT => 30,
         \CURLOPT_USERAGENT => 'Lodestone PHP Parser (https://github.com/Simbiat/lodestone-parser)',
     ];
-
-    private(set) static \CurlHandle|null|false $curl_handle = null;
 
     /**
      * Main constructor

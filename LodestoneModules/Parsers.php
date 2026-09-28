@@ -18,7 +18,7 @@ trait Parsers
      *
      * @throws \Throwable
      */
-    protected function parse(): self
+    private function parse(): self
     {
         $started = \hrtime(true);
         // Set array key for results
@@ -69,20 +69,20 @@ trait Parsers
             // Parsing of pages
             if (
                 \in_array($this->type, [
-                'search_character',
-                'character_friends',
-                'character_following',
-                'free_company_members',
-                'linkshell_members',
-                'pvp_team_members',
-                'search_free_company',
-                'search_linkshell',
-                'search_pvp_team',
-                'topics',
-                'notices',
-                'maintenance',
-                'updates',
-                'status',
+                    'search_character',
+                    'character_friends',
+                    'character_following',
+                    'free_company_members',
+                    'linkshell_members',
+                    'pvp_team_members',
+                    'search_free_company',
+                    'search_linkshell',
+                    'search_pvp_team',
+                    'topics',
+                    'notices',
+                    'maintenance',
+                    'updates',
+                    'status',
                 ], true)
             ) {
                 if (!$this->regexfail(\preg_match_all(Regex::PAGECOUNT, $this->html, $pages, \PREG_SET_ORDER), \preg_last_error(), 'PAGECOUNT')) {
@@ -114,10 +114,10 @@ trait Parsers
             // Notices special precut for pinned items
             if (
                 \in_array($this->type, [
-                'notices',
-                'maintenance',
-                'updates',
-                'status',
+                    'notices',
+                    'maintenance',
+                    'updates',
+                    'status',
                 ], true)
             ) {
                 if (!$this->regexfail(\preg_match_all(Regex::NOTICES, $this->html, $notices, \PREG_SET_ORDER), \preg_last_error(), 'NOTICES')) {
@@ -158,20 +158,20 @@ trait Parsers
             if (!$this->regexfail(\preg_match_all($this->regex, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'main regex')) {
                 if (
                     !\in_array($this->type, [
-                    'search_character',
-                    'character_friends',
-                    'character_following',
-                    'free_company_members',
-                    'linkshell_members',
-                    'pvp_team_members',
-                    'search_free_company',
-                    'search_linkshell',
-                    'search_pvp_team',
-                    'topics',
-                    'notices',
-                    'maintenance',
-                    'updates',
-                    'status',
+                        'search_character',
+                        'character_friends',
+                        'character_following',
+                        'free_company_members',
+                        'linkshell_members',
+                        'pvp_team_members',
+                        'search_free_company',
+                        'search_linkshell',
+                        'search_pvp_team',
+                        'topics',
+                        'notices',
+                        'maintenance',
+                        'updates',
+                        'status',
                     ], true)
                 ) {
                     return $this;
@@ -363,7 +363,9 @@ trait Parsers
                         $temp_results[$key]['active'] = \mb_trim($temp_result['active'], null, 'UTF-8');
                         $temp_results[$key]['recruitment'] = \mb_trim($temp_result['recruitment'], null, 'UTF-8');
                         $temp_results[$key]['grand_company'] = \mb_trim($temp_result['grand_company'], null, 'UTF-8');
-                        $temp_results[$key]['members_count'] = empty($temp_result['members_count']) ? 0 : (int) $temp_result['members_count'];
+                        $temp_results[$key]['members_count'] = empty($temp_result['members_count'])
+                            ? 0
+                            : (int) $temp_result['members_count'];
 
                         break;
                     case 'achievements':
@@ -432,19 +434,19 @@ trait Parsers
 
                                 break;
                             case 'recipe':
-                                $temp_results[$key]['collectable'] = isset($temp_results[$key]['extraicon']) ? true : false;
-                                if (!isset($temp_results[$key]['master'])) {
+                                $temp_results[$key]['collectable'] = \array_key_exists('extraicon', $temp_results[$key]);
+                                if (!\array_key_exists('master', $temp_results[$key])) {
                                     $temp_results[$key]['master'] = null;
                                 }
                                 $temp_results[$key]['recipe_level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
                                 $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
-                                $temp_results[$key]['expert'] = isset($temp_results[$key]['expert']) ? true : false;
+                                $temp_results[$key]['expert'] = \array_key_exists('expert', $temp_results[$key]);
                                 $temp_results[$key]['item_level'] = (\mb_trim($temp_results[$key]['column2'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column2']);
 
                                 break;
                             case 'gathering':
-                                $temp_results[$key]['collectable'] = isset($temp_results[$key]['extraicon']) ? true : false;
-                                $temp_results[$key]['hidden'] = isset($temp_results[$key]['hidden']) ? true : false;
+                                $temp_results[$key]['collectable'] = \array_key_exists('extraicon', $temp_results[$key]);
+                                $temp_results[$key]['hidden'] = \array_key_exists('hidden', $temp_results[$key]);
                                 $temp_results[$key]['level'] = (\mb_trim($temp_results[$key]['column1'], null, 'UTF-8') === '-' ? 0 : (int) $temp_results[$key]['column1']);
                                 $temp_results[$key]['stars'] = $this->stars($temp_results[$key]);
 
@@ -454,9 +456,9 @@ trait Parsers
 
                                 break;
                             case 'text_command':
-                                $temp_results[$key]['Windows'] = \in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'], true) ? true : false;
-                                $temp_results[$key]['PS4'] = \in_array($temp_results[$key]['column2'], ['Yes', '○', 'oui', '○'], true) ? true : false;
-                                $temp_results[$key]['Mac'] = \in_array($temp_results[$key]['column3'], ['Yes', '○', 'oui', '○'], true) ? true : false;
+                                $temp_results[$key]['Windows'] = \in_array($temp_results[$key]['column1'], ['Yes', '○', 'oui', '○'], true);
+                                $temp_results[$key]['PS4'] = \in_array($temp_results[$key]['column2'], ['Yes', '○', 'oui', '○'], true);
+                                $temp_results[$key]['Mac'] = \in_array($temp_results[$key]['column3'], ['Yes', '○', 'oui', '○'], true);
 
                                 break;
                         }
@@ -550,7 +552,9 @@ trait Parsers
                             if ($temp_result['bio'] === '-') {
                                 $temp_result['bio'] = '';
                             }
-                            $temp_results[$key]['bio'] = !empty($temp_result['bio']) ? $temp_result['bio'] : '';
+                            $temp_results[$key]['bio'] = !empty($temp_result['bio'])
+                                ? $temp_result['bio']
+                                : '';
                             $temp_results[$key]['attributes'] = $this->attributes();
                             // Minions and mounts now show only icon on Lodestone, thus it's not really practically to grab them
                             // $temp_results[$key]['mounts'] = $this->collectibles('mounts');
@@ -615,7 +619,7 @@ trait Parsers
     }
 
     /**
-     * Add  entity to results
+     * Add entity to results
      *
      * @param string          $resultkey    Result key (essentially type of the entity)
      * @param string          $resultsubkey Sub-key of result
@@ -624,7 +628,7 @@ trait Parsers
      *
      * @return void
      */
-    protected function addToResults(string $resultkey, string $resultsubkey, array|int $result, string|int|null $id = null): void
+    private function addToResults(string $resultkey, string $resultsubkey, array|int $result, string|int|null $id = null): void
     {
         switch ($this->type) {
             case 'search_pvp_team':
@@ -638,7 +642,9 @@ trait Parsers
                 break;
             case 'free_company':
             case 'character':
-                $this->result[$resultkey][$this->type_settings['id']] = $result === 403 ? ['private' => true] : $result;
+                $this->result[$resultkey][$this->type_settings['id']] = $result === 403
+                    ? ['private' => true]
+                    : $result;
 
                 break;
             case 'character_jobs':
@@ -790,7 +796,7 @@ trait Parsers
      *
      * @return bool
      */
-    protected function allpagesproc(string $result_key): bool
+    private function allpagesproc(string $result_key): bool
     {
         if (
             $this->all_pages && \in_array($this->type, [
@@ -841,7 +847,7 @@ trait Parsers
             if ($current_page === $total_page) {
                 return false;
             }
-            $current_page++;
+            ++$current_page;
             \ini_set('max_execution_time', '6000');
             $this->all_pages = false;
             switch ($this->type) {
@@ -938,7 +944,7 @@ trait Parsers
      *
      * @return \Simbiat\FFXIV\LodestoneModules\Parsers|\Simbiat\FFXIV\Lodestone
      */
-    protected function pages(array $pages, string $resultkey): self
+    private function pages(array $pages, string $resultkey): self
     {
         foreach ($pages as $page => $data) {
             foreach ($data as $key => $value) {
@@ -959,14 +965,16 @@ trait Parsers
                 if (!empty($pages[0]['pvp_team_community_id'])) {
                     $this->result[$resultkey][$this->type_settings['id']]['community_id'] = $pages[0]['pvp_team_community_id'];
                 }
-                $this->result[$resultkey][$this->type_settings['id']]['page_current'] = 
+                $this->result[$resultkey][$this->type_settings['id']]['page_current'] =
                     isset($pages[0]['page_current'])
                     && \is_numeric($pages[0]['page_current'])
-                 ? $pages[0]['page_current'] : 1;
-                $this->result[$resultkey][$this->type_settings['id']]['page_total'] = 
+                    ? $pages[0]['page_current']
+                    : 1;
+                $this->result[$resultkey][$this->type_settings['id']]['page_total'] =
                     isset($pages[0]['page_total'])
                     && \is_numeric($pages[0]['page_total'])
-                 ? $pages[0]['page_total'] : $this->result[$resultkey][$this->type_settings['id']]['page_current'];
+                    ? $pages[0]['page_total']
+                    : $this->result[$resultkey][$this->type_settings['id']]['page_current'];
                 if (
                     isset($pages[0]['total'])
                     && \is_numeric($pages[0]['total'])
@@ -977,14 +985,16 @@ trait Parsers
                 break;
             case 'grand_company_ranking':
             case 'free_company_ranking':
-                $this->result[$resultkey][$this->type_settings['week']]['page_current'] = 
+                $this->result[$resultkey][$this->type_settings['week']]['page_current'] =
                     isset($pages[0]['page_current'])
                     && \is_numeric($pages[0]['page_current'])
-                 ? $pages[0]['page_current'] : 1;
-                $this->result[$resultkey][$this->type_settings['week']]['page_total'] = 
+                    ? $pages[0]['page_current']
+                    : 1;
+                $this->result[$resultkey][$this->type_settings['week']]['page_total'] =
                     isset($pages[0]['page_total'])
                     && \is_numeric($pages[0]['page_total'])
-                 ? $pages[0]['page_total'] : $this->result[$resultkey][$this->type_settings['week']]['page_current'];
+                    ? $pages[0]['page_total']
+                    : $this->result[$resultkey][$this->type_settings['week']]['page_current'];
                 if (
                     isset($pages[0]['total'])
                     && \is_numeric($pages[0]['total'])
@@ -994,14 +1004,16 @@ trait Parsers
 
                 break;
             case 'database':
-                $this->result[$resultkey][$this->type_settings['type']]['page_current'] = 
+                $this->result[$resultkey][$this->type_settings['type']]['page_current'] =
                     isset($pages[0]['page_current'])
                     && \is_numeric($pages[0]['page_current'])
-                 ? $pages[0]['page_current'] : 1;
-                $this->result[$resultkey][$this->type_settings['type']]['page_total'] = 
+                    ? $pages[0]['page_current']
+                    : 1;
+                $this->result[$resultkey][$this->type_settings['type']]['page_total'] =
                     isset($pages[0]['page_total'])
                     && \is_numeric($pages[0]['page_total'])
-                 ? $pages[0]['page_total'] : $this->result[$resultkey][$this->type_settings['type']]['page_current'];
+                    ? $pages[0]['page_total']
+                    : $this->result[$resultkey][$this->type_settings['type']]['page_current'];
                 if (
                     isset($pages[0]['total'])
                     && \is_numeric($pages[0]['total'])
@@ -1011,14 +1023,16 @@ trait Parsers
 
                 break;
             default:
-                $this->result[$resultkey]['page_current'] = 
+                $this->result[$resultkey]['page_current'] =
                     isset($pages[0]['page_current'])
                     && \is_numeric($pages[0]['page_current'])
-                 ? $pages[0]['page_current'] : 1;
-                $this->result[$resultkey]['page_total'] = 
+                    ? $pages[0]['page_current']
+                    : 1;
+                $this->result[$resultkey]['page_total'] =
                     isset($pages[0]['page_total'])
                     && \is_numeric($pages[0]['page_total'])
-                 ? $pages[0]['page_total'] : $this->result[$resultkey]['page_current'];
+                    ? $pages[0]['page_total']
+                    : $this->result[$resultkey]['page_current'];
                 if (
                     isset($pages[0]['total'])
                     && \is_numeric($pages[0]['total'])
@@ -1069,7 +1083,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function crest(array $tempresult, string $keybase): array
+    private function crest(array $tempresult, string $keybase): array
     {
         $crest[] = \str_replace(['40x40', '64x64'], '128x128', $tempresult[$keybase.'1']);
         if (!empty($tempresult[$keybase.'2'])) {
@@ -1101,7 +1115,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function grandcompany(array $tempresult): array
+    private function grandcompany(array $tempresult): array
     {
         $gc = [];
         if (!empty($tempresult['gcrank'])) {
@@ -1121,7 +1135,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function freecompany(array $tempresult): array
+    private function freecompany(array $tempresult): array
     {
         return [
             'crest' => $this->crest($tempresult, 'fccrestimg'),
@@ -1135,7 +1149,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function jobs(): array
+    private function jobs(): array
     {
         $temp_jobs = [];
         $this->regex = Regex::CHARACTER_JOBS;
@@ -1158,7 +1172,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function jobDetails(array $job): array
+    private function jobDetails(array $job): array
     {
         return [
             'expcur' => (\is_numeric($job['expcur']) ? (int) $job['expcur'] : 0),
@@ -1174,7 +1188,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function attributes(): array
+    private function attributes(): array
     {
         $temp_attrs = [];
         $this->regex = Regex::CHARACTER_ATTRIBUTES;
@@ -1199,7 +1213,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function collectibles(string $type): array
+    private function collectibles(string $type): array
     {
         $collectables = [];
         if ($type === 'mounts') {
@@ -1220,7 +1234,7 @@ trait Parsers
      *
      * @return array
      */
-    protected function items(): array
+    private function items(): array
     {
         $this->regex = Regex::CHARACTER_GEAR;
         if (!$this->regexfail(\preg_match_all(Regex::CHARACTER_GEAR, $this->html, $temp_results, \PREG_SET_ORDER), \preg_last_error(), 'CHARACTER_GEAR')) {
@@ -1330,7 +1344,7 @@ trait Parsers
      *
      * @return int
      */
-    protected function stars(array $stars): int
+    private function stars(array $stars): int
     {
         if (isset($stars['star4'])) {
             return 4;
@@ -1357,7 +1371,7 @@ trait Parsers
      *
      * @return bool
      */
-    protected function regexfail(int|bool $matchescount, int|string $errorcode, int|string $regexid): bool
+    private function regexfail(int|bool $matchescount, int|string $errorcode, int|string $regexid): bool
     {
         if ($matchescount === 0) {
             $this->errorRegister('No matches found for regex ('.$regexid.')');
@@ -1382,7 +1396,7 @@ trait Parsers
      *
      * @return void
      */
-    protected function errorRegister(string $errormessage, string $type = 'parse', int $started = 0): void
+    private function errorRegister(string $errormessage, string $type = 'parse', int $started = 0): void
     {
         $error = ['type' => $this->type, 'id' => ($this->type_settings['id'] ?? null), 'error' => $errormessage, 'url' => $this->url];
         $this->last_error = \array_merge($error, ['html' => $this->html, 'regex' => $this->regex]);
@@ -1411,7 +1425,7 @@ trait Parsers
      *
      * @return void
      */
-    protected function benchUpdate(int $duration): void
+    private function benchUpdate(int $duration): void
     {
         $this->result['benchmark']['parse_time'][] = \date('H:i:s.'.\sprintf('%06d', $duration / 1000), (int) ($duration / 1000000000));
         $this->result['benchmark']['memory'] = $this->converters->memory(\memory_get_usage(true));
@@ -1423,9 +1437,11 @@ trait Parsers
      *
      * @return void
      */
-    protected function errorUnregister(): void
+    private function errorUnregister(): void
     {
         \array_pop($this->errors);
-        $this->last_error = \count($this->errors) === 0 ? null : \end($this->errors);
+        $this->last_error = \count($this->errors) === 0
+            ? null
+            : \end($this->errors);
     }
 }

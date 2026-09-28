@@ -13,15 +13,12 @@ use Simbiat\FFXIV\Lodestone;
  */
 final class Converters
 {
-
     /**
      * Convert image of the Free Company rank to rank ID
      *
      * @param string $image
      *
      * @return string
-     *
-     * @noinspection SpellCheckingInspection
      */
     public function fcRankId(string $image): string
     {
@@ -83,7 +80,7 @@ final class Converters
     }
 
     /**
-     * Get Feast rank ID  (for filter) based on value provided
+     * Get Feast rank ID (for filter) based on value provided
      *
      * @param string $rank
      *
@@ -122,7 +119,7 @@ final class Converters
     }
 
     /**
-     * Get activity ID  (for filter) based on value provided
+     * Get activity ID (for filter) based on value provided
      *
      * @param string $act
      *
@@ -146,7 +143,7 @@ final class Converters
     }
 
     /**
-     * Get house estate ID  (for filter) based on value provided
+     * Get house estate ID (for filter) based on value provided
      *
      * @param string $house
      *
@@ -163,7 +160,7 @@ final class Converters
     }
 
     /**
-     * Get Free Company open status ID  (for filter) based on value provided
+     * Get Free Company open status ID (for filter) based on value provided
      *
      * @param string $join
      *
