@@ -270,6 +270,9 @@ trait Parsers
                                 $this->result[$resultkey][$this->type_settings['id']]['server'] = $pages[0]['linkshell_server'];
                             }
                         }
+                        if ($this->type === 'pvp_team_members') {
+                            $this->result[$resultkey][$this->type_settings['id']]['data_center'] = $temp_result['data_center'];
+                        }
 
                         break;
                     case 'frontline':
